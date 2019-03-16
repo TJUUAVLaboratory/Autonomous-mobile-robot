@@ -1,0 +1,11 @@
+\subsubsection usage Usage
+\verbatim
+<node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan">
+  <param name="scan_height" type="int" value="1" />
+  <param name="scan_time" type="double" value="0.033" />
+  <param name="range_min" type="double" value="0.45" />
+  <param name="range_max" type="double" value="10.0" />
+  <param name="output_frame_id" type="str" value="camera_depth_frame" />
+</node>
+\endverbatim
+

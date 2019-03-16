@@ -1,0 +1,2 @@
+arbotix_ros/arbotix:arbotix_ros/arbotix_controllers:arbotix_ros/arbotix_firmware:arbotix_ros/arbotix_msgs:arbotix_ros/arbotix_python:arbotix_ros/arbotix_sensors:depthimage_to_laserscan:mrobot_description:mrobot_gazebo:mrobot_navigation:mrobot_teleop
+-DCATKIN_DEVEL_PREFIX=/home/ubuntu/coding/test/myrotot_simulation/devel -DCMAKE_INSTALL_PREFIX=/home/ubuntu/coding/test/myrotot_simulation/install -G Unix Makefiles

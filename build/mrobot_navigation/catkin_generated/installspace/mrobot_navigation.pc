@@ -1,0 +1,8 @@
+prefix=/home/ubuntu/coding/test/myrotot_simulation/install
+
+Name: mrobot_navigation
+Description: Description of mrobot_navigation
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/ubuntu/coding/test/myrotot_simulation/install/lib 
+Requires: 
