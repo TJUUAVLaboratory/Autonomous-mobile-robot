@@ -1,8 +1,0 @@
-prefix=/home/ubuntu/coding/test/myrotot_simulation/devel
-
-Name: arbotix_sensors
-Description: Description of arbotix_sensors
-Version: 0.10.0
-Cflags: 
-Libs: -L/home/ubuntu/coding/test/myrotot_simulation/devel/lib 
-Requires: 
