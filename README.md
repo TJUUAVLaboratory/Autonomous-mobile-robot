@@ -1,4 +1,11 @@
+<!-- vscode-markdown-toc -->
+* 1. [仿真环境与交换](#)
 
+<!-- vscode-markdown-toc-config
+	numbering=true
+	autoSave=true
+	/vscode-markdown-toc-config -->
+<!-- /vscode-markdown-toc -->
 
 
 
@@ -14,3 +21,22 @@
 室内移动机器人自主感知与导航
 
 
+
+##  1. <a name=''></a>仿真环境与交换(mrobot_gazebo)
+
+**需要的库与插件**
+gazebo_plugins/  gazebo_ros/  gazebo_ros_control  
+
+**需要的机器人描述部件  URDF**
+
+- 机器人body mrobot_body.urdf.cacro  mrobot.urdf.cacro   
+- 相机的模型 camera.xacro  usb_camera
+- kinect.xacro  RGBD相机模型
+- rplidar.xacro 二维激光雷达模型
+- mrobot_with_camera.urdf.xacro  机器人+urb_camera   1280*720 50Hz
+- mrobot_with_kinect.urdf.xacro  机器人+kinect		 640*480 RGB+depth 45Hz
+- mrobot_with_rplidar.urdf.xacro 机器人+rplidar      5Hz
+
+**需要的仿真环境 world**
+
+- cloister / playground / playpen / room
