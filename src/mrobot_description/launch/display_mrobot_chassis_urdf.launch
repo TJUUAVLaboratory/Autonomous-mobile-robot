@@ -1,4 +1,5 @@
 <launch>
+<!-- 显示机器人的底盘 -->
 	<param name="robot_description" textfile="$(find mrobot_description)/urdf/mrobot_chassis.urdf" />
 
 	<!-- 设置GUI参数，显示关节控制插件 -->

@@ -41,6 +41,7 @@ int main(int argc, char **argv){
   depthimage_to_laserscan::DepthImageToLaserScanROS dtl(n, pnh);
   
   ros::spin();
-
-  return 0;
 }
+
+
+  
