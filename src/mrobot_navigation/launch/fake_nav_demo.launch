@@ -4,7 +4,6 @@
 
     <!-- 设置地图的配置文件 -->
     <arg name="map" default="gmapping_map.yaml" />
-
     <!-- 运行地图服务器，并且加载设置的地图-->
     <node name="map_server" pkg="map_server" type="map_server" args="$(find mrobot_navigation)/maps/$(arg map)"/>
 

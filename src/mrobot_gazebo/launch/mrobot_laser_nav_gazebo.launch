@@ -33,4 +33,6 @@
     <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
           args="-urdf -model mrobot -param robot_description"/> 
 
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find mrobot_description)/config/mrobot_arbotix.rviz" required="true" />          
+
 </launch>

@@ -3,7 +3,8 @@
 * 2. [perception](#perception)
 * 3. [mapping](#mapping)
 	* 3.1. [map_server](#map_server)
-* 4. [mrobot_navigation](#mrobot_navigation)
+* 4. [navigation](#navigation)
+* 5. [mrobot_navigation](#mrobot_navigation)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -58,7 +59,7 @@ gazebo_plugins/  gazebo_ros/  gazebo_ros_control
  > - 加载现有的地图  
    - 更新地图  
    - 发布/map topic
-   
+
 
 
 image_loader.cpp   map_server_image_loader .pgm地图的加载
@@ -89,8 +90,26 @@ nav_msgs/MapMetaData info
       float64 w
 int8[] data
 
+地图的表现形式 Occupancy Grid Map 
+
+##  4. <a name='navigation'></a>navigation
 
 
-##  4. <a name='mrobot_navigation'></a>mrobot_navigation
+### move_base
 
 
+##  5. <a name='mrobot_navigation'></a>mrobot_navigation
+
+
+
+
+## obstable recognition V0
+
+0. gazebo robot and world (robot with lidar)
+  - lidar 发布 /scan话题
+
+1. map server : load map  & rviz visualization
+  - YAMLCPP read gmapping config yaml
+  - 发布地图话题
+
+2. Odom

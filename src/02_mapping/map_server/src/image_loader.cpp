@@ -29,6 +29,10 @@
 
 /*
  * This file contains helper functions for loading images as maps.
+   读取pgm图片的地图 SDL_image
+   convert IMG to ROS map  structure [nav_msgs::GetMap::Response]
+
+
  *
  * Author: Brian Gerkey
  */
@@ -53,6 +57,16 @@
 namespace map_server
 {
 
+/* resp:代表load之后的地图
+   fname: image name
+   res:分辨率
+   negate
+   occ_th:
+   free_th:
+   origin:
+   map mode
+
+   */
 void
 loadMapFromFile(nav_msgs::GetMap::Response* resp,
                 const char* fname, double res, bool negate,

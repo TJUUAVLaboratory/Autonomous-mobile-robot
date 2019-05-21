@@ -39,6 +39,7 @@ using namespace std;
 
 /**
  * @brief Map generation node.
+ 在建图完成之后，将地图保存为 lidar_gmapping.pgm &  lidar_gmapping.yaml
  */
 class MapGenerator
 {

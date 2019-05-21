@@ -167,7 +167,7 @@ class MapServer
       ROS_INFO("Loading map from image \"%s\"", mapfname.c_str());
       try
       {
-         // load map from file ***.pgm
+         // load map from file ***.pgm  ==> map_resp
           map_server::loadMapFromFile(&map_resp_,mapfname.c_str(),res,negate,occ_th,free_th, origin, mode);
       }
       catch (std::runtime_error e)
