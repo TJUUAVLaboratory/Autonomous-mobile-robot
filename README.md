@@ -1,8 +1,9 @@
 <!-- vscode-markdown-toc -->
 * 1. [仿真环境与交换(mrobot_gazebo/mrobot_description)](#mrobot_gazebomrobot_description)
 * 2. [perception](#perception)
-* 3. [mrobot_navigation](#mrobot_navigation)
+* 3. [mapping](#mapping)
 	* 3.1. [map_server](#map_server)
+* 4. [mrobot_navigation](#mrobot_navigation)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -50,9 +51,7 @@ gazebo_plugins/  gazebo_ros/  gazebo_ros_control
 ##  2. <a name='perception'></a>perception 
 
 
-
-##  3. <a name='mrobot_navigation'></a>mrobot_navigation
-
+##  3. <a name='mapping'></a>mapping
 
 ###  3.1. <a name='map_server'></a>map_server
  
@@ -83,3 +82,9 @@ nav_msgs/MapMetaData info
       float64 z
       float64 w
 int8[] data
+
+
+
+##  4. <a name='mrobot_navigation'></a>mrobot_navigation
+
+
