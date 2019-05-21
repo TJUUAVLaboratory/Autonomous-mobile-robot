@@ -55,6 +55,12 @@ gazebo_plugins/  gazebo_ros/  gazebo_ros_control
 
 ###  3.1. <a name='map_server'></a>map_server
  
+ > - 加载现有的地图  
+   - 更新地图  
+   - 发布/map topic
+   
+
+
 image_loader.cpp   map_server_image_loader .pgm地图的加载
 map_saver.cpp	   map_saver  
 main.cpp    	   map_server exe  
