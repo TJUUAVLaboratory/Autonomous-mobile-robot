@@ -7,6 +7,7 @@ project(obstable_navigatoin)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   move_base_msgs
+  genmsg actionlib_msgs actionlib
   roscpp
   tf
   visualization_msgs
@@ -105,7 +106,6 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES mrobot_navigation
  CATKIN_DEPENDS geometry_msgs move_base_msgs roscpp rospy tf visualization_msgs
-#  DEPENDS system_lib
 )
 
 ###########
