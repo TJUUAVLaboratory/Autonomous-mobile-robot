@@ -105,11 +105,15 @@ int8[] data
 
 ## obstable recognition V0
 
-0. gazebo robot and world (robot with lidar)
+0. **gazebo robot and world** (robot with lidar)
   - lidar 发布 /scan话题
 
-1. map server : load map  & rviz visualization
+1. **map server** : load map  & rviz visualization
   - YAMLCPP read gmapping config yaml
   - 发布地图话题
 
-2. Odom
+2. **Odom**  AMCL 粒子滤波
+
+
+3. **设置航线**
+

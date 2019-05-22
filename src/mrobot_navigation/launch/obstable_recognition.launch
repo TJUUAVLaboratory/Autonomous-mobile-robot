@@ -43,7 +43,7 @@
     <node name="map_server" pkg="map_server" type="map_server" args="$(find mrobot_navigation)/maps/$(arg map)"/>
 
 
-<!--gmapping-->
+<!--AMCL 定位-->
 <arg name="use_map_topic" default="false"/>
     <arg name="scan_topic" default="scan"/>
 
@@ -84,6 +84,14 @@
         <remap from="scan" to="$(arg scan_topic)"/>
     </node>
 
+<!--move_base action-->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+    <rosparam file="$(find mrobot_navigation)/config/mrobot/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find mrobot_navigation)/config/mrobot/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find mrobot_navigation)/config/mrobot/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find mrobot_navigation)/config/mrobot/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find mrobot_navigation)/config/mrobot/base_local_planner_params.yaml" command="load" />
+  </node>
 
 
 <!-- 运行rviz -->
