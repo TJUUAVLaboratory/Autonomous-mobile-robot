@@ -3,22 +3,22 @@ project(move_base)
 
 find_package(catkin REQUIRED
     COMPONENTS
-        actionlib
-        base_local_planner
-        clear_costmap_recovery
+        actionlib  ## move base action
+        base_local_planner ##  local robot navigation (Trajectory Rollout  || Dynamic windows approach)
+        clear_costmap_recovery ##
         cmake_modules
-        costmap_2d
+        costmap_2d  ##
         dynamic_reconfigure
         geometry_msgs
         message_generation
         move_base_msgs
-        nav_core
+        nav_core ##
         nav_msgs
-        navfn
+        navfn  ##navfn  globalPlanner  navfn::NavFn  navfn::NavfnROS 
         pluginlib
         roscpp
         rospy
-        rotate_recovery
+        rotate_recovery ##
         std_srvs
         tf
 )

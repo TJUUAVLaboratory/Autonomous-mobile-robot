@@ -1,12 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(obstable_navigatoin)
 
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
+  std_msgs
   move_base_msgs
+  sensor_msgs
+  laser_geometry
   genmsg actionlib_msgs actionlib
   roscpp
   tf
@@ -14,8 +19,14 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Eigen3)
+include_directories(
+  ${EIGEN3_INCLUDE_DIR}
+)
 
+
+find_package(boost)
+include_directories( ${boost_INCLUDE_DIR})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -105,7 +116,8 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES mrobot_navigation
- CATKIN_DEPENDS geometry_msgs move_base_msgs roscpp rospy tf visualization_msgs
+ CATKIN_DEPENDS geometry_msgs  std_msgs move_base_msgs roscpp rospy tf visualization_msgs
+ laser_geometry
 )
 
 ###########
@@ -116,7 +128,10 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
-  ${catkin_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS},
+  ${Eigen3_INCLUDE_DIRS},
+  INCLUDE_DIRS include
+
 )
 
 ## Declare a C++ library
@@ -138,7 +153,7 @@ add_executable(obstable_navigatoin_node src/obstable_navigation.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(obstable_navigatoin_node
-  ${catkin_LIBRARIES}
+  ${catkin_LIBRARIES} 
 )
 
 #############

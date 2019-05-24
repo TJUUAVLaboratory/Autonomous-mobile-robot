@@ -4,3 +4,9 @@
 /build
 
 /.vscode
+
+/devel_isolated
+
+/el
+
+/el_isolated

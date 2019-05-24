@@ -61,7 +61,8 @@
 
 namespace move_base {
   //typedefs to help us out with the action server so that we don't hace to type so much
-  typedef actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction> MoveBaseActionServer;
+  typedef actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction> MoveBaseActionServer;  
+  // movebase action server
 
   enum MoveBaseState {
     PLANNING,
@@ -87,7 +88,7 @@ namespace move_base {
        * @param name The name of the action
        * @param tf A reference to a TransformListener
        */
-      MoveBase(tf::TransformListener& tf);
+      MoveBase(tf::TransformListener& tf); //关键的函数
 
       /**
        * @brief  Destructor - Cleans up
@@ -180,7 +181,7 @@ namespace move_base {
       boost::shared_ptr<nav_core::BaseLocalPlanner> tc_;
       costmap_2d::Costmap2DROS* planner_costmap_ros_, *controller_costmap_ros_;
 
-      boost::shared_ptr<nav_core::BaseGlobalPlanner> planner_;
+      boost::shared_ptr<nav_core::BaseGlobalPlanner> planner_; //global planner实例化对象
       std::string robot_base_frame_, global_frame_;
 
       std::vector<boost::shared_ptr<nav_core::RecoveryBehavior> > recovery_behaviors_;
