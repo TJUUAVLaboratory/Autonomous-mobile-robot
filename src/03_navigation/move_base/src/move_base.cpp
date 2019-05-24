@@ -280,7 +280,15 @@ namespace move_base {
     action_goal_pub_.publish(action_goal);
   }
 
-  //
+
+
+  /*
+    >> 清除在costmap上机器人周围的的obstable
+    对 planner_costmap_ros_操作
+    1. 先得到机器人在costmap上的global pose (getRobotPose)
+    2. 然后以机器人位置中心圈一个矩形, 并清除 getCostmap()->setConvexPolygonCost
+    对 controller_costmap_ros_ 同样操作一遍
+  */
   void MoveBase::clearCostmapWindows(double size_x, double size_y){
     tf::Stamped<tf::Pose> global_pose;
 
@@ -347,10 +355,17 @@ namespace move_base {
     return true;
   }
 
+  /*
+  >> move_base action server (请求一次全局规划的服务)
+  1. 确保有一个 global costmap
+  2. 确保能够的到机器人的位置
+  3. clear机器人附近的costmap
+  4. 尝试直接对于goal进行 make global plan,成功了,直接得到 global_plan vector pose list
 
-  // move_base action server
+
+  */
   bool MoveBase::planService(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::Response &resp){
-    if(as_->isActive()){
+    if(as_->isActive()){  //
       ROS_ERROR("move_base must be in an inactive state to make a plan for an external user");
       return false;
     }
@@ -380,7 +395,8 @@ namespace move_base {
     clearCostmapWindows(2 * clearing_radius_, 2 * clearing_radius_);
 
     //first try to make a plan to the exact desired goal
-    std::vector<geometry_msgs::PoseStamped> global_plan;
+    std::vector<geometry_msgs::PoseStamped> global_plan;  //global plan waypoint list
+    //尝试make global plan
     if(!planner_->makePlan(start, req.goal, global_plan) || global_plan.empty()){
       ROS_DEBUG_NAMED("move_base","Failed to find a plan to exact goal of (%.2f, %.2f), searching for a feasible goal within tolerance", 
           req.goal.pose.position.x, req.goal.pose.position.y);

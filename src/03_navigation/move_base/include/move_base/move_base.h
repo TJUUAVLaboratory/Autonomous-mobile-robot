@@ -48,16 +48,17 @@
 #include <nav_core/base_local_planner.h>
 #include <nav_core/base_global_planner.h>
 #include <nav_core/recovery_behavior.h>
+
 #include <geometry_msgs/PoseStamped.h>
 #include <costmap_2d/costmap_2d_ros.h>
 #include <costmap_2d/costmap_2d.h>
-#include <nav_msgs/GetPlan.h>
+#include <nav_msgs/GetPlan.h>  //全局规划给局部规划的plan
 
 #include <pluginlib/class_loader.h>
 #include <std_srvs/Empty.h>
 
 #include <dynamic_reconfigure/server.h>
-#include "move_base/MoveBaseConfig.h"
+#include "move_base/MoveBaseConfig.h"  //配置文件的设置
 
 namespace move_base {
   //typedefs to help us out with the action server so that we don't hace to type so much
@@ -65,8 +66,8 @@ namespace move_base {
   // movebase action server
 
   enum MoveBaseState {
-    PLANNING,
-    CONTROLLING,
+    PLANNING,  //全局
+    CONTROLLING, //局部
     CLEARING
   };
 
@@ -96,11 +97,12 @@ namespace move_base {
       virtual ~MoveBase();
 
       /**
-       * @brief  Performs a control cycle
+       * @brief  Performs a control cycle  
        * @param goal A reference to the goal to pursue
        * @param global_plan A reference to the global plan being used
        * @return True if processing of the goal is done, false otherwise
        */
+       //一轮控制的循环
       bool executeCycle(geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& global_plan);
 
     private:
@@ -110,6 +112,7 @@ namespace move_base {
        * @param resp The service response
        * @return True if the service call succeeds, false otherwise
        */
+       //清除Costmap上的 obstables的服务
       bool clearCostmapsService(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp);
 
       /**
@@ -174,36 +177,38 @@ namespace move_base {
        */
       void wakePlanner(const ros::TimerEvent& event);
 
-      tf::TransformListener& tf_;
+      tf::TransformListener& tf_;  //tf 坐标变换关系
 
-      MoveBaseActionServer* as_;
+      MoveBaseActionServer* as_; // Action server
 
-      boost::shared_ptr<nav_core::BaseLocalPlanner> tc_;
-      costmap_2d::Costmap2DROS* planner_costmap_ros_, *controller_costmap_ros_;
-
+      boost::shared_ptr<nav_core::BaseLocalPlanner> tc_;   //local_planner
       boost::shared_ptr<nav_core::BaseGlobalPlanner> planner_; //global planner实例化对象
+      costmap_2d::Costmap2DROS* planner_costmap_ros_, *controller_costmap_ros_; //维护costMap的类, 有global costMap和 local costMap
+
+      
       std::string robot_base_frame_, global_frame_;
 
-      std::vector<boost::shared_ptr<nav_core::RecoveryBehavior> > recovery_behaviors_;
+      std::vector<boost::shared_ptr<nav_core::RecoveryBehavior> > recovery_behaviors_;  //修复机制接口的类
       unsigned int recovery_index_;
 
-      tf::Stamped<tf::Pose> global_pose_;
-      double planner_frequency_, controller_frequency_, inscribed_radius_, circumscribed_radius_;
-      double planner_patience_, controller_patience_;
-      int32_t max_planning_retries_;
+      tf::Stamped<tf::Pose> global_pose_;  //定义一个全局坐标系
+      double planner_frequency_, controller_frequency_, inscribed_radius_, circumscribed_radius_; //全局规划,局部规划的频率, 内切,外切半径的控制
+      double planner_patience_, controller_patience_;  //全局规划 局部规划的 容耐值
+      int32_t max_planning_retries_;  //规划失败 重试的次数
       uint32_t planning_retries_;
-      double conservative_reset_dist_, clearing_radius_;
-      ros::Publisher current_goal_pub_, vel_pub_, action_goal_pub_;
-      ros::Subscriber goal_sub_;
-      ros::ServiceServer make_plan_srv_, clear_costmaps_srv_;
+      double conservative_reset_dist_, clearing_radius_; 
+      ros::Publisher current_goal_pub_, vel_pub_, action_goal_pub_;  //发布话题
+      ros::Subscriber goal_sub_;        //订阅话题
+      ros::ServiceServer make_plan_srv_, clear_costmaps_srv_; //定义两个服务
       bool shutdown_costmaps_, clearing_rotation_allowed_, recovery_behavior_enabled_;
-      double oscillation_timeout_, oscillation_distance_;
+      double oscillation_timeout_, oscillation_distance_; //震荡
 
-      MoveBaseState state_;
+      MoveBaseState state_; //movebase state enum
       RecoveryTrigger recovery_trigger_;
 
-      ros::Time last_valid_plan_, last_valid_control_, last_oscillation_reset_;
+      ros::Time last_valid_plan_, last_valid_control_, last_oscillation_reset_; //时间记录
       geometry_msgs::PoseStamped oscillation_pose_;
+      // 加载类
       pluginlib::ClassLoader<nav_core::BaseGlobalPlanner> bgp_loader_;
       pluginlib::ClassLoader<nav_core::BaseLocalPlanner> blp_loader_;
       pluginlib::ClassLoader<nav_core::RecoveryBehavior> recovery_loader_;
