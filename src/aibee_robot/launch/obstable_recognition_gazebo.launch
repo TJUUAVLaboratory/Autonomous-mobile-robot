@@ -1,7 +1,6 @@
 
-
 <launch>
-<!--robot & world & sensors-->
+ <!-- ***************************** robot & world & sensors ************************************ -->
     <!-- 设置launch文件的参数 -->
     <arg name="world_name" value="$(find mrobot_gazebo)/worlds/cloister.world"/>
     <arg name="paused" default="false"/>
@@ -36,13 +35,15 @@
           args="-urdf -model mrobot -param robot_description"/> 
 
 
+<!-- ***************************** ROS Navigation ************************************ -->
+
 <!--map_server-->
     <!-- 设置地图的配置文件 -->
     <arg name="map" default="cloister_gmapping.yaml" />
     <!--<arg name="map" default="gridmap/wandaf1.yaml" />-->
     
     <!-- 运行地图服务器，并且加载设置的地图-->
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find mrobot_navigation)/maps/$(arg map)"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find aibee_robot)/maps/$(arg map)"/>
 
 
 <!--AMCL 定位-->
@@ -88,16 +89,16 @@
 
 <!--move_base action-->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
-    <rosparam file="$(find mrobot_navigation)/config/mrobot/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find mrobot_navigation)/config/mrobot/costmap_common_params.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find mrobot_navigation)/config/mrobot/local_costmap_params.yaml" command="load" />
-    <rosparam file="$(find mrobot_navigation)/config/mrobot/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find mrobot_navigation)/config/mrobot/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/base_local_planner_params.yaml" command="load" />
   </node>
 
 
 <!-- 运行rviz -->
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find mrobot_navigation)/rviz/obstable.rviz"/>
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>
 
 </launch>
 
