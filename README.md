@@ -1,12 +1,13 @@
 <!-- vscode-markdown-toc -->
-* 1. [ros_gazebo_sim 移动机器人仿真系统](#ros_gazebo_sim)
-	* 1.1. [仿真环境与交换(mrobot_gazebo/mrobot_description)](#mrobot_gazebomrobot_description)
-	* 1.2. [mrobot_teleop  键盘操控机器人](#mrobot_teleop)
-* 2. [ROS_Navigation 机器人的定位/导航功能包](#ROS_Navigation)
-* 3. [navigation](#navigation)
-	* 3.1. [move_base](#move_base)
-* 4. [mrobot_navigation](#mrobot_navigation)
-* 5. [obstable recognition V0](#obstablerecognitionV0)
+* 1. [TODO list:](#TODOlist:)
+* 2. [aibee_robot 定义机器人仿真与实测](#aibee_robot)
+* 3. [function_navigation 根据需求定义机器人自主功能](#function_navigation)
+* 4. [ROS_Navigation 机器人的定位/导航功能包](#ROS_Navigation)
+	* 4.1. [map_server](#map_server)
+	* 4.2. [move_base](#move_base)
+* 5. [ros_gazebo_sim 移动机器人仿真系统](#ros_gazebo_sim)
+	* 5.1. [仿真环境与交换(mrobot_gazebo/mrobot_description)](#mrobot_gazebomrobot_description)
+	* 5.2. [mrobot_teleop  键盘操控机器人](#mrobot_teleop)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -18,7 +19,7 @@
 
 # Autonomous-mobile-robot 室内移动机器人自主感知与导航
 
-## TODO list:
+##  1. <a name='TODOlist:'></a>TODO list:
 > 使用`ROS+gazebo`搭建一个 室内/室外的轮式机器人的仿真场景，然后集成`ROS Navigation`机器人感知导航算法，然后不断地完善和丰富移动机器人的功能，比如：
 - 可以使用多种视觉/雷达/轮盘传感器 来做机器人的定位和状态估计
 - 可以完善mave_base中的global_costmap global_planner, local_costmap local_planner的功能
@@ -27,7 +28,7 @@
 
 
 ============================================================================================
-## aibee_robot 定义机器人仿真与实测
+##  2. <a name='aibee_robot'></a>aibee_robot 定义机器人仿真与实测
 
 **aibee_robot package**
 
@@ -38,16 +39,17 @@ ROS-gazebo仿真:
 使用RVIZ 进行可视化,并可以在RVIZ中选定 goal
 
 
-============================================================================================
-## function_navigation 根据需求定义机器人自主功能
-
-
-
 
 ============================================================================================
-##  2. <a name='ROS_Navigation'></a>ROS_Navigation 机器人的定位/导航功能包
+##  3. <a name='function_navigation'></a>function_navigation 根据需求定义机器人自主功能
 
- ### map_server 
+
+
+
+============================================================================================
+##  4. <a name='ROS_Navigation'></a>ROS_Navigation 机器人的定位/导航功能包
+
+###  4.1. <a name='map_server'></a>map_serverr 
  > - 加载现有的地图  
    - 更新地图  
    - 发布/map topic
@@ -63,17 +65,17 @@ nav_msgs/OccupancyGrid
 
 
 
-###  3.1. <a name='move_base'></a>move_base
+###  4.2. <a name='move_base'></a>move_base
 
 
 
 
 
-##  1. <a name='ros_gazebo_sim'></a>ros_gazebo_sim 移动机器人仿真系统
+##  5. <a name='ros_gazebo_sim'></a>ros_gazebo_sim 移动机器人仿真系统
 
 ============================================================================================
 
-###  1.1. <a name='mrobot_gazebomrobot_description'></a>仿真环境与交换(mrobot_gazebo/mrobot_description)
+###  5.1. <a name='mrobot_gazebomrobot_description'></a>仿真环境与交换(mrobot_gazebo/mrobot_description)
 
 **需要的库与插件**
 gazebo_plugins/  gazebo_ros/  gazebo_ros_control  
@@ -91,7 +93,7 @@ gazebo_plugins/  gazebo_ros/  gazebo_ros_control
 **需要的仿真环境 world**
 - cloister / playground / playpen / room
 
-###  1.2. <a name='mrobot_teleop'></a>mrobot_teleop  键盘操控机器人
+###  5.2. <a name='mrobot_teleop'></a>mrobot_teleop  键盘操控机器人
 
 > mrobot_teleop.launch  使用键盘控制机器人运动
 
