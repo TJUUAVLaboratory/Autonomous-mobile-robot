@@ -1,0 +1,32 @@
+<package format="2">
+  <name>laser_geometry</name>
+  <version>1.6.4</version>
+  <description>
+    This package contains a class for converting from a 2D laser scan as defined by
+    sensor_msgs/LaserScan into a point cloud as defined by sensor_msgs/PointCloud
+    or sensor_msgs/PointCloud2. In particular, it contains functionality to account
+    for the skew resulting from moving robots or tilting laser scanners.
+  </description>
+  <maintainer email="dave.hershberger@sri.com">Dave Hershberger</maintainer>
+  <maintainer email="william@osrfoundation.org">William Woodall</maintainer>
+  <license>BSD</license>
+
+  <author>Tully Foote</author>
+  <author>Radu Bogdan Rusu</author>
+
+  <url>http://ros.org/wiki/laser_geometry</url>
+
+  <buildtool_depend version_gte="0.5.68">catkin</buildtool_depend>
+
+  <depend>angles</depend>
+  <depend>boost</depend>
+  <depend>eigen</depend>
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>tf</depend>
+  <depend>tf2</depend>
+
+  <exec_depend>python-numpy</exec_depend>
+
+  <test_depend>rosunit</test_depend>
+</package>

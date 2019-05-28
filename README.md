@@ -14,7 +14,7 @@
 
 
 
-# Autonomous-mobile-robot
+# Autonomous-mobile-robot 室内移动机器人自主感知与导航
 
 > 使用`ROS+gazebo`搭建一个 室内/室外的轮式机器人的仿真场景，然后集成`ROS Navigation`机器人感知导航算法，然后不断地完善和丰富移动机器人的功能，比如：
 - 可以使用多种视觉/雷达/轮盘传感器 来做机器人的定位和状态估计
@@ -23,11 +23,9 @@
 - 完善机器人的 exploration自主探索陌生环境的能力
 
 
-室内移动机器人自主感知与导航
+## ros_gazebo_sim 移动机器人仿真系统
 
-
-
-##  1. <a name='mrobot_gazebomrobot_description'></a>仿真环境与交换(mrobot_gazebo/mrobot_description)
+###  1. <a name='mrobot_gazebomrobot_description'></a>仿真环境与交换(mrobot_gazebo/mrobot_description)
 
 **需要的库与插件**
 gazebo_plugins/  gazebo_ros/  gazebo_ros_control  
@@ -43,18 +41,15 @@ gazebo_plugins/  gazebo_ros/  gazebo_ros_control
 - mrobot_with_rplidar.urdf.xacro 机器人+rplidar      5Hz
 
 **需要的仿真环境 world**
-
 - cloister / playground / playpen / room
 
+### mrobot_teleop  键盘操控机器人
+
+> mrobot_teleop.launch  使用键盘控制机器人运动
 
 
 
-##  2. <a name='perception'></a>perception 
-
-
-##  3. <a name='mapping'></a>mapping
-
-###  3.1. <a name='map_server'></a>map_server
+## ROS_Navigation 机器人的定位/导航功能包
  
  > - 加载现有的地图  
    - 更新地图  

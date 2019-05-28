@@ -1,0 +1,6 @@
+image: /home/ubuntu/coding/Autonomous-mobile-robot/src/mrobot_navigation/maps/gridmap/wandaf1.pgm
+resolution: 0.050000
+origin: [-93.429999, -80.390002, 0.0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
