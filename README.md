@@ -20,7 +20,10 @@
 # Autonomous-mobile-robot 室内移动机器人自主感知与导航
 
 ##  1. <a name='TODOlist:'></a>TODO list:
-> 使用`ROS+gazebo`搭建一个 室内/室外的轮式机器人的仿真场景，然后集成`ROS Navigation`机器人感知导航算法，然后不断地完善和丰富移动机器人的功能，比如：
+> 使用`ROS+gazebo`搭建一个 室内/室外的轮式机器人的仿真场景，
+然后集成`ROS Navigation`机器人感知导航算法，
+然后不断地完善和丰富移动机器人的功能，比如：
+
 - 可以使用多种视觉/雷达/轮盘传感器 来做机器人的定位和状态估计
 - 可以完善mave_base中的global_costmap global_planner, local_costmap local_planner的功能
 - 完善机器人建图的功能以及 map server
@@ -32,11 +35,19 @@
 
 **aibee_robot package**
 
+> ROS-gazebo仿真: 
 >  roslaunch aibee_robot obstable_recognition_gazebo.launch
-ROS-gazebo仿真: 
-机器人挂载LaserSensor, 预加载仿真环境的 map
-使用 AMCL定位/ map_server加载地图/ move_base全局与局部的路径规划
-使用RVIZ 进行可视化,并可以在RVIZ中选定 goal
+- 机器人挂载LaserSensor,
+- 预加载仿真环境的 map
+- 使用 AMCL定位/ map_server加载地图/ move_base全局与局部的路径规划
+- 使用RVIZ 进行可视化,并可以在RVIZ中选定 goal
+
+[!gazebo 仿真](/doc/obstable_recognition_gazebo/png)
+
+
+
+> 真实机器人测试:
+
 
 
 
