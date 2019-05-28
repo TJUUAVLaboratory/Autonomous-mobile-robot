@@ -42,7 +42,7 @@
 - 使用 AMCL定位/ map_server加载地图/ move_base全局与局部的路径规划
 - 使用RVIZ 进行可视化,并可以在RVIZ中选定 goal
 
-[!gazebo 仿真](/doc/obstable_recognition_gazebo/png)
+[!gazebo 仿真](doc/obstable_recognition_gazebo.png)
 
 
 
