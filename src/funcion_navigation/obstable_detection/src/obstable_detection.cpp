@@ -1,11 +1,11 @@
 
-
 #include <ros/ros.h>
 #include <ros/console.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/PointCloud2.h> // velodyne sensor data
 
 #include <pcl/point_cloud.h>
@@ -26,6 +26,9 @@ using namespace std;
     1. 接收两个laser data
     2. 检测到有障碍物点 小于超出安全阈值, 发送话题消息
 
+    vertical velodyne:探测周围障碍物
+    slant welodyne :探测地面的障碍物
+
 */
 
 using namespace std;
@@ -35,32 +38,50 @@ class ObstableDetection
 public:
     ObstableDetection(void)
     {
+        //提取参数
+        ros::NodeHandle private_nh("~");
+        private_nh.param("safety_distance", safety_distance, 0.8); //安全范围
+        private_nh.param("safety_tolerance", safety_tolerance, 5); //tolerance点的数量
+        // private_nh.param("obstableMsg_pub", obstableMsg_pub,)
+
+
         //发布障碍物信息
         // obstableMsg_pub = nh.advertise<obstable_detection::obstable_detection_msg>("aibee_navi", 10);
-        obstableMsg_pub = nh.advertise<std_msgs::String>("aibee_navi", 10);
+        obstableMsg_pub = nh.advertise<std_msgs::String>("aibee_navi", 10);        
 
         velodyneSensor_sub = nh.subscribe("/spinning_velodyne/velodyne_points", 10, &ObstableDetection::velodyneSensor_Callback, this);
         rplidarSensor_sub  = nh.subscribe("/scan", 1, &ObstableDetection::rplidarSensor_Callback, this);
+        horizontalObstable_pub = nh.advertise<sensor_msgs::PointCloud>("/obstable_orizontal/obstable_point",20);
      
     }
 
 private:   
     ros::NodeHandle nh;
-    ros::Publisher obstableMsg_pub;   
-
+    ros::Publisher obstableMsg_pub; 
     ros::Subscriber rplidarSensor_sub;
     ros::Subscriber velodyneSensor_sub;  
 
-     
+    ros::Publisher horizontalObstable_pub; //水平障碍物点的发布
+    ros::Publisher slantObstable_pub;   //倾斜雷达障碍物点的发布
+    
+    //订阅 laser sensor
+    string  horizontal_velodyne_topic;  
+    string  slant_velodyne_topic;
+
+    //发布 obstable
+    string  obstableMsg_topic;  //发布话题的消息
+    string  horizontal_obstable_topic; //
+    string  slant_obstable_velodyne_topic;
+    
     
 
-    float safety_distance = 0.8; //安全阈值
-    int  safety_tolerance = 1; //point数量
+    double safety_distance ; //安全阈值
+    int  safety_tolerance ; //point数量
     float distance_traveled ; 
     bool hasObstablePoints;   
 
     obstable_detection::obstable_detection_msg  obstableMsg;
-    char*   cString = "[\"stop\"]";
+    char*  cString = "[\"stop\"]";
     cJSON*  json;
     std_msgs::String json_str;
 
@@ -97,8 +118,10 @@ private:
             }
             if(count > safety_tolerance)
             {
-                    // obstableMsg.string_array[0] = "stop";                    
-                    // obstableMsg_pub.publish(obstableMsg);
+
+                    json = cJSON_Parse(cString);
+                    json_str.data = cJSON_Print(json);
+                    obstableMsg_pub.publish(json_str);
                     hasObstablePoints = true;
             }
             else 
@@ -106,34 +129,69 @@ private:
 
     }
 
- void velodyneSensor_Callback(const sensor_msgs::PointCloud2ConstPtr&  velodyneData)
+// vertical velodyne:探测周围障碍物
+void velodyneSensor_Callback(const sensor_msgs::PointCloud2ConstPtr&  velodyneData)
   {
     pcl::PointCloud<velodyne_pointcloud::PointXYZIR>::Ptr cloud(new pcl::PointCloud<velodyne_pointcloud::PointXYZIR>);
     pcl::fromROSMsg(*velodyneData.get(), *cloud.get());
 
       int count = 0;
+      sensor_msgs::PointCloud obstable_points;
+      obstable_points.header.frame_id = "map";
+      obstable_points.header.stamp = ros::Time::now();
+
        for(int i=0; i<cloud->points.size(); i++)
         {
+            geometry_msgs::Point32 point;
             if(hypot(cloud->points[i].x, cloud->points[i].y) < safety_distance)
             {
                 count++;
+                point.x = cloud->points[i].x;
+                point.y = cloud->points[i].y;
+                point.z = cloud->points[i].z;
+                obstable_points.points.push_back(point);
             }
         }
         if(count > safety_tolerance)
         {
-                // json=cJSON_Parse(cString);
-                // json_str.data = cJSON_Print(json);  
-                json_str.data = cString;
+                json = cJSON_Parse(cString);
+                json_str.data = cJSON_Print(json);
                 obstableMsg_pub.publish(json_str);
+
+                horizontalObstable_pub.publish(obstable_points);
                 hasObstablePoints = true;
         }
         else 
           hasObstablePoints = false;    
-  }     
+  }
 
 
+
+// // slant welodyne :探测地面的障碍物
+// void velodyneSensor_Callback(const sensor_msgs::PointCloud2ConstPtr&  velodyneData)
+//   {
+//     pcl::PointCloud<velodyne_pointcloud::PointXYZIR>::Ptr cloud(new pcl::PointCloud<velodyne_pointcloud::PointXYZIR>);
+//     pcl::fromROSMsg(*velodyneData.get(), *cloud.get());
+
+//       int count = 0;
+//        for(int i=0; i<cloud->points.size(); i++)
+//         {
+//             if(hypot(cloud->points[i].x, cloud->points[i].y) < safety_distance)
+//             {
+//                 count++;
+//             }
+//         }
+//         if(count > safety_tolerance)
+//         {
+//                 json = cJSON_Parse(cString);
+//                 json_str.data = cJSON_Print(json);
+//                 obstableMsg_pub.publish(json_str);
+//                 hasObstablePoints = true;
+//         }
+//         else 
+//           hasObstablePoints = false;    
+//   }
 };
-
 
 int main(int argc, char **argv)
 {
