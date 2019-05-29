@@ -17,6 +17,9 @@
 #include "obstable_detection/obstable_detection_msg.h"
 
 #include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include "cJSON.h"
 // #include "json/json.h"
 using namespace std;
 /*
@@ -33,7 +36,8 @@ public:
     ObstableDetection(void)
     {
         //发布障碍物信息
-        obstableMsg_pub = nh.advertise<obstable_detection::obstable_detection_msg>("aibee_navi", 10);
+        // obstableMsg_pub = nh.advertise<obstable_detection::obstable_detection_msg>("aibee_navi", 10);
+        obstableMsg_pub = nh.advertise<std_msgs::String>("aibee_navi", 10);
 
         velodyneSensor_sub = nh.subscribe("/spinning_velodyne/velodyne_points", 10, &ObstableDetection::velodyneSensor_Callback, this);
         rplidarSensor_sub  = nh.subscribe("/scan", 1, &ObstableDetection::rplidarSensor_Callback, this);
@@ -56,6 +60,9 @@ private:
     bool hasObstablePoints;   
 
     obstable_detection::obstable_detection_msg  obstableMsg;
+    char*   cString = "[\"stop\"]";
+    cJSON*  json;
+    std_msgs::String json_str;
 
     
  public:
@@ -90,8 +97,8 @@ private:
             }
             if(count > safety_tolerance)
             {
-                    obstableMsg.string_array[0] = "stop";                    
-                    obstableMsg_pub.publish(obstableMsg);
+                    // obstableMsg.string_array[0] = "stop";                    
+                    // obstableMsg_pub.publish(obstableMsg);
                     hasObstablePoints = true;
             }
             else 
@@ -114,8 +121,10 @@ private:
         }
         if(count > safety_tolerance)
         {
-                obstableMsg.string_array[0] = "stop";             
-                obstableMsg_pub.publish(obstableMsg);
+                json=cJSON_Parse(cString);
+
+                json_str.data = cJSON_Print(json);           
+                obstableMsg_pub.publish(json_str);
                 hasObstablePoints = true;
         }
         else 
