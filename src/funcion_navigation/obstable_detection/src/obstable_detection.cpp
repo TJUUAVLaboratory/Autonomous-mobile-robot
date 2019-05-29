@@ -121,9 +121,9 @@ private:
         }
         if(count > safety_tolerance)
         {
-                json=cJSON_Parse(cString);
-
-                json_str.data = cJSON_Print(json);           
+                // json=cJSON_Parse(cString);
+                // json_str.data = cJSON_Print(json);  
+                json_str.data = cString;
                 obstableMsg_pub.publish(json_str);
                 hasObstablePoints = true;
         }
