@@ -37,17 +37,19 @@
 
 > ROS-gazebo仿真: 
 >  roslaunch aibee_robot obstable_recognition_gazebo.launch
-- 机器人挂载LaserSensor,
-- 预加载仿真环境的 map
-- 使用 AMCL定位/ map_server加载地图/ move_base全局与局部的路径规划
+- 机器人挂载 rplidar,  {/scan  sensor_msgs/LaserScan}
+- map_serve预加载仿真环境的map  {cloister_gmapping.yaml -> /map  nav_msgs/OccupancyGrid}
+- 使用 AMCL定位  {订阅/tf /scan 发布/tf}
+- move_base全局与局部的路径规划 {订阅/tf /map /odom /move_base/action_topic} {发布 global/plan local/plan (nav_msgs/Path)  /cmd_vel (geometry_msgs/Twist 三轴线速度和三轴角速度)}
 - 使用RVIZ 进行可视化,并可以在RVIZ中选定 goal
+
 
 [!gazebo 仿真](doc/obstable_recognition_gazebo.png)
 
 
 
 > 真实机器人测试:
-
+- 机器人挂载 
 
 
 
