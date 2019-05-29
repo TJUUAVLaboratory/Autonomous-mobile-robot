@@ -385,8 +385,6 @@ void Costmap2DROS::movementCB(const ros::TimerEvent &event)
   }
 }
 
-
-// map update
 void Costmap2DROS::mapUpdateLoop(double frequency)
 {
   // the user might not want to run the loop every cycle
@@ -428,7 +426,6 @@ void Costmap2DROS::mapUpdateLoop(double frequency)
                r.cycleTime().toSec());
   }
 }
-
 
 void Costmap2DROS::updateMap()
 {
