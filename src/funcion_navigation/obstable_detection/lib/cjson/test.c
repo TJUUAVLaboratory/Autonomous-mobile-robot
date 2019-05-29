@@ -27,7 +27,8 @@
 /* Parse text to JSON, then render back to text, and print! */
 void doit(char *text)
 {
-	char *out;cJSON *json;
+	char *out;
+	cJSON *json;
 	
 	json=cJSON_Parse(text);
 	if (!json) {printf("Error before: [%s]\n",cJSON_GetErrorPtr());}
