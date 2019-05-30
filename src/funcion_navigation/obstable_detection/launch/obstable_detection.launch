@@ -2,11 +2,21 @@
 <launch>
 
    
-    <!-- 运行地图服务器，并且加载设置的地图-->
+    <!-- node function: 使用两个雷达探测障碍物, 探测到障碍物发送反馈话题-->
     <node name="obstable_detection" pkg="obstable_detection" type="obstable_detection_node" >
 
-    <param name="safety_distance" value="1.0"/>
-    <param name="safety_tolerance" value="5"/>
+    <param name="horizontal_velodyne_topic" value="/static_velodyne/velodyne_points"/> 
+    <param name="vertical_velodyne_topic" value="/spinning_velodyne/velodyne_points"/> 
+    
+    <param name="obstableMsg_topic" value="/aibee_navi"/> 
+    
+
+    <param name="horizontal_obstable_topic" value="/obstable/horizontal_obstable_point"/> 
+    <param name="vertical_obstable_topic" value="/obstable/vertiacl_obstable_point"/> 
+    <param name="obstable_points_frameId" value="/map"/> 
+
+    <param name="safety_distance"   value="1.0"/>
+    <param name="safety_tolerance"  value="5"/>
 
     </node>
 
