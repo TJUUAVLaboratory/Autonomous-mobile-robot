@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include "cJSON.h"
 // #include "json/json.h"
-
 /*
     1. 接收两个laser data
     2. 检测到有障碍物点 小于超出安全阈值, 发送话题消息
@@ -212,8 +211,8 @@ void vertical_velodyneSensor_Callback(const sensor_msgs::PointCloud2ConstPtr&  v
                 json = cJSON_Parse(cString);
                 json_str.data = cJSON_Print(json);
                 obstableMsg_pub.publish(json_str);
-
                 horizontalObstable_pub.publish(obstable_points);
+                ROS_DEBUG_STREAM("the horizen points number:" << count);
         }
  
   }
