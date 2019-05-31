@@ -27,7 +27,6 @@
 
     vertical velodyne:探测周围障碍物
     slant welodyne :探测地面的障碍物
-
 */
 
 

@@ -57,20 +57,20 @@ void PointCloudToLaserScanNodelet::onInit()
   boost::mutex::scoped_lock lock(connect_mutex_);
   private_nh_ = getPrivateNodeHandle();
 
-  private_nh_.param<std::string>("target_frame", target_frame_, "");
+  private_nh_.param<std::string>("target_frame", target_frame_, "");  //输出的2D LaserScan的 frame
   private_nh_.param<double>("transform_tolerance", tolerance_, 0.01);
-  private_nh_.param<double>("min_height", min_height_, std::numeric_limits<double>::min());
+  private_nh_.param<double>("min_height", min_height_, std::numeric_limits<double>::min()); //指定 Z段的高度范围 参与点云转换
   private_nh_.param<double>("max_height", max_height_, std::numeric_limits<double>::max());
 
-  private_nh_.param<double>("angle_min", angle_min_, -M_PI);
+  private_nh_.param<double>("angle_min", angle_min_, -M_PI);  //指定 yaw角度范围 参与点云转换
   private_nh_.param<double>("angle_max", angle_max_, M_PI);
-  private_nh_.param<double>("angle_increment", angle_increment_, M_PI / 180.0);
-  private_nh_.param<double>("scan_time", scan_time_, 1.0 / 30.0);
-  private_nh_.param<double>("range_min", range_min_, 0.0);
+  private_nh_.param<double>("angle_increment", angle_increment_, M_PI / 180.0); //输出2D激光雷达的角分辨率,相邻帧的角度
+  private_nh_.param<double>("scan_time", scan_time_, 1.0 / 30.0);  //扫描时间 即转换完之后, 话题发布的频率
+  private_nh_.param<double>("range_min", range_min_, 0.0);   //指定2D 有效测量距离, 探测深度
   private_nh_.param<double>("range_max", range_max_, std::numeric_limits<double>::max());
   private_nh_.param<double>("inf_epsilon", inf_epsilon_, 1.0);
 
-  int concurrency_level;
+  int concurrency_level; //指定线程数
   private_nh_.param<int>("concurrency_level", concurrency_level, 1);
   private_nh_.param<bool>("use_inf", use_inf_, true);
 
@@ -108,10 +108,12 @@ void PointCloudToLaserScanNodelet::onInit()
     sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
   }
 
+  // 发布LaserScan   注意这种机制,有订阅时才发布
   pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan", 10, boost::bind(&PointCloudToLaserScanNodelet::connectCb, this),
                                                boost::bind(&PointCloudToLaserScanNodelet::disconnectCb, this));
 }
 
+// 判断 subscriber publisher
 void PointCloudToLaserScanNodelet::connectCb()
 {
   boost::mutex::scoped_lock lock(connect_mutex_);
@@ -141,6 +143,7 @@ void PointCloudToLaserScanNodelet::failureCb(const sensor_msgs::PointCloud2Const
                                                                              << ", reason: " << reason);
 }
 
+// 订阅3D激光雷达的数据
 void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 {
   // build laserscan output
@@ -159,7 +162,7 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
   output.range_min = range_min_;
   output.range_max = range_max_;
 
-  // determine amount of rays to create
+  // determine amount of rays to create   2D激光一次扫描的数量
   uint32_t ranges_size = std::ceil((output.angle_max - output.angle_min) / output.angle_increment);
 
   // determine if laserscan rays with no obstacle data will evaluate to infinity or max_range
@@ -181,7 +184,7 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
     try
     {
       cloud.reset(new sensor_msgs::PointCloud2);
-      tf2_->transform(*cloud_msg, *cloud, target_frame_, ros::Duration(tolerance_));
+      tf2_->transform(*cloud_msg, *cloud, target_frame_, ros::Duration(tolerance_)); //坐标系转换
       cloud_out = cloud;
     }
     catch (tf2::TransformException& ex)
@@ -190,7 +193,7 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
       return;
     }
   }
-  else
+  else // 输入和输出 frame_id 一致
   {
     cloud_out = cloud_msg;
   }
@@ -205,13 +208,14 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
       NODELET_DEBUG("rejected for nan in point(%f, %f, %f)\n", *iter_x, *iter_y, *iter_z);
       continue;
     }
-
+    // 限制 Z 轴的高度
     if (*iter_z > max_height_ || *iter_z < min_height_)
     {
       NODELET_DEBUG("rejected for height %f not in range (%f, %f)\n", *iter_z, min_height_, max_height_);
       continue;
     }
 
+    // x y 转换成 range
     double range = hypot(*iter_x, *iter_y);
     if (range < range_min_)
     {
@@ -226,6 +230,7 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
       continue;
     }
 
+    // x+yi 的辐角
     double angle = atan2(*iter_y, *iter_x);
     if (angle < output.angle_min || angle > output.angle_max)
     {

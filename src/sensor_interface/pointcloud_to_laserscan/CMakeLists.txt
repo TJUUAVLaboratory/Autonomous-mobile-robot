@@ -23,9 +23,11 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+# nodelet 链接成库
 add_library(laserscan_to_pointcloud src/laserscan_to_pointcloud_nodelet.cpp)
 target_link_libraries(laserscan_to_pointcloud ${catkin_LIBRARIES})
 
+# node 链接成可执行文件
 add_executable(laserscan_to_pointcloud_node src/laserscan_to_pointcloud_node.cpp)
 target_link_libraries(laserscan_to_pointcloud_node laserscan_to_pointcloud ${catkin_LIBRARIES})
 
