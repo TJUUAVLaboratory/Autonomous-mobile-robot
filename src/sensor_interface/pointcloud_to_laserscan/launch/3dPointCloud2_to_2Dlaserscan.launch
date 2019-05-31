@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-
 <launch>
     <arg name="ladir_name" default="static_velodyne" />
     <arg name="ladir_frame_id" default="horizontal_vlp16_link" />
@@ -17,7 +16,7 @@
 
             angle_min: -3.1415926       # -M_PI
             angle_max: 3.1415926        # M_PI
-            angle_increment: 0.0043633  # 2M_PI/1440
+            angle_increment: 0.314159  # 2M_PI/720
             scan_time: 0.3333           #  out put 30Hz
             range_min: 0.01
             range_max: 50
