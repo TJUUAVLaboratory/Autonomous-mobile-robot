@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>mrpt_localization</name>
+  <version>0.1.24</version>
+  <description>Package for robot 2D self-localization using dynamic or static (MRPT or ROS) maps.
+	The interface is similar to amcl (http://wiki.ros.org/amcl)
+   but supports different particle-filter algorithms, several grid maps at
+   different heights, range-only localization, etc.</description>
+
+  <url type="website">http://www.mrpt.org/</url>
+  <maintainer email="markus.bader@tuwien.ac.at">Markus Bader</maintainer>
+  <author>Markus Bader</author>
+  <author email="raffi.z@gmail.com">Raphael Zack</author>
+  <license>BSD</license>
+
+
+  <license>BSD</license>
+  <url>http://wiki.ros.org/mrpt_localization</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>mrpt1</depend>
+  <depend>roscpp</depend>
+  <depend>tf</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>mrpt_msgs</depend>
+  <depend>mrpt_bridge</depend>
+  <depend>pose_cov_ops</depend>
+  <depend>dynamic_reconfigure</depend>
+
+
+</package>
