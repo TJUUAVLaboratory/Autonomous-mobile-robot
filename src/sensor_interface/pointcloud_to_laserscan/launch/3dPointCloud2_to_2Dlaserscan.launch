@@ -6,7 +6,7 @@
     <!-- run pointcloud_to_laserscan node -->
     <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
         <!-- 输入数据的 3D Pointclude2 topic 映射成到 cloud_in-->
-        <remap from="cloud_in" to="$(arg ladir_name)/velodyne_points"/>
+        <remap from="cloud_in" to="/static_velodyne/velodyne_points"/>
         
         <remap from="scan" to="/scan"/>
         <rosparam>
