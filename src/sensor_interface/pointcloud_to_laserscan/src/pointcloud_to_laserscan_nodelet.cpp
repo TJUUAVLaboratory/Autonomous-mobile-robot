@@ -146,6 +146,7 @@ void PointCloudToLaserScanNodelet::failureCb(const sensor_msgs::PointCloud2Const
 // 订阅3D激光雷达的数据
 void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 {
+  ROS_INFO("subscribe_pointCloud2 messages");
   // build laserscan output
   sensor_msgs::LaserScan output;
   output.header = cloud_msg->header;
