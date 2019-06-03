@@ -13,7 +13,7 @@
 
     <param name="horizontal_obstable_topic" value="/obstable/horizontal_obstable_point"/> 
     <param name="vertical_obstable_topic" value="/obstable/vertiacl_obstable_point"/> 
-    <param name="obstable_points_frameId" value="/map"/> 
+    <param name="obstable_points_frameId" value="horizontal_vlp16_link"/> 
 
     <param name="safety_distance"   value="1.0"/>
     <param name="safety_tolerance"  value="5"/>
