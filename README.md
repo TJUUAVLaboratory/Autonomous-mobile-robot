@@ -116,4 +116,10 @@ gazebo_plugins/  gazebo_ros/  gazebo_ros_control
 
 ## improved_SLAM 
 > - ros navigation  slam-gmapping  amcl定位等方法都是针对 2D激光雷达数据接口的算法, laserscan
-- 而robot 使用的是 
+- 而robot 使用的是 velodyne_VLP_16的3D激光雷达
+- 所以使用一些高级的 laser-SLAM / V-Slam算法替换原本的ros navigation中的功能包
+
+###  [LOAM](Lidar Odometry and Mapping in Real-time)
+
+- [loam_velodyne 原版本](https://github.com/laboshinl/loam_velodyne)
+- [A-LOAM 港科大优化版本 uses Eigen and Ceres Solver to simplify code structure](https://github.com/HKUST-Aerial-Robotics/A-LOAM)
