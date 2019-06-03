@@ -17,7 +17,6 @@
 /* Author: Brian Gerkey */
 
 #include <ros/ros.h>
-
 #include "slam_gmapping.h"
 
 int

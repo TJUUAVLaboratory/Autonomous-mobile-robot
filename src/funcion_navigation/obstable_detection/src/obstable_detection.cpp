@@ -54,6 +54,9 @@ public:
         private_nh.param("safety_distance", safety_distance, 0.8); //安全范围
         private_nh.param("safety_tolerance", safety_tolerance, 5); //tolerance点的数量
 
+        private_nh.param("horizontal_safety_distance", horizontal_safety_distance, 0.8); //安全范围
+        private_nh.param("horizontal_safety_tolerance", horizontal_safety_tolerance, 5); //tolerance点的数量
+
 
         //发布障碍物信息
         // obstableMsg_pub = nh.advertise<obstable_detection::obstable_detection_msg>("aibee_navi", 10);
@@ -96,6 +99,9 @@ private:
 
     double safety_distance ; //安全阈值
     int  safety_tolerance ; //point数量
+    double horizontal_safety_distance; // 水平雷达 安全距离阈值
+    int  horizontal_safety_tolerance ; // 水平雷达  tolerance point数量
+    
 
     obstable_detection::obstable_detection_msg  obstableMsg; //自定义消息类型
     char*  cString = "[\"stop\"]";
@@ -158,7 +164,7 @@ void horizontal_velodyneSensor_Callback(const sensor_msgs::PointCloud2ConstPtr& 
        for(int i=0; i<cloud->points.size(); i++)
         {
             geometry_msgs::Point32 point;
-            if(hypot(cloud->points[i].x, cloud->points[i].y) < safety_distance)
+            if(hypot(cloud->points[i].x, cloud->points[i].y) < horizontal_safety_distance)
             {
                 count++;
                 point.x = cloud->points[i].x;
@@ -167,7 +173,7 @@ void horizontal_velodyneSensor_Callback(const sensor_msgs::PointCloud2ConstPtr& 
                 obstable_points.points.push_back(point);
             }
         }
-        if(count > safety_tolerance)
+        if(count > horizontal_safety_tolerance)
         {
                 json = cJSON_Parse(cString);
                 json_str.data = cJSON_Print(json);
@@ -188,32 +194,6 @@ void vertical_velodyneSensor_Callback(const sensor_msgs::PointCloud2ConstPtr&  v
     pcl::PointCloud<velodyne_pointcloud::PointXYZIR>::Ptr cloud(new pcl::PointCloud<velodyne_pointcloud::PointXYZIR>);
     pcl::fromROSMsg(*velodyneData.get(), *cloud.get());
 
-      int count = 0;
-      sensor_msgs::PointCloud obstable_points;
-      obstable_points.header.frame_id = obstable_points_frameId;
-      obstable_points.header.stamp = ros::Time::now();
-
-       for(int i=0; i<cloud->points.size(); i++)
-        {
-            geometry_msgs::Point32 point;
-            if(hypot(cloud->points[i].x, cloud->points[i].y) < safety_distance)
-            {
-                count++;
-                point.x = cloud->points[i].x;
-                point.y = cloud->points[i].y;
-                point.z = cloud->points[i].z;
-                obstable_points.points.push_back(point);
-            }
-        }
-        if(count > safety_tolerance)
-        {
-                json = cJSON_Parse(cString);
-                json_str.data = cJSON_Print(json);
-                obstableMsg_pub.publish(json_str);
-                horizontalObstable_pub.publish(obstable_points);
-                ROS_DEBUG_STREAM("the horizen points number:" << count);
-        }
- 
   }
 
 };

@@ -18,6 +18,9 @@
     <param name="safety_distance"   value="1.0"/>
     <param name="safety_tolerance"  value="5"/>
 
+    <param name="horizontal_safety_distance"   value="1.0"/>
+    <param name="horizontal_safety_tolerance"  value="5"/>
+
     </node>
 
 
