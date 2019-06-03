@@ -83,10 +83,10 @@ nav_msgs/OccupancyGrid
 
 
 
-
+============================================================================================
 ##  5. <a name='ros_gazebo_sim'></a>ros_gazebo_sim 移动机器人仿真系统
 
-============================================================================================
+
 
 ###  5.1. <a name='mrobot_gazebomrobot_description'></a>仿真环境与交换(mrobot_gazebo/mrobot_description)
 
@@ -111,3 +111,9 @@ gazebo_plugins/  gazebo_ros/  gazebo_ros_control
 > mrobot_teleop.launch  使用键盘控制机器人运动
 
 
+
+============================================================================================
+
+## improved_SLAM 
+> - ros navigation  slam-gmapping  amcl定位等方法都是针对 2D激光雷达数据接口的算法, laserscan
+- 而robot 使用的是 

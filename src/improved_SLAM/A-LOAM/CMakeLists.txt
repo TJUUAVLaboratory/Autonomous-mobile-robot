@@ -18,16 +18,18 @@ find_package(catkin REQUIRED COMPONENTS
   tf
 )
 
-#find_package(Eigen3 REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(Ceres REQUIRED)
+find_package(Ceres 1.12.0 REQUIRED)
+
 
 include_directories(
   include
 	${catkin_INCLUDE_DIRS} 
 	${PCL_INCLUDE_DIRS}
-  ${CERES_INCLUDE_DIRS}
+  ${Ceres_INCLUDE_DIRS}
+  ${Eigen3_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS})
 
 catkin_package(

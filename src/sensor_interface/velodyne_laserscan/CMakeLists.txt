@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(my_velodyne_laserscan)
+project(velodyne_laserscan)
 
 # Set minimum C++ standard to C++11
 if (NOT "${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}")

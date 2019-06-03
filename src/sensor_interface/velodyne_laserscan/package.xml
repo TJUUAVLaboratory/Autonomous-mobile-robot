@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>my_velodyne_laserscan</name>
+  <name>velodyne_laserscan</name>
   <version>1.5.2</version>
   <description>
     Extract a single ring of a Velodyne PointCloud2 and publish it as a LaserScan message
