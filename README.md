@@ -123,3 +123,11 @@ gazebo_plugins/  gazebo_ros/  gazebo_ros_control
 
 - [loam_velodyne 原版本](https://github.com/laboshinl/loam_velodyne)
 - [A-LOAM 港科大优化版本 uses Eigen and Ceres Solver to simplify code structure](https://github.com/HKUST-Aerial-Robotics/A-LOAM)
+
+
+```
+test:
+
+roslaunch aloam_velodyne aloam_velodyne_VLP_16.launch
+rosbag play  data/nsh_indoor_outdoor.bag
+```

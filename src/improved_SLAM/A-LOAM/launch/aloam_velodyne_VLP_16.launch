@@ -12,8 +12,9 @@
     <param name="mapping_line_resolution" type="double" value="0.2"/>
     <param name="mapping_plane_resolution" type="double" value="0.4"/>
 
-    <!--指定雷达话题-->
-    <param name="lidar_point_topic"  value= "/static_velodyne/velodyne_points"/>
+    <!--指定雷达话题   /static_velodyne/velodyne_points  /velodyne_points-->
+    <param name="lidar_point_topic"  value= "/velodyne_points"/>
+
     
 
     <node pkg="aloam_velodyne" type="ascanRegistration" name="ascanRegistration" output="screen" />
@@ -24,7 +25,7 @@
 
 
 
-    <arg name="rviz" default="false" />
+    <arg name="rviz" default="true" />
 
     <group if="$(arg rviz)">
         <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find aloam_velodyne)/rviz_cfg/aloam_velodyne.rviz" />

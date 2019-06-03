@@ -201,7 +201,7 @@ void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
         }
         else
         {
-            printf("wrong scan number\n");
+            printf("wrong scan line number [16/32/64]\n");
             ROS_BREAK();
         }
         //printf("angle %f scanID %d \n", angle, scanID);
