@@ -114,6 +114,12 @@ void removeClosedPointCloud(const pcl::PointCloud<PointT> &cloud_in,
 
 void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
 {
+    static int count = 0;
+    count++;
+    if(count < 10)
+        return;
+else
+{
     if (!systemInited)
     { 
         systemInitCount++;
@@ -457,6 +463,9 @@ void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
     printf("scan registration time %f ms *************\n", t_whole.toc());
     if(t_whole.toc() > 100)
         ROS_WARN("scan registration process over 100ms");
+
+    count = 0;        
+ }
 }
 
 int main(int argc, char **argv)
