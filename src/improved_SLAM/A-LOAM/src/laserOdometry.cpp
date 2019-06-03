@@ -562,7 +562,8 @@ int main(int argc, char **argv)
             laserCloudCornerLastNum = laserCloudCornerLast->points.size();
             laserCloudSurfLastNum = laserCloudSurfLast->points.size();
 
-            // std::cout << "the size of corner last is " << laserCloudCornerLastNum << ", and the size of surf last is " << laserCloudSurfLastNum << '\n';
+            //debug message
+             std::cout << "the size of corner last is " << laserCloudCornerLastNum << ", and the size of surf last is " << laserCloudSurfLastNum << '\n';
 
             kdtreeCornerLast->setInputCloud(laserCloudCornerLast);
             kdtreeSurfLast->setInputCloud(laserCloudSurfLast);
