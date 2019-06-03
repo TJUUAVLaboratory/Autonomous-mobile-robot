@@ -3,7 +3,7 @@
 
    
     <!-- node function: 使用两个雷达探测障碍物, 探测到障碍物发送反馈话题-->
-    <node name="obstable_detection" pkg="obstable_detection" type="obstable_detection_node" >
+    <node name="obstable_detection" pkg="obstable_detection" type="obstable_detection_node" output="screen" >
 
     <param name="horizontal_velodyne_topic" value="/static_velodyne/velodyne_points"/> 
     <param name="vertical_velodyne_topic" value="/spinning_velodyne/velodyne_points"/> 
