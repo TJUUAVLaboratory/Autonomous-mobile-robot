@@ -12,6 +12,10 @@
     <param name="mapping_line_resolution" type="double" value="0.2"/>
     <param name="mapping_plane_resolution" type="double" value="0.4"/>
 
+    <!--指定雷达话题-->
+    <param name="lidar_point_topic"  value= "/static_velodyne/velodyne_points"/>
+    
+
     <node pkg="aloam_velodyne" type="ascanRegistration" name="ascanRegistration" output="screen" />
 
     <node pkg="aloam_velodyne" type="alaserOdometry" name="alaserOdometry" output="screen" />
