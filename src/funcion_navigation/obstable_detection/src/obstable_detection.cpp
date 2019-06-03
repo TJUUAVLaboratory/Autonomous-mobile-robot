@@ -202,6 +202,8 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "obstable_detection");
     ROS_INFO("obstable_detection is running ...");
+    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
+    // ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);    
     ObstableDetection obstableDetection;
     // obstableNavigation.update_publish();
     // if(obstableNavigation.selectPoints.size() >=10)
