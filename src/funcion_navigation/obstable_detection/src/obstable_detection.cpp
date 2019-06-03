@@ -48,7 +48,7 @@ public:
         private_nh.param("horizontal_obstable_topic", horizontal_obstable_topic, std::string("/obstable/horizontal_obstable_point"));
         private_nh.param("vertical_obstable_topic", vertical_obstable_topic, std::string("/obstable/vertiacl_obstable_point"));
 
-        private_nh.param("obstable_points_frameId", obstable_points_frameId, std::string("/map"));
+        private_nh.param("obstable_points_frameId", obstable_points_frameId, std::string("horizontal_vlp16_link"));
 
         // variable 
         private_nh.param("safety_distance", safety_distance, 0.8); //安全范围
