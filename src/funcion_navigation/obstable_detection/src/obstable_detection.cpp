@@ -179,7 +179,7 @@ void horizontal_velodyneSensor_Callback(const sensor_msgs::PointCloud2ConstPtr& 
                 json_str.data = cJSON_Print(json);
                 obstableMsg_pub.publish(json_str);
                 horizontalObstable_pub.publish(obstable_points);
-                ROS_DEBUG_STREAM("the horizen points number:" << count);
+                ROS_INFO_STREAM("the horizen points number:" << count);
         }
  
   }
