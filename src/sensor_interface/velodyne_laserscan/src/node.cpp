@@ -42,8 +42,15 @@ int main(int argc, char** argv)
   // create VelodyneLaserScan class
   velodyne_laserscan::VelodyneLaserScan n(nh, nh_priv);
 
+  ros::Rate loop_rate(50);
   // handle callbacks until shut down
-  ros::spin();
+  //ros::spin();
+  while (ros::ok())
+  {
+    ros::spinOnce(); //control the subscribe rate.
+    loop_rate.sleep();
+  }
+  
 
   return 0;
 }

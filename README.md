@@ -133,26 +133,3 @@ rosbag play  data/nsh_indoor_outdoor.bag
 ```
 
 
-Mapping 10 Hz
-line resolution 0.200000 plane resolution 0.400000
-scan line number 16
-points size 12707
-prepare time 1.961278
-sort q time 0.551256
-seperate points time 1.686884
-scan registration time 4.374232 ms *************
-points size 12668
-prepare time 1.838952
-sort q time 0.689153
-seperate points time 1.706866
-scan registration time 4.075749 ms *************
-points size 12736
-prepare time 2.074040
-sort q time 0.639669
-seperate points time 1.709800
-scan registration time 4.335209 ms *************
-points size 12731
-prepare time 1.982548
-sort q time 0.722240
-seperate points time 1.859007
-scan registration time 4.518367 ms *************

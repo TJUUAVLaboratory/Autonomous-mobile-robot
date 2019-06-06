@@ -39,7 +39,10 @@ namespace velodyne_laserscan
 VelodyneLaserScan::VelodyneLaserScan(ros::NodeHandle &nh, ros::NodeHandle &nh_priv) :
     nh_(nh), srv_(nh_priv), ring_count_(0)
 {
+
+  //
   ros::SubscriberStatusCallback connect_cb = boost::bind(&VelodyneLaserScan::connectCb, this);
+
   pub_ = nh.advertise<sensor_msgs::LaserScan>("scan", 10, connect_cb, connect_cb);
 
   srv_.setCallback(boost::bind(&VelodyneLaserScan::reconfig, this, _1, _2));
@@ -58,6 +61,7 @@ void VelodyneLaserScan::connectCb()
   }
 }
 
+// received 3DLidar PointCloud2 topic
 void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
 {
   // Latch ring count
