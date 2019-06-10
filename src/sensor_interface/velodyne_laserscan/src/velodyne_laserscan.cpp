@@ -179,7 +179,8 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
   // Construct LaserScan message
   if ((offset_x >= 0) && (offset_y >= 0) && (offset_r >= 0))
   {
-    const float RESOLUTION = std::abs(cfg_.resolution);
+    // const float RESOLUTION = std::abs(cfg_.resolution);
+    const float RESOLUTION = 0.1/180.0*M_PI;
     const size_t SIZE = 2.0 * M_PI / RESOLUTION;
     ROS_INFO_ONCE("VelodyneLaserScan: convert resolution %f deg", RESOLUTION*180.0/M_PI); // Lidar resolution
     ROS_INFO_ONCE("VelodyneLaserScan: convert size %d points", SIZE); // Lidar resolution

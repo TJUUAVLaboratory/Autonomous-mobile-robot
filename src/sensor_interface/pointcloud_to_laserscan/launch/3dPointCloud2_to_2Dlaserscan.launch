@@ -3,7 +3,7 @@
     <arg name="ladir_name" default="static_velodyne" />
     <arg name="ladir_frame_id" default="horizontal_vlp16_link" />
     <!-- run pointcloud_to_laserscan node -->
-    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan" output="screen">
         <!-- 输入数据的 3D Pointclude2 topic 映射成到 cloud_in-->
         <remap from="cloud_in" to="/static_velodyne/velodyne_points"/>
         
@@ -14,13 +14,13 @@
             min_height: 0.0
             max_height: 3.0
 
-            angle_min: -3.1415926       # -M_PI
-            angle_max: 3.1415926        # M_PI
-            angle_increment: 0.314159  # 2M_PI/720
-            scan_time: 0.3333           #  out put 30Hz
+            angle_min: -M_PI        # -M_PI
+            angle_max: M_PI         # M_PI
+            angle_increment: 2M_PI/360  # 2M_PI/720
+            scan_time: 1/30.0          #  out put 30Hz
             range_min: 0.01
-            range_max: 50
-            use_inf:  false
+            range_max: 50.0
+            use_inf:  true
             inf_epsilon: 10.0
 
             # Concurrency level, affects number of pointclouds queued for processing and number of threads used

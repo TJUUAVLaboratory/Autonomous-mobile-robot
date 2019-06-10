@@ -30,7 +30,8 @@
  *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
- *
+ *  
+ *  function:  pointcloud to laserscan 
  *
  */
 
@@ -97,6 +98,7 @@ void PointCloudToLaserScanNodelet::onInit()
   // if pointcloud target frame specified, we need to filter by transform availability
   if (!target_frame_.empty())
   {
+    ROS_INFO_ONCE("filter by transform availability");
     tf2_.reset(new tf2_ros::Buffer());
     tf2_listener_.reset(new tf2_ros::TransformListener(*tf2_));
     message_filter_.reset(new MessageFilter(sub_, *tf2_, target_frame_, input_queue_size_, nh_));
@@ -105,6 +107,7 @@ void PointCloudToLaserScanNodelet::onInit()
   }
   else  // otherwise setup direct subscription
   {
+    ROS_INFO_ONCE("setup direct subscription");
     sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
   }
 
@@ -119,7 +122,7 @@ void PointCloudToLaserScanNodelet::connectCb()
   boost::mutex::scoped_lock lock(connect_mutex_);
   if (pub_.getNumSubscribers() > 0 && sub_.getSubscriber().getNumPublishers() == 0)
   {
-    NODELET_INFO("Got a subscriber to scan, starting subscriber to pointcloud");
+    ROS_INFO("Got a subscriber to scan, starting subscriber to pointcloud");
     sub_.subscribe(nh_, "cloud_in", input_queue_size_);
   }
 }
@@ -129,7 +132,7 @@ void PointCloudToLaserScanNodelet::disconnectCb()
   boost::mutex::scoped_lock lock(connect_mutex_);
   if (pub_.getNumSubscribers() == 0)
   {
-    NODELET_INFO("No subscibers to scan, shutting down subscriber to pointcloud");
+    ROS_INFO("No subscibers to scan, shutting down subscriber to pointcloud");
     sub_.unsubscribe();
   }
 }
@@ -143,7 +146,7 @@ void PointCloudToLaserScanNodelet::failureCb(const sensor_msgs::PointCloud2Const
                                                                              << ", reason: " << reason);
 }
 
-// 订阅3D激光雷达的数据
+// 订阅3D激光雷达的数据 ==> pointCloud2 to laserscan
 void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 {
   ROS_INFO("subscribe_pointCloud2 messages");
@@ -184,6 +187,7 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
   {
     try
     {
+      ROS_INFO("transform tf between cloud_in and targer");
       cloud.reset(new sensor_msgs::PointCloud2);
       tf2_->transform(*cloud_msg, *cloud, target_frame_, ros::Duration(tolerance_)); //坐标系转换
       cloud_out = cloud;
@@ -206,13 +210,13 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
   {
     if (std::isnan(*iter_x) || std::isnan(*iter_y) || std::isnan(*iter_z))
     {
-      NODELET_DEBUG("rejected for nan in point(%f, %f, %f)\n", *iter_x, *iter_y, *iter_z);
+      ROS_WARN("rejected for nan in point(%f, %f, %f)\n", *iter_x, *iter_y, *iter_z);
       continue;
     }
     // 限制 Z 轴的高度
     if (*iter_z > max_height_ || *iter_z < min_height_)
     {
-      NODELET_DEBUG("rejected for height %f not in range (%f, %f)\n", *iter_z, min_height_, max_height_);
+      ROS_WARN("rejected for height %f not in range (%f, %f)\n", *iter_z, min_height_, max_height_);
       continue;
     }
 
@@ -220,13 +224,13 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
     double range = hypot(*iter_x, *iter_y);
     if (range < range_min_)
     {
-      NODELET_DEBUG("rejected for range %f below minimum value %f. Point: (%f, %f, %f)", range, range_min_, *iter_x,
+      ROS_WARN("rejected for range %f below minimum value %f. Point: (%f, %f, %f)", range, range_min_, *iter_x,
                     *iter_y, *iter_z);
       continue;
     }
     if (range > range_max_)
     {
-      NODELET_DEBUG("rejected for range %f above maximum value %f. Point: (%f, %f, %f)", range, range_max_, *iter_x,
+      ROS_WARN("rejected for range %f above maximum value %f. Point: (%f, %f, %f)", range, range_max_, *iter_x,
                     *iter_y, *iter_z);
       continue;
     }
@@ -235,7 +239,7 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
     double angle = atan2(*iter_y, *iter_x);
     if (angle < output.angle_min || angle > output.angle_max)
     {
-      NODELET_DEBUG("rejected for angle %f not in range (%f, %f)\n", angle, output.angle_min, output.angle_max);
+      ROS_WARN("rejected for angle %f not in range (%f, %f)\n", angle, output.angle_min, output.angle_max);
       continue;
     }
 
