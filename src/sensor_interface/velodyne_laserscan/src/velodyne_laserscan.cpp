@@ -145,7 +145,7 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
   int offset_r = -1;
 
   // get x,y,z ring intensity offset
-  ROS_INFO_STREAM("msg->fields.size: " << msg->fields.size()); // Lidar resolution
+  ROS_INFO_ONCE("msg->fields.size %d ", msg->fields.size()); // debug message
   for (size_t i = 0; i < msg->fields.size(); i++)
   {
     if (msg->fields[i].datatype == sensor_msgs::PointField::FLOAT32)
@@ -181,7 +181,7 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
   {
     const float RESOLUTION = std::abs(cfg_.resolution);
     const size_t SIZE = 2.0 * M_PI / RESOLUTION;
-    ROS_INFO_ONCE("VelodyneLaserScan: convert resolution %f 度", RESOLUTION*180.0/M_PI); // Lidar resolution
+    ROS_INFO_ONCE("VelodyneLaserScan: convert resolution %f deg", RESOLUTION*180.0/M_PI); // Lidar resolution
     ROS_INFO_ONCE("VelodyneLaserScan: convert size %d points", SIZE); // Lidar resolution
 
     sensor_msgs::LaserScanPtr scan(new sensor_msgs::LaserScan()); // scan pointer
@@ -206,6 +206,8 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
       for (sensor_msgs::PointCloud2ConstIterator<float> it(*msg, "x"); it != it.end(); ++it)
       {
         const uint16_t r = *((const uint16_t*)(&it[5]));  // ring
+        ROS_INFO_STREAM("value of r : "<< r);
+        ROS_INFO_STREAM("value of ring : "<< ring);
 
         if (r == ring)
         {
