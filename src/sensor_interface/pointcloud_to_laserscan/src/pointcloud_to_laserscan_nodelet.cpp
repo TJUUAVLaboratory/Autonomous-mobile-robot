@@ -98,7 +98,7 @@ void PointCloudToLaserScanNodelet::onInit()
   // if pointcloud target frame specified, we need to filter by transform availability
   if (!target_frame_.empty())
   {
-    ROS_INFO_ONCE("filter by transform availability");
+    ROS_INFO("filter by transform availability");
     tf2_.reset(new tf2_ros::Buffer());
     tf2_listener_.reset(new tf2_ros::TransformListener(*tf2_));
     message_filter_.reset(new MessageFilter(sub_, *tf2_, target_frame_, input_queue_size_, nh_));
@@ -107,7 +107,7 @@ void PointCloudToLaserScanNodelet::onInit()
   }
   else  // otherwise setup direct subscription
   {
-    ROS_INFO_ONCE("setup direct subscription");
+    ROS_INFO("setup direct subscription");
     sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
   }
 
@@ -245,6 +245,7 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
 
     // overwrite range at laserscan ray if new range is smaller
     int index = (angle - output.angle_min) / output.angle_increment;
+    ROS_INFO_STREAM("the range index is: "<< index);
     if (range < output.ranges[index])
     {
       output.ranges[index] = range;
