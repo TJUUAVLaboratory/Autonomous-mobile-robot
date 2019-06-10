@@ -11,7 +11,7 @@
         <rosparam>
             target_frame: horizontal_vlp16_link   # Leave disabled to output scan in pointcloud frame
             transform_tolerance: 0.01
-            min_height: 0.0
+            min_height: -2.0
             max_height: 3.0
 
             angle_min: -M_PI        # -M_PI
