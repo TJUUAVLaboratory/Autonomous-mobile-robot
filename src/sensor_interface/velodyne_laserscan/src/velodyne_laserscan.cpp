@@ -248,7 +248,7 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
             const float y = *iter_y;  // y
             const float i = *iter_i;  // intensity
             const int bin = (atan2f(y, x) + static_cast<float>(M_PI)) / RESOLUTION;
-
+            ROS_INFO_STREAM("x:" << x <<" y: " << y <<" bin: "<< " SIZE: "<< SIZE);
             if ((bin >= 0) && (bin < static_cast<int>(SIZE)))
             {
               scan->ranges[bin] = sqrtf(x * x + y * y);
