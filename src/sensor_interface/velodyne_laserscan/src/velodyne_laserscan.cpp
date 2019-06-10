@@ -198,8 +198,8 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
     if ((offset_x == 0) &&
         (offset_y == 4) &&
         (offset_z == 8) &&
-        (offset_r == 16) &&  // 调换了两个值
-        (offset_i == 20))
+        (offset_i == 16) &&  // 调换了两个值
+        (offset_r == 20))
     {
       scan->intensities.resize(SIZE);
 
@@ -225,7 +225,7 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
       }
 
     }
-    else
+    else  
     {
       ROS_WARN_ONCE("VelodyneLaserScan: PointCloud2 fields in unexpected order. Using slower generic method.");
 
@@ -240,6 +240,8 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
         {
           const uint16_t r = *iter_r;  // ring
 
+          ROS_INFO_STREAM("value of r : "<< r);
+          ROS_INFO_STREAM("value of ring : "<< ring);
           if (r == ring)
           {
             const float x = *iter_x;  // x
