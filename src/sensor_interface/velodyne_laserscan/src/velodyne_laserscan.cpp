@@ -62,8 +62,8 @@ void VelodyneLaserScan::connectCb()
 }
 
 /* ********************************************
-
 received 3DLidar PointCloud2 topic
+
 
 
 ******************************************** */
@@ -109,7 +109,7 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
       ROS_ERROR("VelodyneLaserScan: Field 'ring' of type 'UINT16' not present in PointCloud2");
       return;
     }
-  }
+  } // if (!ring_count_) latch ring count
 
   // Select ring to use
   uint16_t ring;
@@ -133,8 +133,7 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
   else
   {
     ring = cfg_.ring;
-  }
-
+  } // Select ring to use
   ROS_INFO_ONCE("VelodyneLaserScan: Extracting ring %u", ring); // Lidar ring
 
   // Load structure of PointCloud2
@@ -180,6 +179,9 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
   {
     const float RESOLUTION = std::abs(cfg_.resolution);
     const size_t SIZE = 2.0 * M_PI / RESOLUTION;
+    ROS_INFO_ONCE("VelodyneLaserScan: convert resolution %f 度", RESOLUTION*180.0/M_PI); // Lidar resolution
+    ROS_INFO_ONCE("VelodyneLaserScan: convert size %d points", SIZE); // Lidar resolution
+
     sensor_msgs::LaserScanPtr scan(new sensor_msgs::LaserScan()); // scan pointer
     scan->header = msg->header;
     scan->angle_increment = RESOLUTION; //角分辨率,弧度制
@@ -194,8 +196,8 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
     if ((offset_x == 0) &&
         (offset_y == 4) &&
         (offset_z == 8) &&
-        (offset_i == 16) &&
-        (offset_r == 20))
+        (offset_r == 16) &&  // 调换了两个值
+        (offset_i == 20))
     {
       scan->intensities.resize(SIZE);
 
