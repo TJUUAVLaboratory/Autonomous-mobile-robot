@@ -46,6 +46,7 @@ VelodyneLaserScan::VelodyneLaserScan(ros::NodeHandle &nh, ros::NodeHandle &nh_pr
   pub_ = nh.advertise<sensor_msgs::LaserScan>("scan", 10, connect_cb, connect_cb);
 
   srv_.setCallback(boost::bind(&VelodyneLaserScan::reconfig, this, _1, _2));
+  ROS_INFO("test"); // Lidar resolution
 }
 
 void VelodyneLaserScan::connectCb()
