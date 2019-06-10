@@ -51,17 +51,22 @@ VelodyneLaserScan::VelodyneLaserScan(ros::NodeHandle &nh, ros::NodeHandle &nh_pr
 void VelodyneLaserScan::connectCb()
 {
   boost::lock_guard<boost::mutex> lock(connect_mutex_);
-  if (!pub_.getNumSubscribers())
+  if (!pub_.getNumSubscribers()) // if no number sub 'scan', don't sub 3D points and pub scan
   {
     sub_.shutdown();
   }
   else if (!sub_)
   {
-    sub_ = nh_.subscribe("velodyne_points", 10, &VelodyneLaserScan::recvCallback, this);
+    sub_ = nh_.subscribe("velodyne_points", 10, &VelodyneLaserScan::recvCallback, this); //callback 
   }
 }
 
-// received 3DLidar PointCloud2 topic
+/* ********************************************
+
+received 3DLidar PointCloud2 topic
+
+
+******************************************** */
 void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
 {
   // Latch ring count
@@ -85,6 +90,7 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
       ROS_ERROR("VelodyneLaserScan: Field 'ring' of type 'UINT16' not present in PointCloud2");
       return;
     }
+
     for (sensor_msgs::PointCloud2ConstIterator<uint16_t> it(*msg, "ring"); it != it.end(); ++it)
     {
       const uint16_t ring = *it;
@@ -129,7 +135,7 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
     ring = cfg_.ring;
   }
 
-  ROS_INFO_ONCE("VelodyneLaserScan: Extracting ring %u", ring);
+  ROS_INFO_ONCE("VelodyneLaserScan: Extracting ring %u", ring); // Lidar ring
 
   // Load structure of PointCloud2
   int offset_x = -1;
@@ -138,6 +144,7 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
   int offset_i = -1;
   int offset_r = -1;
 
+  // get x,y,z ring intensity offset
   for (size_t i = 0; i < msg->fields.size(); i++)
   {
     if (msg->fields[i].datatype == sensor_msgs::PointField::FLOAT32)
@@ -173,16 +180,17 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
   {
     const float RESOLUTION = std::abs(cfg_.resolution);
     const size_t SIZE = 2.0 * M_PI / RESOLUTION;
-    sensor_msgs::LaserScanPtr scan(new sensor_msgs::LaserScan());
+    sensor_msgs::LaserScanPtr scan(new sensor_msgs::LaserScan()); // scan pointer
     scan->header = msg->header;
-    scan->angle_increment = RESOLUTION;
+    scan->angle_increment = RESOLUTION; //角分辨率,弧度制
     scan->angle_min = -M_PI;
     scan->angle_max = M_PI;
     scan->range_min = 0.0;
     scan->range_max = 200.0;
     scan->time_increment = 0.0;
-    scan->ranges.resize(SIZE, INFINITY);
+    scan->ranges.resize(SIZE, INFINITY); // 这就是没测到的数据是INFINITY原因
 
+    //
     if ((offset_x == 0) &&
         (offset_y == 4) &&
         (offset_z == 8) &&
@@ -200,21 +208,22 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
           const float x = it[0];  // x
           const float y = it[1];  // y
           const float i = it[4];  // intensity
-          const int bin = (atan2f(y, x) + static_cast<float>(M_PI)) / RESOLUTION;
+          const int bin = (atan2f(y, x) + static_cast<float>(M_PI)) / RESOLUTION; //下标
 
           if ((bin >= 0) && (bin < static_cast<int>(SIZE)))
           {
-            scan->ranges[bin] = sqrtf(x * x + y * y);
+            scan->ranges[bin] = sqrtf(x * x + y * y); //测量距离的值
             scan->intensities[bin] = i;
           }
         }
       }
+
     }
     else
     {
       ROS_WARN_ONCE("VelodyneLaserScan: PointCloud2 fields in unexpected order. Using slower generic method.");
 
-      if (offset_i >= 0)
+      if (offset_i >= 0)  // have intensity
       {
         scan->intensities.resize(SIZE);
         sensor_msgs::PointCloud2ConstIterator<uint16_t> iter_r(*msg, "ring");
@@ -240,7 +249,7 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
           }
         }
       }
-      else
+      else // don't have intensity
       {
         sensor_msgs::PointCloud2ConstIterator<uint16_t> iter_r(*msg, "ring");
         sensor_msgs::PointCloud2ConstIterator<float> iter_x(*msg, "x");
