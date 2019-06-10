@@ -46,7 +46,6 @@ VelodyneLaserScan::VelodyneLaserScan(ros::NodeHandle &nh, ros::NodeHandle &nh_pr
   pub_ = nh.advertise<sensor_msgs::LaserScan>("scan", 10, connect_cb, connect_cb);
 
   srv_.setCallback(boost::bind(&VelodyneLaserScan::reconfig, this, _1, _2));
-  ROS_INFO("test"); // Lidar resolution
 }
 
 void VelodyneLaserScan::connectCb()
@@ -70,6 +69,7 @@ received 3DLidar PointCloud2 topic
 ******************************************** */
 void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
 {
+  ROS_INFO("received 3d pointsCloude2 message"); // Lidar resolution
   // Latch ring count
   if (!ring_count_)
   {
@@ -145,6 +145,7 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
   int offset_r = -1;
 
   // get x,y,z ring intensity offset
+  ROS_INFO_STREAM("msg->fields.size: " << msg->fields.size()); // Lidar resolution
   for (size_t i = 0; i < msg->fields.size(); i++)
   {
     if (msg->fields[i].datatype == sensor_msgs::PointField::FLOAT32)
