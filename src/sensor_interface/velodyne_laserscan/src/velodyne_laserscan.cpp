@@ -241,9 +241,9 @@ void VelodyneLaserScan::recvCallback(const sensor_msgs::PointCloud2ConstPtr& msg
           const uint16_t r = *iter_r;  // ring
 
           ROS_INFO_STREAM("value of r : "<< r);
-          ROS_INFO_STREAM("value of ring : "<< ring);
           if (r == ring)
           {
+            ROS_WARN("current r equal ring");
             const float x = *iter_x;  // x
             const float y = *iter_y;  // y
             const float i = *iter_i;  // intensity
