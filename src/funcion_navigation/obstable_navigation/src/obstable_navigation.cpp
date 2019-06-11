@@ -215,7 +215,7 @@ private:
         ROS_INFO_STREAM("next  navigation goal pose: " << nextPose.pose.position.x <<", "<<nextPose.pose.position.y);
         next_waypose_pub.publish(nextPose);
         selectPoses.push(nextPose);
-        ROS_INFO_STREAM("select_pose_size: "<< selectPose.size());
+        ROS_INFO_STREAM("select_pose_size: "<< selectPoses.size());
 
         if(selectPoses.size() >=5)
             moveToPose(selectPoses);
