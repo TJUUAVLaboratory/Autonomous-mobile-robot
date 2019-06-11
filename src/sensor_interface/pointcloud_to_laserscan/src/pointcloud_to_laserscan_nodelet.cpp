@@ -210,13 +210,13 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
   {
     if (std::isnan(*iter_x) || std::isnan(*iter_y) || std::isnan(*iter_z))
     {
-      ROS_WARN("rejected for nan in point(%f, %f, %f)\n", *iter_x, *iter_y, *iter_z);
+      ROS_DEGUG("rejected for nan in point(%f, %f, %f)\n", *iter_x, *iter_y, *iter_z);
       continue;
     }
     // 限制 Z 轴的高度
     if (*iter_z > max_height_ || *iter_z < min_height_)
     {
-      ROS_WARN("rejected for height %f not in range (%f, %f)\n", *iter_z, min_height_, max_height_);
+      ROS_DEGUG("rejected for height %f not in range (%f, %f)\n", *iter_z, min_height_, max_height_);
       continue;
     }
 
@@ -224,13 +224,13 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
     double range = hypot(*iter_x, *iter_y);
     if (range < range_min_)
     {
-      ROS_WARN("rejected for range %f below minimum value %f. Point: (%f, %f, %f)", range, range_min_, *iter_x,
+      ROS_DEGUG("rejected for range %f below minimum value %f. Point: (%f, %f, %f)", range, range_min_, *iter_x,
                     *iter_y, *iter_z);
       continue;
     }
     if (range > range_max_)
     {
-      ROS_WARN("rejected for range %f above maximum value %f. Point: (%f, %f, %f)", range, range_max_, *iter_x,
+      ROS_DEGUG("rejected for range %f above maximum value %f. Point: (%f, %f, %f)", range, range_max_, *iter_x,
                     *iter_y, *iter_z);
       continue;
     }
@@ -239,7 +239,7 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
     double angle = atan2(*iter_y, *iter_x);
     if (angle < output.angle_min || angle > output.angle_max)
     {
-      ROS_WARN("rejected for angle %f not in range (%f, %f)\n", angle, output.angle_min, output.angle_max);
+      ROS_DEGUG("rejected for angle %f not in range (%f, %f)\n", angle, output.angle_min, output.angle_max);
       continue;
     }
 
