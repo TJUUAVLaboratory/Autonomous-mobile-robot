@@ -52,7 +52,8 @@ public:
 
         //subscriber
         //from RVIZ
-        NavGoal_sub = nh.subscribe("/move_base_simple/goal", 1, &ObstableNavagation::sub_2D_NavGoal_Callback, this);
+        // NavGoal_sub = nh.subscribe("/move_base_simple/goal", 1, &ObstableNavagation::sub_2D_NavGoal_Callback, this);
+        NavGoal_sub = nh.subscribe("/clicked_pose", 1, &ObstableNavagation::sub_2D_NavGoal_Callback, this);
         point_sub = nh.subscribe("/clicked_point", 1, &ObstableNavagation::sub_2D_point_Callback, this);
         initialPose_sub = nh.subscribe("/initialpose", 1, &ObstableNavagation::sub_initialPose_Callback, this);
         laserScan_sub = nh.subscribe("/scan", 1, &ObstableNavagation::sub_laserScan_Callback, this);
@@ -62,7 +63,49 @@ public:
      
     }
 
+// according getting poses move to goal
+void moveToPose(stack<geometry_msgs::PoseStamped>& poses)
+ {
+        MoveBaseClient movebase_client("move_base", true);
+        while (!movebase_client.waitForServer(ros::Duration(5.0)))
+        {
+            ROS_INFO("waiting for the move_base server to connect");
+        }
 
+        while(!poses.empty())
+        {
+            move_base_msgs::MoveBaseGoal goal;
+
+            goal.target_pose.header.frame_id = "map";
+            goal.target_pose.header.stamp = ros::Time::now();
+            
+            goal.target_pose.pose.position.x = poses.top().pose.position.x;
+            goal.target_pose.pose.position.y = poses.top().pose.position.y;
+            goal.target_pose.pose.position.z = 0;
+
+            goal.target_pose.pose.orientation.x = poses.top().pose.orientation.x;
+            goal.target_pose.pose.orientation.y = poses.top().pose.orientation.y;
+            goal.target_pose.pose.orientation.z = poses.top().pose.orientation.z;
+            goal.target_pose.pose.orientation.w = poses.top().pose.orientation.w;
+
+            poses.pop();
+
+            movebase_client.sendGoal(goal);
+            bool finished_within_time = movebase_client.waitForResult(ros::Duration(60));
+
+            if(!finished_within_time)
+            {
+                movebase_client.cancelGoal();
+                ROS_WARN("time out achieving goal");
+            }
+            else 
+            {        
+                actionlib::SimpleClientGoalState status = movebase_client.getState();                    
+            }
+        }        
+    }
+
+// according getting points move to goal
     void moveToGoal(stack<geometry_msgs::PointStamped>& points)
     {
         MoveBaseClient movebase_client("move_base", true);
@@ -106,6 +149,7 @@ public:
 
 public:
     stack<geometry_msgs::PointStamped> selectPoints;
+    stack<geometry_msgs::PoseStamped> selectPoses;
     
 
 private:   
@@ -170,7 +214,13 @@ private:
         ROS_INFO_STREAM("traveled distance: " << distance_traveled);
         ROS_INFO_STREAM("next  navigation goal pose: " << nextPose.pose.position.x <<", "<<nextPose.pose.position.y);
         next_waypose_pub.publish(nextPose);
+        selectPoses.push(nextPose);
+        ROS_INFO_STREAM("select_pose_size: "<< selectPoints.size());
+
+        if(selectPoses.size() >=5)
+            moveToPose(selectPoses);
     }
+
 
     void sub_2D_point_Callback(const geometry_msgs::PointStampedPtr& point_msg)
     {
