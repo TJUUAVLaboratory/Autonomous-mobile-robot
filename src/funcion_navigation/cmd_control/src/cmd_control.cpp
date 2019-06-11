@@ -17,8 +17,15 @@ int main(int argc, char *argv[])
     msg_switch.function = 0;  
     msg_switch.adress = 0x02000001;  
     msg_switch.data = 1;   //command control  not ipad
-    pub_cmd_control.publish(msg_switch);
+    
 
+    ros::Rate loop_rate(50);
+    while (ros::ok())
+    {
+        pub_cmd_control.publish(msg_switch);
+        loop_rate.sleep();
+    }
+    
     return 0;
 
 }
