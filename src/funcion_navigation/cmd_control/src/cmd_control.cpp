@@ -25,7 +25,13 @@ int main(int argc, char *argv[])
         pub_cmd_control.publish(msg_switch);
         loop_rate.sleep();
     }
-    
+
+    msg_switch.data = 2;// ipad control
+    for(int i=0; i<10; i++)
+    {
+        pub_cmd_control.publish(msg_switch);
+    }
+
     return 0;
 
 }
