@@ -8,7 +8,7 @@
     <!-- run pointcloud_to_laserscan node -->
     <node pkg="velodyne_laserscan" type="velodyne_laserscan_node" name="horizontal_velodyne_Lidar" output="screen">
         <!-- 输入数据的 3D Pointclude2 topic 映射成到 cloud_in-->
-        <!--<remap from="velodyne_points" to="$(arg horizontal_name)/velodyne_points"/>        -->
+        <remap from="velodyne_points" to="$(arg horizontal_name)/velodyne_points"/>        
         <remap from="scan" to="$(arg horizontal_name)/laserscan"/>
     </node>
 
