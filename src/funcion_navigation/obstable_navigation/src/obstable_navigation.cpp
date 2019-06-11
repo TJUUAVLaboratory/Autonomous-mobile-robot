@@ -283,6 +283,7 @@ private:
         pointCloud_pub.publish(cloud_out);
 
         
+        /*
         for(int i=0; i<cloud_out.points.size(); i++)
         {
             static int count = 0;
@@ -304,6 +305,7 @@ private:
                 ROS_DEBUG("that is OK");             
 
         }
+        */
 
 
 
