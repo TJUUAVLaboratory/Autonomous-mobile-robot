@@ -30,7 +30,7 @@
       <param name="lasamplerange" value="0.005"/>
       <param name="lasamplestep" value="0.005"/>
 
-      <remap from="scan" to="/static_velodyne/laserscan"/>
+      <!--<remap from="scan" to="/static_velodyne/laserscan"/>-->
 
     </node>
 </launch>

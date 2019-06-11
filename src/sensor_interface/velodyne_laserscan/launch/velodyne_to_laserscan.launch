@@ -3,19 +3,15 @@
     <arg name="horizontal_name" default="static_velodyne" />
     <arg name="vertical_name" default="spinning_velodyne" />
 
-    <arg name="ladir_frame_id" default="horizontal_vlp16_link" />
+    <!--<arg name="ladir_frame_id" default="horizontal_vlp16_link" />-->
+    <arg name="ladir_frame_id" default="velodyne" />
     <!-- run pointcloud_to_laserscan node -->
     <node pkg="velodyne_laserscan" type="velodyne_laserscan_node" name="horizontal_velodyne_Lidar" output="screen">
         <!-- 输入数据的 3D Pointclude2 topic 映射成到 cloud_in-->
-        <remap from="velodyne_points" to="$(arg horizontal_name)/velodyne_points"/>        
+        <!--<remap from="velodyne_points" to="$(arg horizontal_name)/velodyne_points"/>        -->
         <remap from="scan" to="$(arg horizontal_name)/laserscan"/>
     </node>
 
-    <!-- run pointcloud_to_laserscan node -->
-    <node pkg="velodyne_laserscan" type="velodyne_laserscan_node" name="vertical_velodyne_Lidar" output="screen">
-        <!-- 输入数据的 3D Pointclude2 topic 映射成到 cloud_in-->
-        <remap from="velodyne_points" to="$(arg vertical_name)/velodyne_points"/>        
-        <remap from="scan" to="$(arg vertical_name)/laserscan"/>
-    </node>
+  
 
 </launch>

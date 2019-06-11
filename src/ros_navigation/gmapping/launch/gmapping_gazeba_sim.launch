@@ -1,7 +1,7 @@
 <launch>
     <arg name="scan_topic" default="scan" />
 
-    <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen" clear_params="true">
+    <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
         <param name="odom_frame" value="odom"/>
         <param name="map_update_interval" value="5.0"/>
         <!-- Set maxUrange < actual maximum range of the Laser -->
@@ -35,4 +35,8 @@
         <param name="lasamplestep" value="0.005"/>
         <remap from="scan" to="$(arg scan_topic)"/>
     </node>
+
+     <!--<node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 1 0 0 0 1 base_link velodyne 20" />-->
+     <!--<node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0 0 0 0 0 0 1 base_link odom 20" />-->
+
 </launch>

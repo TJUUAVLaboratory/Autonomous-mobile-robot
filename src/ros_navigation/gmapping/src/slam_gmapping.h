@@ -39,7 +39,7 @@ class SlamGMapping
     ~SlamGMapping();
 
     void init();
-    void startLiveSlam();
+    void startLiveSlam();  //启动gmapping slam
     void startReplay(const std::string & bag_fname, std::string scan_topic);
     void publishTransform();
   
