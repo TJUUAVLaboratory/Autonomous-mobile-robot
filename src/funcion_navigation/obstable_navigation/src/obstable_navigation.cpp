@@ -81,12 +81,12 @@ void moveToPose(stack<geometry_msgs::PoseStamped>& poses)
             
             goal.target_pose.pose.position.x = poses.top().pose.position.x;
             goal.target_pose.pose.position.y = poses.top().pose.position.y;
-            goal.target_pose.pose.position.z = 0.0;
+            goal.target_pose.pose.position.z = 0;
 
-            goal.target_pose.pose.orientation.x = 0;
-            goal.target_pose.pose.orientation.y = 0;
-            goal.target_pose.pose.orientation.z = 0;
-            goal.target_pose.pose.orientation.w = 1;
+            goal.target_pose.pose.orientation.x = poses.top().pose.orientation.x;
+            goal.target_pose.pose.orientation.y = poses.top().pose.orientation.y;
+            goal.target_pose.pose.orientation.z = poses.top().pose.orientation.z;
+            goal.target_pose.pose.orientation.w = poses.top().pose.orientation.w;
 
             poses.pop();
 
@@ -196,12 +196,12 @@ private:
         nextPose.header.frame_id = "/odom";
         nextPose.pose.position.x = pose_msg->pose.position.x;
         nextPose.pose.position.y = pose_msg->pose.position.y;
-        nextPose.pose.position.z = pose_msg->pose.position.z;
+        nextPose.pose.position.z = 0;
 
-        nextPose.pose.orientation.x = pose_msg->pose.orientation.x;
-        nextPose.pose.orientation.y = pose_msg->pose.orientation.y;
-        nextPose.pose.orientation.z = pose_msg->pose.orientation.z;        
-        nextPose.pose.orientation.w = pose_msg->pose.orientation.w;  
+        nextPose.pose.orientation.x = 0;
+        nextPose.pose.orientation.y = 0;
+        nextPose.pose.orientation.z = 0;        
+        nextPose.pose.orientation.w = 1;  
 
         float distance = sqrt(
                                 pow((nextPose.pose.position.x-lastPose.pose.position.x),2) +
@@ -215,7 +215,7 @@ private:
         ROS_INFO_STREAM("next  navigation goal pose: " << nextPose.pose.position.x <<", "<<nextPose.pose.position.y);
         next_waypose_pub.publish(nextPose);
         selectPoses.push(nextPose);
-        ROS_INFO_STREAM("select_pose_size: "<< selectPoses.size());
+        ROS_INFO_STREAM("select_pose_size: "<< selectPose.size());
 
         if(selectPoses.size() >=5)
             moveToPose(selectPoses);
