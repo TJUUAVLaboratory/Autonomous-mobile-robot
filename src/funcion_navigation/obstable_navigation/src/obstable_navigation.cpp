@@ -81,12 +81,12 @@ void moveToPose(stack<geometry_msgs::PoseStamped>& poses)
             
             goal.target_pose.pose.position.x = poses.top().pose.position.x;
             goal.target_pose.pose.position.y = poses.top().pose.position.y;
-            goal.target_pose.pose.position.z = 0;
+            goal.target_pose.pose.position.z = 0.0;
 
-            goal.target_pose.pose.orientation.x = poses.top().pose.orientation.x;
-            goal.target_pose.pose.orientation.y = poses.top().pose.orientation.y;
-            goal.target_pose.pose.orientation.z = poses.top().pose.orientation.z;
-            goal.target_pose.pose.orientation.w = poses.top().pose.orientation.w;
+            goal.target_pose.pose.orientation.x = 0;
+            goal.target_pose.pose.orientation.y = 0;
+            goal.target_pose.pose.orientation.z = 0;
+            goal.target_pose.pose.orientation.w = 1;
 
             poses.pop();
 
