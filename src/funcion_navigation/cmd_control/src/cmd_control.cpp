@@ -11,7 +11,6 @@ int main(int argc, char *argv[])
     ros::NodeHandle nh;
 
     ros::Publisher pub_cmd_control = nh.advertise<cmd_control::keyDataOrParam>("keyDataOrParamU2D", 5, true);
-
     cmd_control::keyDataOrParam msg_switch;
 
     msg_switch.function = 0;  

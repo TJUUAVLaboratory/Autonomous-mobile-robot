@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   move_base_msgs
   sensor_msgs
   laser_geometry
+  message_generation
   genmsg actionlib_msgs actionlib
   roscpp
   tf
@@ -57,12 +58,11 @@ include_directories( ${boost_INCLUDE_DIR})
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+# Generate messages in the 'msg' folder
+add_message_files(
+   FILES
+   keyDataOrParam.msg
+ )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -78,11 +78,12 @@ include_directories( ${boost_INCLUDE_DIR})
 #   Action2.action
 # )
 
-## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs#   move_base_msgs#   visualization_msgs
-# )
+
+generate_messages(
+   DEPENDENCIES
+   std_msgs
+   geometry_msgs
+ )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -118,6 +119,7 @@ catkin_package(
 #  LIBRARIES mrobot_navigation
  CATKIN_DEPENDS geometry_msgs  std_msgs move_base_msgs roscpp rospy tf visualization_msgs
  laser_geometry
+ message_runtime
 )
 
 ###########

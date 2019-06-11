@@ -20,7 +20,6 @@
 
 #include <boost/thread.hpp>
 
-
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 // #include <iostream>
 // #include <vector>
@@ -58,6 +57,8 @@ public:
         initialPose_sub = nh.subscribe("/initialpose", 1, &ObstableNavagation::sub_initialPose_Callback, this);
         laserScan_sub = nh.subscribe("/scan", 1, &ObstableNavagation::sub_laserScan_Callback, this);
 
+           
+
         // obstable_thread = new boost::thread(boost::bind(&ObstableNavagation::moveToGoal, this));
     
      
@@ -66,6 +67,9 @@ public:
 // according getting poses move to goal
 void moveToPose(stack<geometry_msgs::PoseStamped>& poses)
  {
+
+        //启动服务 navigation_control
+
         MoveBaseClient movebase_client("move_base", true);
         while (!movebase_client.waitForServer(ros::Duration(5.0)))
         {
@@ -160,6 +164,7 @@ private:
     ros::Publisher pointCloud_pub;
     ros::Publisher obstableMsg_pub;   
     
+    
 
     ros::Subscriber NavGoal_sub;
     ros::Subscriber point_sub;
@@ -173,6 +178,8 @@ private:
     geometry_msgs::PointStamped lastPoint;
     
     boost::thread* obstable_thread;
+
+    
 
     float safety_distance = 0.8; //安全阈值
     int  safety_tolerance = 1; //point数量
