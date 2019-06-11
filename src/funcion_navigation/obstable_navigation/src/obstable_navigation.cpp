@@ -42,7 +42,7 @@ public:
     {
         // publisher
         next_waypoint_pub = nh.advertise<geometry_msgs::PointStamped>("next_waypoint", 10, true);
-        next_waypose_pub = nh.advertise<geometry_msgs::PoseStamped>("next_waypose_pub", 10, true);
+        next_waypose_pub = nh.advertise<geometry_msgs::PoseStamped>("next_waypose", 10, true);
         //发布障碍物信息
         obstableMsg_pub = nh.advertise<std_msgs::String>("obstableMsg", 10, true);
 
@@ -215,7 +215,7 @@ private:
         ROS_INFO_STREAM("next  navigation goal pose: " << nextPose.pose.position.x <<", "<<nextPose.pose.position.y);
         next_waypose_pub.publish(nextPose);
         selectPoses.push(nextPose);
-        ROS_INFO_STREAM("select_pose_size: "<< selectPoints.size());
+        ROS_INFO_STREAM("select_pose_size: "<< selectPoses.size());
 
         if(selectPoses.size() >=5)
             moveToPose(selectPoses);
