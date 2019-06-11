@@ -149,7 +149,7 @@ void PointCloudToLaserScanNodelet::failureCb(const sensor_msgs::PointCloud2Const
 // 订阅3D激光雷达的数据 ==> pointCloud2 to laserscan
 void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 {
-  ROS_INFO("subscribe_pointCloud2 messages");
+  //ROS_INFO("subscribe_pointCloud2 messages");
   // build laserscan output
   sensor_msgs::LaserScan output;
   output.header = cloud_msg->header;
@@ -245,7 +245,7 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
 
     // overwrite range at laserscan ray if new range is smaller
     int index = (angle - output.angle_min) / output.angle_increment;
-    ROS_INFO_STREAM("the range index is: "<< index);
+    //ROS_INFO_STREAM("the range index is: "<< index);
     if (range < output.ranges[index])
     {
       output.ranges[index] = range;
