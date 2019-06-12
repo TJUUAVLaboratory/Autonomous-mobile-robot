@@ -64,10 +64,10 @@ namespace move_base {
     planner_plan_(NULL), latest_plan_(NULL), controller_plan_(NULL), 
     runPlanner_(false), setup_(false), p_freq_change_(false), c_freq_change_(false), new_global_plan_(false) {
 
-    ROS_WARN("MoveBase::MoveBase");
+    ROS_WARN("MoveBase::MoveBase 01");
     //move_base action server
     as_ = new MoveBaseActionServer(ros::NodeHandle(), "move_base", boost::bind(&MoveBase::executeCb, this, _1), false);
-
+    ROS_WARN("MoveBase::MoveBase 02");
     ros::NodeHandle private_nh("~");
     ros::NodeHandle nh;
 

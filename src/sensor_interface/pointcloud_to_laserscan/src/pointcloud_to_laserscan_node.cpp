@@ -45,7 +45,7 @@
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "pointcloud_to_laserscan_node");
-  ros::NodeHandle private_nh("~");
+  ros::NodeHandle private_nh("pointcloud_to_laserscan_node");
   int concurrency_level;
   private_nh.param<int>("concurrency_level", concurrency_level, 0);
 
