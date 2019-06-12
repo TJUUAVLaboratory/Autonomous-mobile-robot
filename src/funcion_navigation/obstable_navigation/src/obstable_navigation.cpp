@@ -67,7 +67,7 @@ public:
 void moveToPose(stack<geometry_msgs::PoseStamped>& poses)
  {
         //启动服务 navigation_control
-        MoveBaseClient movebase_client("move_base_pose", true);
+        MoveBaseClient movebase_client("move_base", true);
         while (!movebase_client.waitForServer(ros::Duration(5.0)))
         {
             ROS_INFO("waiting for the move_base server to connect");
