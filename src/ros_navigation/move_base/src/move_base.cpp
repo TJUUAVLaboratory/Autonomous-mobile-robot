@@ -141,7 +141,7 @@ namespace move_base {
       ROS_FATAL("Failed to create the %s planner, are you sure it is properly registered and that the containing library is built? Exception: %s", global_planner.c_str(), ex.what());
       exit(1);
     }
-
+    ROS_WARN("MoveBase::MoveBase 04");
     //create the ros wrapper for the controller's costmap... and initializer a pointer we'll use with the underlying map
     controller_costmap_ros_ = new costmap_2d::Costmap2DROS("local_costmap", tf_);
     controller_costmap_ros_->pause();
@@ -157,7 +157,7 @@ namespace move_base {
       exit(1);
     }
 
-    ROS_WARN("MoveBase::MoveBase 04"); 
+    ROS_WARN("MoveBase::MoveBase 05"); 
     // Start actively updating costmaps based on sensor data
     planner_costmap_ros_->start();
     controller_costmap_ros_->start();
