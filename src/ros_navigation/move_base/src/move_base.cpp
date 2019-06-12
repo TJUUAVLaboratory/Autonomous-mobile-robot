@@ -132,10 +132,12 @@ namespace move_base {
     planner_costmap_ros_->pause();
 
     //initialize the global planner
-    try {
+    try
+    {
       planner_ = bgp_loader_.createInstance(global_planner);
       planner_->initialize(bgp_loader_.getName(global_planner), planner_costmap_ros_);
-    } catch (const pluginlib::PluginlibException& ex) {
+    } 
+    catch (const pluginlib::PluginlibException& ex) {
       ROS_FATAL("Failed to create the %s planner, are you sure it is properly registered and that the containing library is built? Exception: %s", global_planner.c_str(), ex.what());
       exit(1);
     }
@@ -155,6 +157,7 @@ namespace move_base {
       exit(1);
     }
 
+    ROS_WARN("MoveBase::MoveBase 04"); 
     // Start actively updating costmaps based on sensor data
     planner_costmap_ros_->start();
     controller_costmap_ros_->start();
@@ -663,7 +666,7 @@ namespace move_base {
   void MoveBase::planThread(){
 
     ROS_WARN("MoveBase::planThread");
-    ROS_DEBUG("move_base_plan_thread","Starting planner thread...");
+    ROS_DEBUG("move_base_plan_thread ----- Starting planner thread...");
     ros::NodeHandle n;
     ros::Timer timer;
     bool wait_for_wake = false;
