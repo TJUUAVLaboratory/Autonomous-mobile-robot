@@ -67,7 +67,7 @@ namespace move_base {
     ROS_WARN("MoveBase::MoveBase 01");
     //move_base action server
     as_ = new MoveBaseActionServer(ros::NodeHandle(), "move_base", boost::bind(&MoveBase::executeCb, this, _1), false);
-    ROS_WARN("MoveBase::MoveBase 02");
+    ROS_WARN("MoveBase::MoveBase 02");  
     ros::NodeHandle private_nh("~");
     ros::NodeHandle nh;
 
@@ -96,6 +96,7 @@ namespace move_base {
 
     //set up the planner's thread  配置全局规划的线程
     planner_thread_ = new boost::thread(boost::bind(&MoveBase::planThread, this));
+    ROS_WARN("MoveBase::MoveBase 03"); 
 
     //for comanding the base  发布命令
     vel_pub_ = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
@@ -662,7 +663,7 @@ namespace move_base {
   void MoveBase::planThread(){
 
     ROS_WARN("MoveBase::planThread");
-    ROS_DEBUG_NAMED("move_base_plan_thread","Starting planner thread...");
+    ROS_DEBUG("move_base_plan_thread","Starting planner thread...");
     ros::NodeHandle n;
     ros::Timer timer;
     bool wait_for_wake = false;
