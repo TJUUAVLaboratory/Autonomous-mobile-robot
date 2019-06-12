@@ -60,6 +60,7 @@ namespace move_base {
     bgp_loader_("nav_core", "nav_core::BaseGlobalPlanner"), //模板类 ClassLoader
     blp_loader_("nav_core", "nav_core::BaseLocalPlanner"), 
     recovery_loader_("nav_core", "nav_core::RecoveryBehavior"),
+
     planner_plan_(NULL), latest_plan_(NULL), controller_plan_(NULL), 
     runPlanner_(false), setup_(false), p_freq_change_(false), c_freq_change_(false), new_global_plan_(false) {
 
@@ -90,7 +91,7 @@ namespace move_base {
 
     //set up plan triple buffer
     planner_plan_ = new std::vector<geometry_msgs::PoseStamped>();
-    latest_plan_ = new std::vector<geometry_msgs::PoseStamped>();
+    latest_plan_  = new std::vector<geometry_msgs::PoseStamped>();
     controller_plan_ = new std::vector<geometry_msgs::PoseStamped>();
 
     //set up the planner's thread  配置全局规划的线程
@@ -145,7 +146,7 @@ namespace move_base {
     //create a local planner
     try {
       tc_ = blp_loader_.createInstance(local_planner);
-      ROS_INFO("Created local_planner %s", local_planner.c_str());
+      ROS_WARN("Created + %s", local_planner.c_str());
       //local planner
       tc_->initialize(blp_loader_.getName(local_planner), &tf_, controller_costmap_ros_);
     } catch (const pluginlib::PluginlibException& ex) {
@@ -156,6 +157,7 @@ namespace move_base {
     // Start actively updating costmaps based on sensor data
     planner_costmap_ros_->start();
     controller_costmap_ros_->start();
+    ROS_WARN("start update global cospmap and local costmap");
 
     //advertise a service for getting a plan  [发布 start and goal 请求 global plan]
     make_plan_srv_ = private_nh.advertiseService("make_plan", &MoveBase::planService, this);
@@ -183,6 +185,7 @@ namespace move_base {
 
     //we're all set up now so we can start the action server
     as_->start();
+    ROS_WARN("MoveBaseAction service start");
 
     //动态参数调节
     dsrv_ = new dynamic_reconfigure::Server<move_base::MoveBaseConfig>(ros::NodeHandle("~"));
@@ -380,8 +383,8 @@ namespace move_base {
   5. 如果在goal规划不出路径,就在goal附近偏移进行规划路径
   6. 将规划的路径填充到 nav_msgs::GetPlan::Response
   */
-  bool MoveBase::planService(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::Response &resp){
-
+  bool MoveBase::planService(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::Response &resp)
+  {
     ROS_WARN("MoveBase::planService");
 
     if(as_->isActive()){  //
