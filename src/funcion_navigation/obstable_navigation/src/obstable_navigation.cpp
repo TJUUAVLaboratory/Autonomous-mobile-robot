@@ -47,7 +47,6 @@ public:
 
         //pub robot cmd
         pointCloud_pub = nh.advertise<sensor_msgs::PointCloud>("pointCloud", 5, true);
-        cmd_vel_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 5);
 
         //subscriber
         //from RVIZ
@@ -67,15 +66,12 @@ public:
 // according getting poses move to goal
 void moveToPose(stack<geometry_msgs::PoseStamped>& poses)
  {
-
         //启动服务 navigation_control
-
-        MoveBaseClient movebase_client("move_base", true);
+        MoveBaseClient movebase_client("move_base_pose", true);
         while (!movebase_client.waitForServer(ros::Duration(5.0)))
         {
             ROS_INFO("waiting for the move_base server to connect");
         }
-
         while(!poses.empty())
         {
             move_base_msgs::MoveBaseGoal goal;
@@ -160,7 +156,6 @@ private:
     ros::NodeHandle nh;
     ros::Publisher next_waypoint_pub;
     ros::Publisher next_waypose_pub;
-    ros::Publisher cmd_vel_pub;
     ros::Publisher pointCloud_pub;
     ros::Publisher obstableMsg_pub;   
     

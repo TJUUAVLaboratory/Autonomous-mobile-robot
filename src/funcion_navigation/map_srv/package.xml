@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-<name>cmd_control</name>
+  <name>map_srv</name>
   <version>0.0.0</version>
   <description>android controll package</description>
 
