@@ -2,9 +2,6 @@
 #include<ros/ros.h>
 #include "map_srv/mapSave.h"
 
-
-
-
 int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "map_srv_node");
