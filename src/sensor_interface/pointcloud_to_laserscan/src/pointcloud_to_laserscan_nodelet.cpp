@@ -162,6 +162,7 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
     {
       output.header.frame_id = target_frame_;
     }
+    else output.header.frame_id = cloud_msg->header.frame_id;
 
     output.angle_min = angle_min_;
     output.angle_max = angle_max_;
@@ -189,25 +190,27 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
   sensor_msgs::PointCloud2Ptr cloud;
 
   // Transform cloud if necessary
-  if (!(output.header.frame_id == cloud_msg->header.frame_id))
-  {
-    try
-    {
-      ROS_INFO("transform tf between cloud_in and targer");
-      cloud.reset(new sensor_msgs::PointCloud2);
-      tf2_->transform(*cloud_msg, *cloud, target_frame_, ros::Duration(tolerance_)); //坐标系转换
-      cloud_out = cloud;
-    }
-    catch (tf2::TransformException& ex)
-    {
-      NODELET_ERROR_STREAM("Transform failure: " << ex.what());
-      return;
-    }
-  }
-  else // 输入和输出 frame_id 一致
-  {
-    cloud_out = cloud_msg;
-  }
+  // if (!(output.header.frame_id == cloud_msg->header.frame_id))
+  // {
+  //   try
+  //   {
+  //     ROS_INFO("transform tf between cloud_in and targer");
+  //     cloud.reset(new sensor_msgs::PointCloud2);
+  //     tf2_->transform(*cloud_msg, *cloud, target_frame_, ros::Duration(tolerance_)); //坐标系转换
+  //     cloud_out = cloud;
+  //   }
+  //   catch (tf2::TransformException& ex)
+  //   {
+  //     NODELET_ERROR_STREAM("Transform failure: " << ex.what());
+  //     return;
+  //   }
+  // }
+  // else // 输入和输出 frame_id 一致
+  // {
+  //   cloud_out = cloud_msg;
+  // }
+
+  cloud_out = cloud_msg;
 
   // Iterate through pointcloud
   for (sensor_msgs::PointCloud2ConstIterator<float> iter_x(*cloud_out, "x"), iter_y(*cloud_out, "y"),
