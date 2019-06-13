@@ -49,9 +49,9 @@
 
 namespace pointcloud_to_laserscan
 {
-PointCloudToLaserScanNodelet::PointCloudToLaserScanNodelet()
-{
-}
+  PointCloudToLaserScanNodelet::PointCloudToLaserScanNodelet()
+  {
+  }
 
 void PointCloudToLaserScanNodelet::onInit()
 {
@@ -95,7 +95,7 @@ void PointCloudToLaserScanNodelet::onInit()
     input_queue_size_ = boost::thread::hardware_concurrency();
   }
 
-  if pointcloud target frame specified, we need to filter by transform availability
+  // if pointcloud target frame specified, we need to filter by transform availability
   if (!target_frame_.empty())
   {
     ROS_INFO("filter by transform availability");
@@ -111,7 +111,6 @@ void PointCloudToLaserScanNodelet::onInit()
     sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
   }
 
-  
 
   // 发布LaserScan   注意这种机制,有订阅时才发布
   pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan", 10, boost::bind(&PointCloudToLaserScanNodelet::connectCb, this),
