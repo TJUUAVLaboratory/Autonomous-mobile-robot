@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     {
         for(int w=0; w<map_image.cols; ++w)
         {
-            std::cout << " " << map_image.ptr(h,w);
+            std::cout << " " << map_image.data[w];
         }
         std::cout << std::endl;
     }
