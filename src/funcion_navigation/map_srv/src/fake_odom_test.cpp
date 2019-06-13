@@ -1,27 +1,20 @@
 
 #include<ros/ros.h>
-#include <opencv2/opencv.hpp>
-#include <opencv2/highgui.hpp>
+#include<opencv2/opencv.hpp>
+#include<opencv2/highgui.hpp>
 #include<nav_msgs/Odometry.h>
 #include<std_msgs/String.h>
+#include "cJSON.h"
+#include<string>
+#include <sstream>
 
 using namespace std;
 
+struct point {
+    float x;
+    float y;
 
-// void onMouse(int event, int x, int y, int flags, void *param)
-// {
-// cv::Mat *im = reinterpret_cast<cv::Mat*>(param);
-// switch (event)   //调度事件
-//     {
-//     case EVENT_LBUTTONDOWN:  //鼠标左键按下事件
-//     //显示像素值
-//     std::cout << "at(" << x << "," << y << ") value is:" << static_cast<int>(im->at<uchar>(cv::Point(x, y))) << std::endl;
-//     //使用Mat对象的at方法来获取(x,y)的像素值
-//     break;
-
-//     }
-// }
-
+} ;
 
 void onMouse(int event, int x,int y ,int flags,void *p){
     IplImage *img1;
@@ -52,7 +45,12 @@ void onMouse(int event, int x,int y ,int flags,void *p){
     }
 }
 
-
+std::string getStringFromFloat(float f)
+  {
+      std::ostringstream buffer;
+      buffer << f;
+      return buffer.str();
+ }
 
 //  request map save to path
 int main(int argc, char *argv[])
@@ -65,13 +63,51 @@ int main(int argc, char *argv[])
     
     std::string image_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.png";
     cv::Mat  map_image = cv::imread(image_path);
-
-    cv::imshow("Original Image", map_image);
+//     cv::imshow("Original Image", map_image);
     ROS_INFO_STREAM( "the image size: rows: " << map_image.rows << " cols: "<< map_image.cols);
+//    // cv::setMouseCallback("Original Image", onMouse, reinterpret_cast<void *>(&map_image));
+//     //注册回调函数，表示将函数onMouse与名为“Original Image”的窗口进行关联
+//     cv::waitKey(0);  
+        point start; start.x = 427, start.y = 280;
+        point goal;  goal.x = 348, goal.y = 313;
 
-   // cv::setMouseCallback("Original Image", onMouse, reinterpret_cast<void *>(&map_image));
-//注册回调函数，表示将函数onMouse与名为“Original Image”的窗口进行关联
-    cv::waitKey(0);    
+        float param[] = {-17.2203, -13.7435, 41, 39.7};
+        float resolution = 40.0/(map_image.rows*map_image.cols);
+
+        nav_msgs::Odometry odom_msg;
+        odom_msg.header.stamp = ros::Time::now();
+        odom_msg.header.frame_id = "/odom";
+        odom_msg.pose.pose.position.x = start.x*resolution + param[0];
+        odom_msg.pose.pose.position.y = start.y*resolution + param[1];
+        odom_msg.pose.pose.position.z = 0;
+
+        odom_msg.pose.pose.orientation.x = 0;
+        odom_msg.pose.pose.orientation.y = 0;
+        odom_msg.pose.pose.orientation.z = 0;
+        odom_msg.pose.pose.orientation.w = 1;
+
+        point target;
+        target.x = goal.x * resolution + param[0];
+        target.y = goal.y * resolution + param[1];
+        std_msgs::String target_msg;
+
+        string  target_x, target_y;
+        target_x = getStringFromFloat(target.x);
+        target_y = getStringFromFloat(target.y);
+
+    
+        string msg_string = "[\"start\",\"pathfind/full_map.png\",[ -17.2203, -13.7435, 41, 39.7 ],[" + target_x + ","+target_y+"]]";
+        cJSON*  json = cJSON_Parse(msg_string.c_str());
+        target_msg.data = cJSON_Print(json);
+
+        ros::Rate loop_rate(50);
+        while (ros::ok())
+        {
+            fake_odom_pub.publish(odom_msg);
+            fake_goal_pub.publish(target_msg);
+            loop_rate.sleep();
+        }
+        
 
     return 0;
 

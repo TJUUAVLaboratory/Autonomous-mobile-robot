@@ -18,6 +18,9 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
+# file(GLOB jsoncpp_source  lib/cjson/cJSON.c)
+# add_library(cjson  ${jsoncpp_source})
+
 
 add_service_files(
   FILES
@@ -40,12 +43,14 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/lib/cjson
 )
 
 add_executable(fake_odom_node src/fake_odom_test.cpp)
 target_link_libraries(fake_odom_node
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
+    ${catkin_LIBRARIES}  cjson
     )
 
 
