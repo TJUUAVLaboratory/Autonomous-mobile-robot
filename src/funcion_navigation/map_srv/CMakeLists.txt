@@ -15,6 +15,8 @@ find_package(catkin REQUIRED COMPONENTS
   message_filters
 )
 # Generate messages in the 'msg' folder
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 
 add_service_files(
@@ -40,9 +42,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(map_srv_node src/map_srv.cpp)
-target_link_libraries(map_srv_node
+add_executable(fake_odom_node src/fake_odom_test.cpp)
+target_link_libraries(fake_odom_node
     ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
     )
 
 
