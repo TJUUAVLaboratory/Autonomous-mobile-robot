@@ -59,6 +59,7 @@ void move_parameter(ros::NodeHandle& old_h, ros::NodeHandle& new_h, std::string 
   if (should_delete) old_h.deleteParam(name);
 }
 
+// Costmap2DROS 构造
 Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
     layered_costmap_(NULL),
     name_(name),
