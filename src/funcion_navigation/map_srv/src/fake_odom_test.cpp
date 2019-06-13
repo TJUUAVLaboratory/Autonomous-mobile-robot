@@ -17,9 +17,9 @@ int main(int argc, char *argv[])
     cv::Mat  map_image = cv::imread(image_path);
     ROS_INFO_STREAM( "the image size: rows: " << map_image.rows << " cols: "<< map_image.cols);
 
-    for(int h=0; h<map_image.rows; ++h)
+    for(int h=0; h<10; ++h)
     {
-        for(int w=0; w<map_image.cols; ++w)
+        for(int w=0; w<10; ++w)
         {
             char pixel = map_image.at<uchar>(h,w);
             std::cout << " " << pixel;
