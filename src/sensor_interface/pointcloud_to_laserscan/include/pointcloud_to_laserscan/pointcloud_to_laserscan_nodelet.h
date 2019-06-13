@@ -92,7 +92,7 @@ private:
   double inf_epsilon_;
 
   // added
-  int times;
+  // int times;
   // sensor_msgs::LaserScan output;
 };
 
