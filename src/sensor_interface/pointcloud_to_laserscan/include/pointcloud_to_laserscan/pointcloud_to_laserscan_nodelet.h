@@ -92,8 +92,8 @@ private:
   double inf_epsilon_;
 
   // added
-  int times=0;
-  sensor_msgs::LaserScan output;
+  int times;
+  // sensor_msgs::LaserScan output;
 };
 
 }  // namespace pointcloud_to_laserscan

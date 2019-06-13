@@ -145,7 +145,7 @@ void PointCloudToLaserScanNodelet::failureCb(const sensor_msgs::PointCloud2Const
 void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 {
   // build laserscan output
-  // sensor_msgs::LaserScan output;
+  sensor_msgs::LaserScan output;
   if(times==0)
   {
     output.header = cloud_msg->header;
@@ -252,7 +252,8 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
      pub_.publish(output);
   }
   
-}
+ }
+ 
 }  // namespace pointcloud_to_laserscan
 
 PLUGINLIB_EXPORT_CLASS(pointcloud_to_laserscan::PointCloudToLaserScanNodelet, nodelet::Nodelet)
