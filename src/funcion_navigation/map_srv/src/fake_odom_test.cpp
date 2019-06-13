@@ -15,8 +15,16 @@ int main(int argc, char *argv[])
     
     std::string image_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.png";
     cv::Mat  map_image = cv::imread(image_path);
-
     ROS_INFO_STREAM( "the image size: rows: " << map_image.rows << " cols: "<< map_image.cols);
+
+    for(int h=0; h<map_image.rows; ++h)
+    {
+        for(int w=0; w<map_image.cols; ++w)
+        {
+            std::cout << " " << *map_image.ptr(h,w);
+        }
+        std::cout << std::endl;
+    }
 
 
     
