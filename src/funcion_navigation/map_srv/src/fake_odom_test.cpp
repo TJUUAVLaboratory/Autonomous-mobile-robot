@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     {
         for(int w=0; w<map_image.cols; ++w)
         {
-            std::cout << " " << *(map_image.at<char>(h,w));
+            ROS_INFO_STREAM(" "<< map_image.at<uchar>(h,w));
         }
         std::cout << std::endl;
     }
