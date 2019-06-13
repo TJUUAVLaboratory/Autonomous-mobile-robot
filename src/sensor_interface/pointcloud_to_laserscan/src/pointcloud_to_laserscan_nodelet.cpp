@@ -96,20 +96,22 @@ void PointCloudToLaserScanNodelet::onInit()
   }
 
   // if pointcloud target frame specified, we need to filter by transform availability
-  if (!target_frame_.empty())
-  {
-    ROS_INFO("filter by transform availability");
-    tf2_.reset(new tf2_ros::Buffer());
-    tf2_listener_.reset(new tf2_ros::TransformListener(*tf2_));
-    message_filter_.reset(new MessageFilter(sub_, *tf2_, target_frame_, input_queue_size_, nh_));
-    message_filter_->registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
-    message_filter_->registerFailureCallback(boost::bind(&PointCloudToLaserScanNodelet::failureCb, this, _1, _2));
-  }
-  else  // otherwise setup direct subscription
-  {
-    ROS_INFO("setup direct subscription");
-    sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
-  }
+  // if (!target_frame_.empty())
+  // {
+  //   ROS_INFO("filter by transform availability");
+  //   tf2_.reset(new tf2_ros::Buffer());
+  //   tf2_listener_.reset(new tf2_ros::TransformListener(*tf2_));
+  //   message_filter_.reset(new MessageFilter(sub_, *tf2_, target_frame_, input_queue_size_, nh_));
+  //   message_filter_->registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
+  //   message_filter_->registerFailureCallback(boost::bind(&PointCloudToLaserScanNodelet::failureCb, this, _1, _2));
+  // }
+  // else  // otherwise setup direct subscription
+  // {
+  //   ROS_INFO("setup direct subscription");
+  //   sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
+  // }
+
+  sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
 
   // 发布LaserScan   注意这种机制,有订阅时才发布
   pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan", 10, boost::bind(&PointCloudToLaserScanNodelet::connectCb, this),
