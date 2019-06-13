@@ -255,7 +255,13 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
       output.ranges[index] = range;
     }
   }
-  pub_.publish(output);
+  
+  times++;
+  if (times == 60){
+     times=0;
+     pub_.publish(output);
+  }
+
 }
 }  // namespace pointcloud_to_laserscan
 
