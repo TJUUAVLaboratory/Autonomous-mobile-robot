@@ -154,7 +154,7 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
   //ROS_INFO("subscribe_pointCloud2 messages");
   // build laserscan output
   sensor_msgs::LaserScan output;
-  static int time;
+  static int time=0;
   if(time == 0)
   {
     output.header = cloud_msg->header;
