@@ -58,8 +58,8 @@ int main(int argc, char *argv[])
     ros::init(argc, argv, "fake_odom_node");
     ros::NodeHandle nh;
 
-    ros::Publisher fake_odom_pub = nh.advertise<nav_msgs::Odometry>("/odom", 50, true);
-    ros::Publisher fake_goal_pub = nh.advertise<std_msgs::String>("/aibee_navi", 50, true);
+    ros::Publisher fake_odom_pub = nh.advertise<nav_msgs::Odometry>("/odom", 1, true);
+    ros::Publisher fake_goal_pub = nh.advertise<std_msgs::String>("/aibee_navi", 1, true);
     
     std::string image_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.png";
     cv::Mat  map_image = cv::imread(image_path);
@@ -104,6 +104,7 @@ int main(int argc, char *argv[])
         while (ros::ok())
         {
             fake_odom_pub.publish(odom_msg);
+            
             fake_goal_pub.publish(target_msg);
             loop_rate.sleep();
         }
