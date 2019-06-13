@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
         point goal;  goal.x = 348, goal.y = 313;
 
         float param[] = {-17.2203, -13.7435, 41, 39.7};
-        float resolution = 40.0/(map_image.rows*map_image.cols);
+        float resolution = param[3]/map_image.cols;
 
         nav_msgs::Odometry odom_msg;
         odom_msg.header.stamp = ros::Time::now();
