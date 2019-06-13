@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     cv::imshow("Original Image", map_image);
     ROS_INFO_STREAM( "the image size: rows: " << map_image.rows << " cols: "<< map_image.cols);
 
-    cv::setMouseCallback("Original Image", onMouse, reinterpret_cast<void *>(&map_image));
+   // cv::setMouseCallback("Original Image", onMouse, reinterpret_cast<void *>(&map_image));
 //注册回调函数，表示将函数onMouse与名为“Original Image”的窗口进行关联
     cv::waitKey(0);    
 
