@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "Check_odom_Node");
     // ros::NodeHandle nh;
-
+    ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
     Check_odom_Node  check_odom;
     check_odom.map_operate();    
 
