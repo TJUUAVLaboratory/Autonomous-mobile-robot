@@ -52,6 +52,7 @@ public:
 
     void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
     {
+        ROS_INFO("received  clicked pose");
         current_odom_point.header.frame_id = "/odom";
         current_odom_point.point.x = pose_msg->pose.position.x;
         current_odom_point.point.y = pose_msg->pose.position.y;
