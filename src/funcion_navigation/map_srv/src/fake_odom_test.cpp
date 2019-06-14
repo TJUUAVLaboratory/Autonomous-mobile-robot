@@ -103,6 +103,7 @@ int main(int argc, char *argv[])
         ros::Rate loop_rate(50);
         while (ros::ok())
         {
+            odom_msg.header.stamp = ros::Time::now();
             fake_odom_pub.publish(odom_msg);
             
             fake_goal_pub.publish(target_msg);
