@@ -41,6 +41,7 @@ private:
 public:
     Check_odom_Node(void)
     {
+        ROS_INFO("Check_odom_Node");
         // map save service
         client = nh.serviceClient<map_srv::mapSave>("/map_save");
         map_client.request.message = "save_map";
@@ -64,6 +65,7 @@ public:
 
 void map_operate()
 {
+    ROS_INFO("Check_odom_Node");
     while(ros::ok())
     {
         // map save request 
