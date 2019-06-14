@@ -236,7 +236,7 @@ private:
         selectPoints.push(nextPoint);
         ROS_INFO_STREAM("select_point_size: "<< selectPoints.size());
 
-        if(selectPoints.size() >=10)
+        if(selectPoints.size() >=5)
             moveToGoal(selectPoints);
     }
 

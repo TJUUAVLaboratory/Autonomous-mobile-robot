@@ -72,6 +72,10 @@
     <node name="obstable_navigatoin" pkg="obstable_navigatoin" type="obstable_navigatoin_node" output="screen" >
     </node>
 
+    <!--坐标系的转换-->
+    <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 1 map odom 20" />
+
+
 <!-- 运行rviz -->
     <!--<node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>-->
 

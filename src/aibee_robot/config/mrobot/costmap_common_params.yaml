@@ -1,3 +1,12 @@
+
+## obstacle_range 决定多远范围以内被当成障碍物点显示在costmap里
+## raytrace_range
+## robot_radius  机器人的形状
+## inflation_radius comstmap的膨胀半径
+## observation_sources 用来感知的数据类型, laserscan or pointcloud
+## 
+
+
 obstacle_range: 2.5
 raytrace_range: 3.0
 robot_radius: 0.165

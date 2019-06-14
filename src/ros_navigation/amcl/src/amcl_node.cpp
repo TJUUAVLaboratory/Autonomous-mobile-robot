@@ -107,6 +107,7 @@ angle_diff(double a, double b)
 
 static const std::string scan_topic_ = "scan";
 
+//  AMCL Node class 
 class AmclNode
 {
   public:
@@ -122,7 +123,7 @@ class AmclNode
     void savePoseToServer();
 
   private:
-    tf::TransformBroadcaster* tfb_;
+    tf::TransformBroadcaster*   tfb_;  //publish tf
 
     // Use a child class to get access to tf2::Buffer class inside of tf_
     struct TransformListenerWrapper : public tf::TransformListener
@@ -130,11 +131,11 @@ class AmclNode
       inline tf2_ros::Buffer &getBuffer() {return tf2_buffer_;}
     };
 
-    TransformListenerWrapper* tf_;
+    TransformListenerWrapper* tf_;  //automatically subscribes to ROS transform messages
 
     bool sent_first_transform_;
 
-    tf::Transform latest_tf_;
+    tf::Transform latest_tf_;  // tf::Transform supports rigid transforms 坐标系的转换
     bool latest_tf_valid_;
 
     // Pose-generating function used to uniformly distribute particles over
@@ -168,7 +169,7 @@ class AmclNode
     std::string odom_frame_id_;
 
     //paramater to store latest odom pose
-    tf::Stamped<tf::Pose> latest_odom_pose_;
+    tf::Stamped<tf::Pose>  latest_odom_pose_;
 
     //parameter for what base to use
     std::string base_frame_id_;
@@ -189,7 +190,7 @@ class AmclNode
     double resolution;
 
     message_filters::Subscriber<sensor_msgs::LaserScan>* laser_scan_sub_;
-    tf::MessageFilter<sensor_msgs::LaserScan>* laser_scan_filter_;
+    tf::MessageFilter<sensor_msgs::LaserScan>*  laser_scan_filter_;  // filter massage
 
     ros::Subscriber initial_pose_sub_;
     std::vector< AMCLLaser* > lasers_;
@@ -222,6 +223,7 @@ class AmclNode
     void requestMap();
 
     // Helper to get odometric pose from transform system
+    // 从TF中得到 odom x,y yaw time string
     bool getOdomPose(tf::Stamped<tf::Pose>& pose,
                      double& x, double& y, double& yaw,
                      const ros::Time& t, const std::string& f);
@@ -411,7 +413,7 @@ AmclNode::AmclNode() :
   private_nh_.param("transform_tolerance", tmp_tol, 0.1);
   private_nh_.param("recovery_alpha_slow", alpha_slow_, 0.001);
   private_nh_.param("recovery_alpha_fast", alpha_fast_, 0.1);
-  private_nh_.param("tf_broadcast", tf_broadcast_, true);
+  private_nh_.param("tf_broadcast", tf_broadcast_, true);  //config 是否发布tf message
 
   transform_tolerance_.fromSec(tmp_tol);
 
@@ -424,8 +426,8 @@ AmclNode::AmclNode() :
   updatePoseFromServer();
 
   cloud_pub_interval.fromSec(1.0);
-  tfb_ = new tf::TransformBroadcaster();
-  tf_ = new TransformListenerWrapper();
+  tfb_ = new tf::TransformBroadcaster();  // tf publish
+  tf_ = new TransformListenerWrapper();  // tf subscribe
 
   pose_pub_ = nh_.advertise<geometry_msgs::PoseWithCovarianceStamped>("amcl_pose", 2, true);
   particlecloud_pub_ = nh_.advertise<geometry_msgs::PoseArray>("particlecloud", 2, true);
@@ -452,7 +454,8 @@ AmclNode::AmclNode() :
   if(use_map_topic_) {
     map_sub_ = nh_.subscribe("map", 1, &AmclNode::mapReceived, this);
     ROS_INFO("Subscribed to map topic.");
-  } else {
+  } 
+  else {
     requestMap();
   }
   m_force_update = false;
@@ -1388,7 +1391,7 @@ AmclNode::laserReceived(const sensor_msgs::LaserScanConstPtr& laser_scan)
                                  tf::Point(odom_to_map.getOrigin()));
       latest_tf_valid_ = true;
 
-      if (tf_broadcast_ == true)
+      if (tf_broadcast_ == true) // allowed publish tf message
       {
         // We want to send a transform that is good up until a
         // tolerance time so that odom can be used
@@ -1417,7 +1420,7 @@ AmclNode::laserReceived(const sensor_msgs::LaserScanConstPtr& laser_scan)
       tf::StampedTransform tmp_tf_stamped(latest_tf_.inverse(),
                                           transform_expiration,
                                           global_frame_id_, odom_frame_id_);
-      this->tfb_->sendTransform(tmp_tf_stamped);
+      this->tfb_->sendTransform(tmp_tf_stamped); // 发布 global_frmae_id (/map) 与 odom_frame_id (/odom)的tf message
     }
 
     // Is it time to save our last pose to the param server
