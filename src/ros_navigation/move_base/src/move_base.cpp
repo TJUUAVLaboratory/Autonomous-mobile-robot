@@ -64,10 +64,8 @@ namespace move_base {
     planner_plan_(NULL), latest_plan_(NULL), controller_plan_(NULL), 
     runPlanner_(false), setup_(false), p_freq_change_(false), c_freq_change_(false), new_global_plan_(false) {
 
-    ROS_WARN("MoveBase::MoveBase 01");
-    //move_base action server
+    //move_base action server  监听 move_base_msgs::MoveBaseGoal消息
     as_ = new MoveBaseActionServer(ros::NodeHandle(), "move_base", boost::bind(&MoveBase::executeCb, this, _1), false);
-    ROS_WARN("MoveBase::MoveBase 02");  
     ros::NodeHandle private_nh("~");
     ros::NodeHandle nh;
 
@@ -758,7 +756,6 @@ namespace move_base {
   2. 将goal转换到全局坐标系
   3. 开启planThread
   4. 执行executeCycle(goal, global_plan)
-
   */
   void MoveBase::executeCb(const move_base_msgs::MoveBaseGoalConstPtr& move_base_goal)
   {
