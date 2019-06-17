@@ -29,7 +29,7 @@ pixel_point  current_pixel_point;
 
 map_srv::mapSave map_client; // reruest message
 ros::ServiceClient client;
-
+cv::Mat  map_image;
 image_transport::Publisher pub_map_image;
 
 
@@ -58,17 +58,16 @@ void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
 
     std::string image_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.png";
     std::string output_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map_1.png";
-    cv::Mat  map_image = cv::imread(image_path);
+    map_image = cv::imread(image_path);
     cv::Mat  kernel =  cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
     cv::morphologyEx(map_image, map_image, cv::MORPH_CLOSE, kernel);
     cv::morphologyEx(map_image, map_image, cv::MORPH_OPEN, kernel);
 
     cv::imwrite(output_path, map_image);
 
-    sensor_msgs::ImagePtr image_map_msg;
-
-    image_map_msg= cv_bridge::CvImage(current_odom_point.header, "mono8", map_image).toImageMsg();
-    pub_map_image.publish(image_map_msg);
+    // sensor_msgs::ImagePtr image_map_msg;
+    // image_map_msg= cv_bridge::CvImage(current_odom_point.header, "mono8", map_image).toImageMsg();
+    // pub_map_image.publish(image_map_msg);
 
 }
 
@@ -92,7 +91,14 @@ int main(int argc, char *argv[])
     image_transport::ImageTransport it(nh);
     pub_map_image = it.advertise("/map_image", 2);  
 
-    ros::spin(); 
+    ros::Rate loop_rate(30);
+    while(ros::ok())
+    {
+        sensor_msgs::ImagePtr image_map_msg;
+        image_map_msg= cv_bridge::CvImage(current_odom_point.header, "mono8", map_image).toImageMsg();
+        pub_map_image.publish(image_map_msg);
+        ros::spinOnce(); 
+    }
 
     return 0;
 
