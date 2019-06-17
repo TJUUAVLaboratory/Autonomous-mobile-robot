@@ -89,8 +89,8 @@ int main(int argc, char *argv[])
         point target;
         target.x = goal.x * resolution + param[0];
         target.y = goal.y * resolution + param[1];
-        std_msgs::String target_msg;
 
+        std_msgs::String target_msg;
         string  target_x, target_y;
         target_x = getStringFromFloat(target.x);
         target_y = getStringFromFloat(target.y);

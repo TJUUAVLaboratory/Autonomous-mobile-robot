@@ -8,6 +8,10 @@
 #include<opencv2/highgui/highgui.hpp>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
+#include <std_msgs/String.h>
+#include "cJSON.h"
+#include <string>
+
 // + clicked pose button  
 // + get the current pose
 // request the map save
@@ -25,15 +29,25 @@ struct pixel_point
 
 // global varient
 geometry_msgs::PointStamped  current_odom_point;
+geometry_msgs::PointStamped  last_odom_point;
 pixel_point  current_pixel_point; 
 
 map_srv::mapSave map_client; // reruest message
 ros::ServiceClient client;
 cv::Mat  map_image;
 image_transport::Publisher pub_map_image;
+ros::Publisher fake_goal_pub;
 float resolution;
 
 float param[] = {-17.2203, -13.7435, 41, 39.7};
+
+
+std::string getStringFromFloat(float f)
+  {
+      std::ostringstream buffer;
+      buffer << f;
+      return buffer.str();
+ }
 
 
 void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
@@ -44,7 +58,8 @@ void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
     current_odom_point.point.x = pose_msg->pose.position.x;
     current_odom_point.point.y = pose_msg->pose.position.y;
     current_odom_point.point.z = 0;
-
+    ROS_INFO_STREAM("current position: " << current_odom_point.point.x <<" , " << current_odom_point.point.y);
+    ROS_INFO_STREAM("last position: " << last_odom_point.point.x <<" , "<< last_odom_point.point.y);
     //request  map save
     if(client.call(map_client))
     {
@@ -64,8 +79,8 @@ void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
     else 
         ROS_ERROR("Failed to call the service"); 
 
-    std::string image_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.pgm";
-    std::string output_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map_1.pgm";
+    std::string image_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.png";
+    std::string output_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.png";
     map_image = cv::imread(image_path);
     // cv::Mat  kernel =  cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
     // cv::morphologyEx(map_image, map_image, cv::MORPH_CLOSE, kernel);
@@ -81,10 +96,30 @@ void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
     cv::circle(map_image, cv::Point(current_pixel_point.u, current_pixel_point.v), 10, cv::Scalar(255,255,255));
     cv::imwrite(output_path, map_image);
 
-    sensor_msgs::ImagePtr image_map_msg;
-    image_map_msg= cv_bridge::CvImage(current_odom_point.header, "mono8", map_image).toImageMsg();
-    pub_map_image.publish(image_map_msg);
+    // sensor_msgs::ImagePtr image_map_msg;
+    // image_map_msg= cv_bridge::CvImage(current_odom_point.header, "mono8", map_image).toImageMsg();
+    // pub_map_image.publish(image_map_msg);
 
+    // send target
+    std_msgs::String target_msg;
+    std::string  target_x, target_y, param_0, param_1, param_2, param_3;
+    target_x = getStringFromFloat(last_odom_point.point.x);
+    target_y = getStringFromFloat(last_odom_point.point.y);
+    param_0 = getStringFromFloat(param[0]);
+    param_1 = getStringFromFloat(param[1]);
+    param_2 = getStringFromFloat(param[2]);
+    param_3 = getStringFromFloat(param[3]);
+
+    std::string msg_string = "[\"start\",\"pathfind/full_map.png\",[" + param_0 +
+                                                            ","  + param_1 +
+                                                            ","  + param_2 +
+                                                            ","  + param_3 + 
+                                                            " ],[" + target_x + ","+target_y+"]]";
+    cJSON*  json = cJSON_Parse(msg_string.c_str());
+    target_msg.data = cJSON_Print(json);
+    fake_goal_pub.publish(target_msg);
+    last_odom_point = current_odom_point;
+       
 }
 
 
@@ -103,7 +138,10 @@ int main(int argc, char *argv[])
     // sub clicked_pose get current pose
     ros::Subscriber current_pose_sub = nh.subscribe("/clicked_pose", 1, &sub_currentPose_Callback); 
 
-    //
+    // send  goal
+    fake_goal_pub = nh.advertise<std_msgs::String>("/aibee_navi", 1, true);
+
+    //publish map_image
     image_transport::ImageTransport it(nh);
     pub_map_image = it.advertise("/map_image", 2);  
 

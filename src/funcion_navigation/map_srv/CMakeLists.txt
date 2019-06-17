@@ -61,6 +61,6 @@ add_executable(check_odom_node src/check_odom_position.cpp)
 target_link_libraries(check_odom_node
     ${catkin_LIBRARIES}
     ${OpenCV_LIBRARIES}
-    ${catkin_LIBRARIES} 
+    ${catkin_LIBRARIES}  cjson
     )
 
