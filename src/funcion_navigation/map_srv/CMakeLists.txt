@@ -13,6 +13,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_filters
+  image_transport
+  cv_bridge
 )
 # Generate messages in the 'msg' folder
 find_package(OpenCV REQUIRED)
@@ -37,7 +39,8 @@ find_package(cmake_modules)
 
 
 catkin_package(
-  CATKIN_DEPENDS geometry_msgs roscpp std_msgs message_runtime 
+  CATKIN_DEPENDS geometry_msgs roscpp std_msgs message_runtime   image_transport
+  cv_bridge
 )
 
 include_directories(

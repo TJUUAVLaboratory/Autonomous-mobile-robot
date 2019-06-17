@@ -3,9 +3,11 @@
 #include "map_srv/mapSave.h"  // mapsave service message
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PointStamped.h>
+#include <sensor_msgs/Image.h>
 #include<opencv2/opencv.hpp>
 #include<opencv2/highgui/highgui.hpp>
-
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
 // + clicked pose button  
 // + get the current pose
 // request the map save
@@ -27,6 +29,8 @@ pixel_point  current_pixel_point;
 
 map_srv::mapSave map_client; // reruest message
 ros::ServiceClient client;
+
+image_transport::Publisher pub_map_image;
 
 
 
@@ -60,6 +64,12 @@ void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
 
     cv::imwrite(output_path, map_image);
 
+    sensor_msgs::ImagePtr image_map_msg;
+    image_map_msg->header.stamp = ros::Time().now();
+    image_map_msg->header.frame_id = "/map";
+    image_map_msg= cv_bridge::CvImage(image_map_msg->header, "mono8", map_image).toImageMsg();
+    pub_map_image.publish(image_map_msg);
+
 }
 
 
@@ -76,7 +86,11 @@ int main(int argc, char *argv[])
     map_client.request.map_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind";
 
     // sub clicked_pose get current pose
-    ros::Subscriber current_pose_sub = nh.subscribe("/clicked_pose", 1, &sub_currentPose_Callback);   
+    ros::Subscriber current_pose_sub = nh.subscribe("/clicked_pose", 1, &sub_currentPose_Callback); 
+
+    //
+    image_transport::ImageTransport it(nh);
+    pub_map_image = it.advertise("/map_image", 2);  
 
     ros::spin(); 
 
