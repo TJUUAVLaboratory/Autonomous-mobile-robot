@@ -56,11 +56,19 @@ void path_waypoint_Callback(const std_msgs::StringPtr& path_msg)
     ROS_INFO_STREAM("the waypoints: "<<path_data);
 
     cJSON*  pathJson = cJSON_Parse(path_data.data.c_str());
-    cJSON* json_out = cJSON_GetObjectItem(pathJson, "pathfind_ok");
+    cJSON* json_array = cJSON_GetObjectItem(pathJson, "pathfind_ok");
 
-    std::string string_out;
-    char* json_print = cJSON_Print(json_out);
-    ROS_INFO_STREAM("the waypoints:_out "<< std::string(json_print));
+    for(int i=0; i<cJSON_GetArraySize(json_array); i++)
+    {
+        cJSON* point = cJSON_GetArrayItem(json_array, i);
+        for(int j=0; j<2; j++)
+        {
+            cJSON* coord = cJSON_GetArrayItem(point,i);
+            ROS_INFO_STREAM("test value: "<< coord->valueint);
+        }
+
+    }
+
 
 
 }
