@@ -54,9 +54,7 @@ public:
         NavGoal_sub = nh.subscribe("/clicked_pose", 1, &ObstableNavagation::sub_2D_NavGoal_Callback, this);
         point_sub = nh.subscribe("/clicked_point", 1, &ObstableNavagation::sub_2D_point_Callback, this);
         initialPose_sub = nh.subscribe("/initialpose", 1, &ObstableNavagation::sub_initialPose_Callback, this);
-        laserScan_sub = nh.subscribe("/scan", 1, &ObstableNavagation::sub_laserScan_Callback, this);
-
-           
+        laserScan_sub = nh.subscribe("/scan", 1, &ObstableNavagation::sub_laserScan_Callback, this);           
 
         // obstable_thread = new boost::thread(boost::bind(&ObstableNavagation::moveToGoal, this));
     
