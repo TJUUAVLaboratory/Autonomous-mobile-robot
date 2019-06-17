@@ -64,8 +64,8 @@ void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
     else 
         ROS_ERROR("Failed to call the service"); 
 
-    std::string image_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.png";
-    std::string output_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map_1.png";
+    std::string image_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.pgm";
+    std::string output_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map_1.pgm";
     map_image = cv::imread(image_path);
     cv::Mat  kernel =  cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
     cv::morphologyEx(map_image, map_image, cv::MORPH_CLOSE, kernel);
