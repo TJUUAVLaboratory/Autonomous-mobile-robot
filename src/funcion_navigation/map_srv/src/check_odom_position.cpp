@@ -18,8 +18,8 @@
 
 struct pixel_point
 {
-    float x;
-    float y;
+    float u;
+    float v;
 };
 
 
@@ -31,7 +31,9 @@ map_srv::mapSave map_client; // reruest message
 ros::ServiceClient client;
 cv::Mat  map_image;
 image_transport::Publisher pub_map_image;
+float resolution;
 
+float param[] = {-17.2203, -13.7435, 41, 39.7};
 
 
 void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
@@ -51,6 +53,12 @@ void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
                             << " "<< map_client.response.parameters[1] 
                             << " "<< map_client.response.parameters[2] 
                             << " "<< map_client.response.parameters[3]);
+
+        param[0] = map_client.response.parameters[0];                            
+        param[1] = map_client.response.parameters[1];
+        param[2] = map_client.response.parameters[2];
+        param[3] = map_client.response.parameters[3];
+
     }
 
     else 
@@ -59,15 +67,23 @@ void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
     std::string image_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.png";
     std::string output_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map_1.png";
     map_image = cv::imread(image_path);
-    // cv::Mat  kernel =  cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
-    // cv::morphologyEx(map_image, map_image, cv::MORPH_CLOSE, kernel);
-    // cv::morphologyEx(map_image, map_image, cv::MORPH_OPEN, kernel);
+    cv::Mat  kernel =  cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
+    cv::morphologyEx(map_image, map_image, cv::MORPH_CLOSE, kernel);
+    cv::morphologyEx(map_image, map_image, cv::MORPH_OPEN, kernel);
+
+    resolution = param[2]/map_image.rows;
+    resolution = (resolution+param[3]/map_image.cols)/2.0;
+    ROS_INFO_STREAM("resolution: " << resolution);
+
+    current_pixel_point.u = (current_odom_point.point.x-param[0])/resolution;
+    current_pixel_point.v = (current_odom_point.point.y-param[1])/resolution;
+    ROS_INFO_STREAM("current pixel point: "<< current_pixel_point.u << " , "<<current_pixel_point.v);
 
     cv::imwrite(output_path, map_image);
 
-    // sensor_msgs::ImagePtr image_map_msg;
-    // image_map_msg= cv_bridge::CvImage(current_odom_point.header, "mono8", map_image).toImageMsg();
-    // pub_map_image.publish(image_map_msg);
+    sensor_msgs::ImagePtr image_map_msg;
+    image_map_msg= cv_bridge::CvImage(current_odom_point.header, "mono8", map_image).toImageMsg();
+    pub_map_image.publish(image_map_msg);
 
 }
 
