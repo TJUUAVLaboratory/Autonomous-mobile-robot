@@ -51,9 +51,16 @@ std::string getStringFromFloat(float f)
 
 void path_waypoint_Callback(const std_msgs::StringPtr& path_msg)
 {
-    std_msgs::String pathJson;
-    pathJson.data = path_msg->data;
-    ROS_INFO_STREAM("the waypoints: "<<pathJson);
+    std_msgs::String path_data;
+    path_data.data = path_msg->data;
+    ROS_INFO_STREAM("the waypoints: "<<path_data);
+
+    cJSON*  pathJson = cJSON_Parse(path_data.data.c_str());
+    cJSON* json_out = cJSON_GetObjectItem(pathJson, "pathfind_ok");
+
+    char* string_out = cJSON_Print(json_out);
+    ROS_INFO_STREAM("the waypoints:_out "<< string_out);
+
 
 }
 
