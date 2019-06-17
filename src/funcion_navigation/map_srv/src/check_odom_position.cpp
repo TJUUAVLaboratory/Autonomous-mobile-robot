@@ -37,6 +37,7 @@ image_transport::Publisher pub_map_image;
 void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
 {
     ROS_INFO("received  clicked pose");
+    current_odom_point.header.stamp = pose_msg->header.stamp;
     current_odom_point.header.frame_id = "/odom";
     current_odom_point.point.x = pose_msg->pose.position.x;
     current_odom_point.point.y = pose_msg->pose.position.y;
@@ -65,9 +66,8 @@ void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
     cv::imwrite(output_path, map_image);
 
     sensor_msgs::ImagePtr image_map_msg;
-    image_map_msg->header.stamp = ros::Time().now();
-    image_map_msg->header.frame_id = "/map";
-    image_map_msg= cv_bridge::CvImage(image_map_msg->header, "mono8", map_image).toImageMsg();
+
+    image_map_msg= cv_bridge::CvImage(current_odom_point.header, "mono8", map_image).toImageMsg();
     pub_map_image.publish(image_map_msg);
 
 }
