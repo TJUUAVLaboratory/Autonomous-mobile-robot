@@ -49,6 +49,14 @@ std::string getStringFromFloat(float f)
       return buffer.str();
  }
 
+void path_waypoint_Callback(const std_msgs::StringPtr& path_msg)
+{
+    std_msgs::String pathJson;
+    pathJson.data = path_msg->data;
+    ROS_INFO_STREAM("the waypoints: "<<pathJson);
+
+}
+
 
 void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
 {
@@ -137,6 +145,8 @@ int main(int argc, char *argv[])
 
     // sub clicked_pose get current pose
     ros::Subscriber current_pose_sub = nh.subscribe("/clicked_pose", 1, &sub_currentPose_Callback); 
+    ros::Subscriber path_waypoints_sub = nh.subscribe("/aibee_navi_out", 1, &path_waypoint_Callback);
+    
 
     // send  goal
     fake_goal_pub = nh.advertise<std_msgs::String>("/aibee_navi", 1, true);
