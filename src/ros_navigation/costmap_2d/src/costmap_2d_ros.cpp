@@ -117,7 +117,7 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
 
   // check if we want a rolling window version of the costmap
   bool rolling_window, track_unknown_space, always_send_full_costmap;
-  private_nh.param("rolling_window", rolling_window, false);
+  private_nh.param("rolling_window", rolling_window, false);  // 在global costmap false \\ loacal costmap true
   private_nh.param("track_unknown_space", track_unknown_space, false);
   private_nh.param("always_send_full_costmap", always_send_full_costmap, false);
 
@@ -164,6 +164,7 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
 
   setUnpaddedRobotFootprint(makeFootprintFromParams(private_nh));
 
+  // 发布costmap
   publisher_ = new Costmap2DPublisher(&private_nh, layered_costmap_->getCostmap(), global_frame_, "costmap",
                                       always_send_full_costmap);
 
@@ -453,6 +454,7 @@ void Costmap2DROS::updateMap()
   }
 }
 
+// costmap start
 void Costmap2DROS::start()
 {
   std::vector < boost::shared_ptr<Layer> > *plugins = layered_costmap_->getPlugins();

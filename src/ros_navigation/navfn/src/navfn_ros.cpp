@@ -196,18 +196,23 @@ namespace navfn {
     wy = costmap_->getOriginY() + my * costmap_->getResolution();
   }
 
+
+  // makePlan
   bool NavfnROS::makePlan(const geometry_msgs::PoseStamped& start, 
       const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan){
     return makePlan(start, goal, default_tolerance_, plan);
   }
 
+
   bool NavfnROS::makePlan(const geometry_msgs::PoseStamped& start, 
-      const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan){
-    boost::mutex::scoped_lock lock(mutex_);
-    if(!initialized_){
-      ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
-      return false;
-    }
+      const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan)
+      {
+        boost::mutex::scoped_lock lock(mutex_);
+        if(!initialized_)
+        {
+          ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
+          return false;
+        }
 
     //clear the plan, just in case
     plan.clear();
@@ -226,7 +231,8 @@ namespace navfn {
                 tf::resolve(tf_prefix_, global_frame_).c_str(), tf::resolve(tf_prefix_, start.header.frame_id).c_str());
       return false;
     }
-
+    
+    //start
     double wx = start.pose.position.x;
     double wy = start.pose.position.y;
 

@@ -61,6 +61,7 @@ namespace move_base {
     blp_loader_("nav_core", "nav_core::BaseLocalPlanner"), 
     recovery_loader_("nav_core", "nav_core::RecoveryBehavior"),
 
+    //pose list
     planner_plan_(NULL), latest_plan_(NULL), controller_plan_(NULL), 
     runPlanner_(false), setup_(false), p_freq_change_(false), c_freq_change_(false), new_global_plan_(false) {
 
@@ -94,12 +95,13 @@ namespace move_base {
 
     //set up the planner's thread  配置全局规划的线程
     planner_thread_ = new boost::thread(boost::bind(&MoveBase::planThread, this));
-    ROS_WARN("MoveBase::MoveBase 03"); 
+    
 
     //for comanding the base  发布命令
     vel_pub_ = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
     current_goal_pub_ = private_nh.advertise<geometry_msgs::PoseStamped>("current_goal", 0 );
 
+    // /move_base/goal target_pose send to move_bashe action server
     ros::NodeHandle action_nh("move_base"); //发布action goal
     action_goal_pub_ = action_nh.advertise<move_base_msgs::MoveBaseActionGoal>("goal", 1);
 
@@ -139,11 +141,11 @@ namespace move_base {
       ROS_FATAL("Failed to create the %s planner, are you sure it is properly registered and that the containing library is built? Exception: %s", global_planner.c_str(), ex.what());
       exit(1);
     }
-    ROS_WARN("MoveBase::MoveBase 04");
+
     //create the ros wrapper for the controller's costmap... and initializer a pointer we'll use with the underlying map
-    controller_costmap_ros_ = new costmap_2d::Costmap2DROS("local_costmap", tf_);
+    controller_costmap_ros_ = new costmap_2d::Costmap2DROS("local_costmap", tf_);  //注意tf tree
     controller_costmap_ros_->pause();
-    ROS_WARN("MoveBase::MoveBase 05");
+    
     //create a local planner
     try {
       tc_ = blp_loader_.createInstance(local_planner);
@@ -155,7 +157,6 @@ namespace move_base {
       exit(1);
     }
 
-    ROS_WARN("MoveBase::MoveBase 06"); 
     // Start actively updating costmaps based on sensor data
     planner_costmap_ros_->start();
     controller_costmap_ros_->start();
@@ -485,7 +486,8 @@ namespace move_base {
   }
 
   
-  MoveBase::~MoveBase(){
+  MoveBase::~MoveBase()
+  {
     recovery_behaviors_.clear();
 
     delete dsrv_;
@@ -645,7 +647,7 @@ namespace move_base {
   {
     ROS_WARN("MoveBase::wakePlanner");
     // we have slept long enough for rate
-    planner_cond_.notify_one();
+    planner_cond_.notify_one();  //唤醒线程
   }
 
 
@@ -685,11 +687,12 @@ namespace move_base {
       lock.unlock();
       ROS_DEBUG_NAMED("move_base_plan_thread","Planning...");
 
-      //run planner
+      //run planner 全局路径规划
       planner_plan_->clear();  //planner plan vector清空
       bool gotPlan = n.ok() && makePlan(temp_goal, *planner_plan_);
 
-      if(gotPlan){
+      if(gotPlan)
+      {
         ROS_DEBUG_NAMED("move_base_plan_thread","Got Plan with %zu points!", planner_plan_->size());
         //pointer swap the plans under mutex (the controller will pull from latest_plan_)
         std::vector<geometry_msgs::PoseStamped>* temp_plan = planner_plan_;
@@ -941,7 +944,7 @@ namespace move_base {
     //push the feedback out
     move_base_msgs::MoveBaseFeedback feedback;
     feedback.base_position = current_position;
-    as_->publishFeedback(feedback);
+    as_->publishFeedback(feedback); // moveAction server反馈当前机器人的位姿
 
     //check to see if we've moved far enough to reset our oscillation timeout
     if(distance(current_position, oscillation_pose_) >= oscillation_distance_)
@@ -962,6 +965,7 @@ namespace move_base {
     }
 
     //if we have a new plan then grab it and give it to the controller
+    // 局部路径规划
     if(new_global_plan_){
       //make sure to set the new plan flag to false
       new_global_plan_ = false;
@@ -1065,7 +1069,7 @@ namespace move_base {
             recovery_index_ = 0;
         }
         else 
-        {
+        { // 局部路径规划找不到合适的通行
           ROS_DEBUG_NAMED("move_base", "The local planner could not find a valid plan.");
           ros::Time attempt_end = last_valid_control_ + ros::Duration(controller_patience_);
 
@@ -1154,7 +1158,7 @@ namespace move_base {
     return false;
   }
 
-
+  //revoveryBehaviors
   bool MoveBase::loadRecoveryBehaviors(ros::NodeHandle node){
     XmlRpc::XmlRpcValue behavior_list;
     if(node.getParam("recovery_behaviors", behavior_list)){

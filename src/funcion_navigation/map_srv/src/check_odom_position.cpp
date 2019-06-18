@@ -11,6 +11,7 @@
 #include <std_msgs/String.h>
 #include "cJSON.h"
 #include <string>
+#include <vector>
 
 // + clicked pose button  
 // + get the current pose
@@ -40,7 +41,8 @@ ros::Publisher fake_goal_pub;
 float resolution;
 
 float param[] = {-17.2203, -13.7435, 41, 39.7};
-
+std::string image_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.png";
+std::string output_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map_1.png";
 
 std::string getStringFromFloat(float f)
   {
@@ -49,28 +51,40 @@ std::string getStringFromFloat(float f)
       return buffer.str();
  }
 
+template <class Type>
+Type stringToNum(const std::string& str)
+{
+	std::istringstream iss(str);
+	Type num;
+	iss >> num;
+	return num;    
+}
+
 void path_waypoint_Callback(const std_msgs::StringPtr& path_msg)
 {
-    std_msgs::String path_data;
-    path_data.data = path_msg->data;
-    ROS_INFO_STREAM("the waypoints: "<<path_data);
+    
+    std::string path_string = path_msg->data;
+    char* cstr = new char [path_string.length()+1];
+    std::strcpy(cstr, path_string.c_str());
 
-    cJSON*  pathJson = cJSON_Parse(path_data.data.c_str());
-    cJSON* json_array = cJSON_GetObjectItem(pathJson, "pathfind_ok");
-
-    for(int i=0; i<cJSON_GetArraySize(json_array); i++)
+    char *path = std::strtok(cstr, ",");
+    std::vector<float> path_num;
+    for(int i=0; i<6; i++)
     {
-        cJSON* point = cJSON_GetArrayItem(json_array, i);
-        for(int j=0; j<2; j++)
-        {
-            cJSON* coord = cJSON_GetArrayItem(point,i);
-            ROS_INFO_STREAM("test value: "<< coord->valueint);
-        }
-
+        path = std::strtok(NULL, "[[ , ]");
+        path_num.push_back(stringToNum<float>(std::string(path))); 
+        // ROS_INFO_STREAM("NUM: " << path_num.back());
     }
-
-
-
+    ROS_INFO_STREAM("path vector size: " << path_num.size());
+    int item = 0;
+    for(int j=0; j< path_num.size()/2; j++)
+    {
+        pixel_point temp_point;
+        temp_point.u = (path_num[item++]-param[0])/resolution;
+        temp_point.v = (path_num[item++]-param[1])/resolution;
+        cv::rectangle(map_image,cv::Point(temp_point.u-5, temp_point.v+5),cv::Point(temp_point.u+5, temp_point.v-5), cv::Scalar(0,0,0));
+        cv::imwrite(output_path, map_image);
+    }  
 }
 
 
@@ -103,8 +117,7 @@ void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
     else 
         ROS_ERROR("Failed to call the service"); 
 
-    std::string image_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.png";
-    std::string output_path = "/home/aibee/aibee_navi/aibee_navi_0529/exp0528/pathfind/full_map.png";
+
     map_image = cv::imread(image_path);
     // cv::Mat  kernel =  cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
     // cv::morphologyEx(map_image, map_image, cv::MORPH_CLOSE, kernel);
