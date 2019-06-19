@@ -35,7 +35,7 @@
             angle_max: M_PI         # M_PI
             angle_increment: 2M_PI/720  # 2M_PI/720
             scan_time: 1/30.0          #  out put 30Hz
-            range_min: 0.00
+            range_min: 0.4
             range_max: 50.0
             use_inf:  true
             inf_epsilon: 10.0
