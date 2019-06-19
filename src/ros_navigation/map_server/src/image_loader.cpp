@@ -66,6 +66,7 @@ namespace map_server
    origin:
    map mode
 
+   SDL 读取image 封装nav_msgs/OccupancyGrid
    */
 void
 loadMapFromFile(nav_msgs::GetMap::Response* resp,

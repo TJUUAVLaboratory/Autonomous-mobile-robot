@@ -60,6 +60,10 @@ class MapServer
 {
   public:
     /** Trivial constructor */
+    // 解析yaml文件
+    // SDL_image 读取image 封装nav_msgs/OccupancyGrid
+    // 发布 /map_metadata  /map
+    // 启动服务  static_map
     MapServer(const std::string& fname, double res)
     {
       std::string mapfname = "";
@@ -87,12 +91,14 @@ class MapServer
         YAML::Node doc;
         parser.GetNextDocument(doc);
 #endif
+        // resolution  meters / pixel
         try {
           doc["resolution"] >> res;
         } catch (YAML::InvalidScalar) {
           ROS_ERROR("The map does not contain a resolution tag or it is invalid.");
           exit(-1);
         }
+        //
         try {
           doc["negate"] >> negate;
         } catch (YAML::InvalidScalar) {
@@ -167,7 +173,8 @@ class MapServer
       ROS_INFO("Loading map from image \"%s\"", mapfname.c_str());
       try
       {
-         // load map from file ***.pgm  ==> map_resp
+         // SDL_image 读取image 封装nav_msgs/OccupancyGrid
+         // load map from file ***.pgm  ==>  map_resp_
           map_server::loadMapFromFile(&map_resp_,mapfname.c_str(),res,negate,occ_th,free_th, origin, mode);
       }
       catch (std::runtime_error e)
@@ -196,7 +203,10 @@ class MapServer
       // Latched publisher for data
       map_pub = n.advertise<nav_msgs::OccupancyGrid>("map", 1, true);
       map_pub.publish( map_resp_.map );
-    }
+    } //MapServer constructor function end
+
+
+
 
   private:
     ros::NodeHandle n;
