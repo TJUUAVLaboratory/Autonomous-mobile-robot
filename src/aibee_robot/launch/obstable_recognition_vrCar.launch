@@ -39,7 +39,7 @@
             <!--target_frame: velodyne   # Leave disabled to output scan in pointcloud frame-->
             transform_tolerance: 0.01
             min_height: -2.0
-            max_height: 3.0
+            max_height: 2.0
 
             angle_min: -M_PI        # -M_PI
             angle_max: M_PI         # M_PI
