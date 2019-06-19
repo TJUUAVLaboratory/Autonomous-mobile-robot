@@ -130,7 +130,7 @@ void sub_currentPose_Callback(const geometry_msgs::PoseStampedPtr& pose_msg)
     current_pixel_point.u = (current_odom_point.point.x-param[0])/resolution;
     current_pixel_point.v = (current_odom_point.point.y-param[1])/resolution;
     ROS_INFO_STREAM("current pixel point: "<< current_pixel_point.u << " , "<<current_pixel_point.v);
-    cv::circle(map_image, cv::Point(current_pixel_point.u, current_pixel_point.v), 10, cv::Scalar(255,255,255));
+    cv::circle(map_image, cv::Point(current_pixel_point.u, current_pixel_point.v), 10, cv::Scalar(0,0,0));
     cv::imwrite(output_path, map_image);
 
     // sensor_msgs::ImagePtr image_map_msg;
