@@ -79,19 +79,23 @@ LayeredCostmap::~LayeredCostmap()
   }
 }
 
+// resize map
 void LayeredCostmap::resizeMap(unsigned int size_x, unsigned int size_y, double resolution, double origin_x,
                                double origin_y, bool size_locked)
 {
   boost::unique_lock<Costmap2D::mutex_t> lock(*(costmap_.getMutex()));
   size_locked_ = size_locked;
   costmap_.resizeMap(size_x, size_y, resolution, origin_x, origin_y);
+
+  //对于每一层costmap都要 match size
   for (vector<boost::shared_ptr<Layer> >::iterator plugin = plugins_.begin(); plugin != plugins_.end();
       ++plugin)
   {
-    (*plugin)->matchSize();
+    (*plugin)->matchSize();  //
   }
 }
 
+//
 void LayeredCostmap::updateMap(double robot_x, double robot_y, double robot_yaw)
 {
   // Lock for the remainder of this function, some plugins (e.g. VoxelLayer)
@@ -99,7 +103,7 @@ void LayeredCostmap::updateMap(double robot_x, double robot_y, double robot_yaw)
   boost::unique_lock<Costmap2D::mutex_t> lock(*(costmap_.getMutex()));
 
   // if we're using a rolling buffer costmap... we need to update the origin using the robot's position
-  if (rolling_window_)
+  if (rolling_window_) //机器人处于地图的中心位置
   {
     double new_origin_x = robot_x - costmap_.getSizeInMetersX() / 2;
     double new_origin_y = robot_y - costmap_.getSizeInMetersY() / 2;
@@ -162,6 +166,7 @@ void LayeredCostmap::updateMap(double robot_x, double robot_y, double robot_yaw)
 bool LayeredCostmap::isCurrent()
 {
   current_ = true;
+  //每一层都要判断一下
   for (vector<boost::shared_ptr<Layer> >::iterator plugin = plugins_.begin(); plugin != plugins_.end();
       ++plugin)
   {
@@ -169,6 +174,7 @@ bool LayeredCostmap::isCurrent()
   }
   return current_;
 }
+
 
 void LayeredCostmap::setFootprint(const std::vector<geometry_msgs::Point>& footprint_spec)
 {

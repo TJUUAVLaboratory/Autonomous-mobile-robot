@@ -59,30 +59,34 @@ void move_parameter(ros::NodeHandle& old_h, ros::NodeHandle& new_h, std::string 
   if (should_delete) old_h.deleteParam(name);
 }
 
+
 // Costmap2DROS 构造
 Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
-    layered_costmap_(NULL),
+    layered_costmap_(NULL), // 
     name_(name),
     tf_(tf),
-    transform_tolerance_(0.3),
-    map_update_thread_shutdown_(false),
+    transform_tolerance_(0.3),          //timeout before transform errors
+    map_update_thread_shutdown_(false), // flag
     stop_updates_(false),
     initialized_(true),
     stopped_(false),
     robot_stopped_(false),
-    map_update_thread_(NULL),
+    map_update_thread_(NULL),    //A thread for updating the map
     last_publish_(0),
     plugin_loader_("costmap_2d", "costmap_2d::Layer"),
     publisher_(NULL),
-    dsrv_(NULL),
+    dsrv_(NULL),   // dynamic_reconfigure_Server
     footprint_padding_(0.0)
 {
   // Initialize old pose with something
   old_pose_.setIdentity();
   old_pose_.setOrigin(tf::Vector3(1e30, 1e30, 1e30));
 
-  ros::NodeHandle private_nh("~/" + name);
+  ros::NodeHandle private_nh("~/" + name); // costmap nodehandle name
   ros::NodeHandle g_nh;
+
+  // check frame_id *************************************
+  // 比如 name=global_costmap   tf_prefix = global_costmap 所以要用一个namespace
 
   // get our tf prefix
   ros::NodeHandle prefix_nh;
@@ -99,6 +103,7 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
   ros::Time last_error = ros::Time::now();
   std::string tf_error;
   // we need to make sure that the transform between the robot base frame and the global frame is available
+  // tf中一定要有 global_frame和robot_base_frame *************************************
   while (ros::ok()
       && !tf_.waitForTransform(global_frame_, robot_base_frame_, ros::Time(), ros::Duration(0.1), ros::Duration(0.01),
                                &tf_error))
@@ -173,7 +178,7 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
   initialized_ = true;
   stopped_ = false;
 
-  // Create a time r to check if the robot is moving
+  // Create a time r to check if the robot is moving 启动一个ROS定时器
   robot_stopped_ = false;
   timer_ = private_nh.createTimer(ros::Duration(.1), &Costmap2DROS::movementCB, this);
 
@@ -181,8 +186,10 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
   dynamic_reconfigure::Server<Costmap2DConfig>::CallbackType cb = boost::bind(&Costmap2DROS::reconfigureCB, this, _1,
                                                                               _2);
   dsrv_->setCallback(cb);
-}
+} // Costmap2DROS::Costmap2DROS  construction end
 
+
+// footprint subscribe 回调函数
 void Costmap2DROS::setUnpaddedRobotFootprintPolygon(const geometry_msgs::Polygon& footprint)
 {
   setUnpaddedRobotFootprint(toPointVector(footprint));
@@ -214,6 +221,7 @@ void Costmap2DROS::resetOldParameters(ros::NodeHandle& nh)
   SuperValue super_map;
   SuperValue super_array;
 
+  // static_layer [static_map=ture]
   if (nh.getParam("static_map", flag) && flag)
   {
     map["name"] = XmlRpc::XmlRpcValue("static_layer");
@@ -228,6 +236,7 @@ void Costmap2DROS::resetOldParameters(ros::NodeHandle& nh)
     move_parameter(nh, map_layer, "track_unknown_space", false);
   }
 
+  // obstacle_layer [map_type= voxel / other]
   ros::NodeHandle obstacles(nh, "obstacle_layer");
   if (nh.getParam("map_type", s) && s == "voxel")
   {
@@ -264,6 +273,7 @@ void Costmap2DROS::resetOldParameters(ros::NodeHandle& nh)
   }
   move_parameter(nh, obstacles, "observation_sources");
 
+  // inflation_layer
   ros::NodeHandle inflation(nh, "inflation_layer");
   move_parameter(nh, inflation, "cost_scaling_factor");
   move_parameter(nh, inflation, "inflation_radius");
@@ -316,9 +326,10 @@ void Costmap2DROS::reconfigureCB(costmap_2d::Costmap2DConfig &config, uint32_t l
   readFootprintFromConfig(config, old_config_);
 
   old_config_ = config;
-
+  // mapUpdateLoop thread
   map_update_thread_ = new boost::thread(boost::bind(&Costmap2DROS::mapUpdateLoop, this, map_update_frequency));
 }
+
 
 void Costmap2DROS::readFootprintFromConfig(const costmap_2d::Costmap2DConfig &new_config,
                                            const costmap_2d::Costmap2DConfig &old_config)
@@ -352,6 +363,7 @@ void Costmap2DROS::readFootprintFromConfig(const costmap_2d::Costmap2DConfig &ne
   }
 }
 
+
 void Costmap2DROS::setUnpaddedRobotFootprint(const std::vector<geometry_msgs::Point>& points)
 {
   unpadded_footprint_ = points;
@@ -361,6 +373,7 @@ void Costmap2DROS::setUnpaddedRobotFootprint(const std::vector<geometry_msgs::Po
   layered_costmap_->setFootprint(padded_footprint_);
 }
 
+// ros timer event
 void Costmap2DROS::movementCB(const ros::TimerEvent &event)
 {
   // don't allow configuration to happen while this check occurs
@@ -387,6 +400,8 @@ void Costmap2DROS::movementCB(const ros::TimerEvent &event)
   }
 }
 
+
+// map_update thread
 void Costmap2DROS::mapUpdateLoop(double frequency)
 {
   // the user might not want to run the loop every cycle
@@ -401,7 +416,7 @@ void Costmap2DROS::mapUpdateLoop(double frequency)
     double start_t, end_t, t_diff;
     gettimeofday(&start, NULL);
 
-    updateMap();
+    updateMap(); //
 
     gettimeofday(&end, NULL);
     start_t = start.tv_sec + double(start.tv_usec) / 1e6;
@@ -435,7 +450,7 @@ void Costmap2DROS::updateMap()
   {
     // get global pose
     tf::Stamped < tf::Pose > pose;
-    if (getRobotPose (pose))
+    if (getRobotPose (pose))  // robot在 world系下的位姿
     {
       double x = pose.getOrigin().x(),
              y = pose.getOrigin().y(),
@@ -532,7 +547,7 @@ bool Costmap2DROS::getRobotPose(tf::Stamped<tf::Pose>& global_pose) const
   // get the global pose of the robot
   try
   {
-    tf_.transformPose(global_frame_, robot_pose, global_pose);
+    tf_.transformPose(global_frame_, robot_pose, global_pose); //robot 在global系下的位置
   }
   catch (tf::LookupException& ex)
   {

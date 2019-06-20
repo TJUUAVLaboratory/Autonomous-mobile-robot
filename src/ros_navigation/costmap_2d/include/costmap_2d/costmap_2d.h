@@ -188,6 +188,7 @@ public:
   /**
    * @brief  Will return a pointer to the underlying unsigned char array used as the costmap
    * @return A pointer to the underlying unsigned char array storing cost values
+   * charMap -1~100
    */
   unsigned char* getCharMap() const;
 

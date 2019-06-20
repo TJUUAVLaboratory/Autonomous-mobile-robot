@@ -51,6 +51,9 @@ inline double sign(double x)
 
 /** @brief Same as sign(x) but returns 0 if x is 0. */
 inline double sign0(double x)
+// x<0  -1
+// x>0  1
+// x=0 0
 {
   return x < 0.0 ? -1.0 : (x > 0.0 ? 1.0 : 0.0);
 }

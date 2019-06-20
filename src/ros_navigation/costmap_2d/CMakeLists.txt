@@ -85,6 +85,7 @@ catkin_package(
         Boost
 )
 
+## LIB costmap_2d lib
 add_library(costmap_2d
   src/array_parser.cpp
   src/costmap_2d.cpp
@@ -104,6 +105,7 @@ target_link_libraries(costmap_2d
   ${catkin_LIBRARIES}
 )
 
+## LIB layers lib
 add_library(layers
   plugins/inflation_layer.cpp
   plugins/obstacle_layer.cpp
@@ -116,6 +118,7 @@ target_link_libraries(layers
   costmap_2d
 )
 
+## NODE costmap_2d_markers
 add_executable(costmap_2d_markers src/costmap_2d_markers.cpp)
 add_dependencies(costmap_2d_markers ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(costmap_2d_markers
@@ -125,6 +128,7 @@ target_link_libraries(costmap_2d_markers
     ${catkin_LIBRARIES}
 )
 
+## NODE costmap_2d_cloud
 add_executable(costmap_2d_cloud src/costmap_2d_cloud.cpp)
 add_dependencies(costmap_2d_cloud ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(costmap_2d_cloud
@@ -134,6 +138,7 @@ target_link_libraries(costmap_2d_cloud
     ${catkin_LIBRARIES}
 )
 
+## Node costmap_2d_node
 add_executable(costmap_2d_node src/costmap_2d_node.cpp)
 add_dependencies(costmap_2d_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(costmap_2d_node

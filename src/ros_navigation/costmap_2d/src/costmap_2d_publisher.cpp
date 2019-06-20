@@ -58,7 +58,7 @@ Costmap2DPublisher::Costmap2DPublisher(ros::NodeHandle * ros_node, Costmap2D* co
     cost_translation_table_ = new char[256];
 
     // special values:
-    cost_translation_table_[0] = 0;  // NO obstacle
+    cost_translation_table_[0] = 0;     // NO obstacle
     cost_translation_table_[253] = 99;  // INSCRIBED obstacle
     cost_translation_table_[254] = 100;  // LETHAL obstacle
     cost_translation_table_[255] = -1;  // UNKNOWN
@@ -110,12 +110,13 @@ void Costmap2DPublisher::prepareGrid()
 
   grid_.data.resize(grid_.info.width * grid_.info.height);
 
-  unsigned char* data = costmap_->getCharMap();
+  unsigned char* data = costmap_->getCharMap(); // ros costmap data
   for (unsigned int i = 0; i < grid_.data.size(); i++)
   {
     grid_.data[i] = cost_translation_table_[ data[ i ]];
   }
 }
+
 
 void Costmap2DPublisher::publishCostmap()
 {
@@ -130,7 +131,7 @@ void Costmap2DPublisher::publishCostmap()
   if (always_send_full_costmap_ || grid_.info.resolution != resolution ||
       grid_.info.width != costmap_->getSizeInCellsX() ||
       grid_.info.height != costmap_->getSizeInCellsY() ||
-      saved_origin_x_ != costmap_->getOriginX() ||
+      saved_origin_x_ != costmap_->gtOriginX() ||
       saved_origin_y_ != costmap_->getOriginY())
   {
     prepareGrid();
