@@ -7,13 +7,21 @@
 ## 
 
 
-obstacle_range: 2.5
+obstacle_range: 2.5     ## local_costmap 探测范围  
 raytrace_range: 3.0
-robot_radius: 0.165
-# robot_radius: 0.5
-# inflation_radius: 0.1
-inflation_radius: 0.5
-max_obstacle_height: 0.6
-min_obstacle_height: 0.0
+robot_radius:   0.5      ## robot机体 footprint
+inflation_radius: 0.3    ## 膨胀半径 local & global
+max_obstacle_height: 2.0
+min_obstacle_height: 0.2
 observation_sources: scan
 scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true, expected_update_rate: 0}
+
+
+# obstacle_range: 2.5
+# raytrace_range: 3.0
+# robot_radius:   0.165
+# inflation_radius: 0.5
+# max_obstacle_height: 0.6
+# min_obstacle_height: 0.0
+# observation_sources: scan
+# scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true, expected_update_rate: 0}

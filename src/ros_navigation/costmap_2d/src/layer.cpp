@@ -40,6 +40,7 @@ Layer::Layer()
   , tf_(NULL)
 {}
 
+// 每一个costmap layer 有一个parent and name
 void Layer::initialize(LayeredCostmap* parent, std::string name, tf::TransformListener *tf)
 {
   layered_costmap_ = parent;
