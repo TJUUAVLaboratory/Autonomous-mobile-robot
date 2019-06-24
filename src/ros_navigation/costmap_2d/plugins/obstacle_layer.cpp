@@ -130,7 +130,7 @@ void ObstacleLayer::onInitialize()
       source_node.getParam(raytrace_range_param_name, raytrace_range);
     }
 
-    ROS_DEBUG("Creating an observation buffer for source %s, topic %s, frame %s", source.c_str(), topic.c_str(),
+    ROS_WARN("Creating an observation buffer for source %s, topic %s, frame %s", source.c_str(), topic.c_str(),
               sensor_frame.c_str());
 
     // create an observation buffer
@@ -154,6 +154,7 @@ void ObstacleLayer::onInitialize()
         source.c_str(), topic.c_str(), global_frame_.c_str(), expected_update_rate, observation_keep_time);
 
     // create a callback for the topic
+    // /scan
     if (data_type == "LaserScan")
     {
       boost::shared_ptr < message_filters::Subscriber<sensor_msgs::LaserScan>
@@ -196,7 +197,7 @@ void ObstacleLayer::onInitialize()
       observation_subscribers_.push_back(sub);
       observation_notifiers_.push_back(filter);
     }
-    else
+    else // pointCloud2
     {
       boost::shared_ptr < message_filters::Subscriber<sensor_msgs::PointCloud2>
           > sub(new message_filters::Subscriber<sensor_msgs::PointCloud2>(g_nh, topic, 50));
@@ -249,6 +250,7 @@ void ObstacleLayer::reconfigureCB(costmap_2d::ObstaclePluginConfig &config, uint
   combination_method_ = config.combination_method;
 }
 
+//如果订阅的是 LaserScan
 void ObstacleLayer::laserScanCallback(const sensor_msgs::LaserScanConstPtr& message,
                                       const boost::shared_ptr<ObservationBuffer>& buffer)
 {
@@ -274,6 +276,7 @@ void ObstacleLayer::laserScanCallback(const sensor_msgs::LaserScanConstPtr& mess
   buffer->unlock();
 }
 
+// laserScan Valid Inf
 void ObstacleLayer::laserScanValidInfCallback(const sensor_msgs::LaserScanConstPtr& raw_message,
                                               const boost::shared_ptr<ObservationBuffer>& buffer)
 {
@@ -311,6 +314,7 @@ void ObstacleLayer::laserScanValidInfCallback(const sensor_msgs::LaserScanConstP
   buffer->unlock();
 }
 
+// 如果接收的直接是PointCloud
 void ObstacleLayer::pointCloudCallback(const sensor_msgs::PointCloudConstPtr& message,
                                                const boost::shared_ptr<ObservationBuffer>& buffer)
 {
@@ -328,6 +332,7 @@ void ObstacleLayer::pointCloudCallback(const sensor_msgs::PointCloudConstPtr& me
   buffer->unlock();
 }
 
+// 如果接收的是 pointcloude2 不需要转换，直接存入buffer
 void ObstacleLayer::pointCloud2Callback(const sensor_msgs::PointCloud2ConstPtr& message,
                                                 const boost::shared_ptr<ObservationBuffer>& buffer)
 {
@@ -412,6 +417,7 @@ void ObstacleLayer::updateBounds(double robot_x, double robot_y, double robot_ya
   updateFootprint(robot_x, robot_y, robot_yaw, min_x, min_y, max_x, max_y);
 }
 
+
 void ObstacleLayer::updateFootprint(double robot_x, double robot_y, double robot_yaw, double* min_x, double* min_y,
                                     double* max_x, double* max_y)
 {
@@ -424,6 +430,7 @@ void ObstacleLayer::updateFootprint(double robot_x, double robot_y, double robot
     }
 }
 
+//怎么更新map的cost的
 void ObstacleLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
 {
   if (!enabled_)
@@ -455,6 +462,7 @@ void ObstacleLayer::addStaticObservation(costmap_2d::Observation& obs, bool mark
     static_clearing_observations_.push_back(obs);
 }
 
+//pointcloude vector中的点全部清除
 void ObstacleLayer::clearStaticObservations(bool marking, bool clearing)
 {
   if (marking)

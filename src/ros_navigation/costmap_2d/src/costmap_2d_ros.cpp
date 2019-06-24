@@ -128,11 +128,15 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
 
   layered_costmap_ = new LayeredCostmap(global_frame_, rolling_window, track_unknown_space);
 
+
   if (!private_nh.hasParam("plugins"))
   {
+    ROS_WARN("costmap don't have plugins list, reset Old Parameters");
     resetOldParameters(private_nh);
+
   }
 
+  // resetOldParameters 会为函数产生一个 plugins list
   if (private_nh.hasParam("plugins"))
   {
     XmlRpc::XmlRpcValue my_list;
@@ -141,7 +145,7 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
     {
       std::string pname = static_cast<std::string>(my_list[i]["name"]);
       std::string type = static_cast<std::string>(my_list[i]["type"]);
-      ROS_INFO("Using plugin \"%s\"", pname.c_str());
+      ROS_INFO("Using plugin \"%s\"", (name + "/" + pname).c_str());
 
       boost::shared_ptr<Layer> plugin = plugin_loader_.createInstance(type);
       layered_costmap_->addPlugin(plugin);
@@ -210,6 +214,7 @@ Costmap2DROS::~Costmap2DROS()
   delete dsrv_;
 }
 
+// costmap 如何加载对应的 layer
 void Costmap2DROS::resetOldParameters(ros::NodeHandle& nh)
 {
   ROS_INFO("Loading from pre-hydro parameter style");
@@ -224,6 +229,7 @@ void Costmap2DROS::resetOldParameters(ros::NodeHandle& nh)
   // static_layer [static_map=ture]
   if (nh.getParam("static_map", flag) && flag)
   {
+    ROS_INFO("load static_costmap layer");
     map["name"] = XmlRpc::XmlRpcValue("static_layer");
     map["type"] = XmlRpc::XmlRpcValue("costmap_2d::StaticLayer");
     super_map.setStruct(&map);
@@ -240,6 +246,7 @@ void Costmap2DROS::resetOldParameters(ros::NodeHandle& nh)
   ros::NodeHandle obstacles(nh, "obstacle_layer");
   if (nh.getParam("map_type", s) && s == "voxel")
   {
+    ROS_INFO("load voxel_layer costmap layer");
     map["name"] = XmlRpc::XmlRpcValue("obstacle_layer");
     map["type"] = XmlRpc::XmlRpcValue("costmap_2d::VoxelLayer");
     super_map.setStruct(&map);
@@ -254,6 +261,7 @@ void Costmap2DROS::resetOldParameters(ros::NodeHandle& nh)
   }
   else
   {
+    ROS_INFO("load obstacle_layer costmap layer");
     map["name"] = XmlRpc::XmlRpcValue("obstacle_layer");
     map["type"] = XmlRpc::XmlRpcValue("costmap_2d::ObstacleLayer");
     super_map.setStruct(&map);
@@ -274,6 +282,7 @@ void Costmap2DROS::resetOldParameters(ros::NodeHandle& nh)
   move_parameter(nh, obstacles, "observation_sources");
 
   // inflation_layer
+  ROS_INFO("load inflation_layer costmap layer");
   ros::NodeHandle inflation(nh, "inflation_layer");
   move_parameter(nh, inflation, "cost_scaling_factor");
   move_parameter(nh, inflation, "inflation_radius");
@@ -481,6 +490,7 @@ void Costmap2DROS::start()
         ++plugin)
     {
       (*plugin)->activate();
+      ROS_INFO_STREAM("active costmap_layer-> "<< (*plugin)->getName());
     }
     stopped_ = false;
   }

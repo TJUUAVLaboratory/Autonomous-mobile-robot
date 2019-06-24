@@ -104,7 +104,7 @@ private:
     
 
     obstable_detection::obstable_detection_msg  obstableMsg; //自定义消息类型
-    char*  cString = "[\"stop\"]";
+    char* cString = "[\"stop\"]";
     cJSON*  json;
     std_msgs::String json_str;
 

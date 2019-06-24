@@ -69,6 +69,8 @@ InflationLayer::InflationLayer()
   inflation_access_ = new boost::recursive_mutex();
 }
 
+
+//
 void InflationLayer::onInitialize()
 {
   {
@@ -81,6 +83,7 @@ void InflationLayer::onInitialize()
     seen_size_ = 0;
     need_reinflation_ = false;
 
+    // inlfation layer 的动态参数调节
     dynamic_reconfigure::Server<costmap_2d::InflationPluginConfig>::CallbackType cb = boost::bind(
         &InflationLayer::reconfigureCB, this, _1, _2);
 

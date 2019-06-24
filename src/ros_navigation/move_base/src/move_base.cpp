@@ -73,12 +73,13 @@ namespace move_base {
     recovery_trigger_ = PLANNING_R;
 
     //get some parameters that will be global to the move base node
-    // movebase cfg动态参数调节
     std::string global_planner, local_planner;
     private_nh.param("base_global_planner", global_planner, std::string("navfn/NavfnROS"));
     private_nh.param("base_local_planner", local_planner, std::string("base_local_planner/TrajectoryPlannerROS"));
+    
     private_nh.param("global_costmap/robot_base_frame", robot_base_frame_, std::string("base_link"));
     private_nh.param("global_costmap/global_frame", global_frame_, std::string("/map"));
+    
     private_nh.param("planner_frequency", planner_frequency_, 0.0);
     private_nh.param("controller_frequency", controller_frequency_, 20.0);
     private_nh.param("planner_patience", planner_patience_, 5.0);
@@ -94,8 +95,7 @@ namespace move_base {
     controller_plan_ = new std::vector<geometry_msgs::PoseStamped>();
 
     //set up the planner's thread  配置全局规划的线程
-    planner_thread_ = new boost::thread(boost::bind(&MoveBase::planThread, this));
-    
+    planner_thread_ = new boost::thread(boost::bind(&MoveBase::planThread, this));    
 
     //for comanding the base  发布命令
     vel_pub_ = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
@@ -127,6 +127,8 @@ namespace move_base {
     private_nh.param("clearing_rotation_allowed", clearing_rotation_allowed_, true);
     private_nh.param("recovery_behavior_enabled", recovery_behavior_enabled_, true);
 
+
+    // costmap part ********************
     //create the ros wrapper for the planner's costmap... and initializer a pointer we'll use with the underlying map
     planner_costmap_ros_ = new costmap_2d::Costmap2DROS("global_costmap", tf_);
     planner_costmap_ros_->pause();
@@ -1301,7 +1303,7 @@ namespace move_base {
     }
   }
 
-
+// obstacle_detction
 void MoveBase::laserDataCallBack(const sensor_msgs::LaserScanConstPtr scan_msg)
 {
      // ROS_INFO("received laserScan message");
@@ -1343,6 +1345,7 @@ void MoveBase::laserDataCallBack(const sensor_msgs::LaserScanConstPtr scan_msg)
   }
 
 
+  // obstacle_detction
   void MoveBase::velodyneDataCallBack(const sensor_msgs::PointCloud2ConstPtr&  velodyneData)
   {
     pcl::PointCloud<velodyne_pointcloud::PointXYZIR>::Ptr cloud(new pcl::PointCloud<velodyne_pointcloud::PointXYZIR>);

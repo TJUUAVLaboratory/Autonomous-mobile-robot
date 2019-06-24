@@ -145,6 +145,7 @@ void StaticLayer::matchSize()
   }
 }
 
+
 unsigned char StaticLayer::interpretValue(unsigned char value)
 {
   // check if the static value is above the unknown or lethal thresholds
@@ -161,6 +162,7 @@ unsigned char StaticLayer::interpretValue(unsigned char value)
   return scale * LETHAL_OBSTACLE;
 }
 
+// 订阅 /map的 OccupancyGrid Map
 void StaticLayer::incomingMap(const nav_msgs::OccupancyGridConstPtr& new_map)
 {
   unsigned int size_x = new_map->info.width, size_y = new_map->info.height;
@@ -221,6 +223,7 @@ void StaticLayer::incomingMap(const nav_msgs::OccupancyGridConstPtr& new_map)
   }
 }
 
+// subscribe /map_update Callback
 void StaticLayer::incomingUpdate(const map_msgs::OccupancyGridUpdateConstPtr& update)
 {
   unsigned int di = 0;

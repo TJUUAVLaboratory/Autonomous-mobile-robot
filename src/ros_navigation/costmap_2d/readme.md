@@ -170,3 +170,16 @@ ros costmap 发布的时候，需要将值映射到-1～100
     - map_update_thread_ = new boost::thread(boost::bind(&Costmap2DROS::`mapUpdateLoop`, this, map_update_frequency));
     - **updateMap()**
     - **publishCostmap()**
+
+
+
+
+global costmap 包含 
+- static_layer and  inflation_layer and obstacle_layer
+
+local_cost map 包含
+- inflation_layer and obstacle_layer
+
+1. static_layer 订阅/map
+2. obstacle_layer 订阅传感器信息，然后更新cost
+3. inflation_layer 

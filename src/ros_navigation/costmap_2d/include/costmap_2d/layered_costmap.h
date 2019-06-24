@@ -60,9 +60,6 @@ public:
    */
   LayeredCostmap(std::string global_frame, bool rolling_window, bool track_unknown);
 
-  /**
-   * @brief  Destructor
-   */
   ~LayeredCostmap();
 
   /**
@@ -162,10 +159,11 @@ private:
   bool rolling_window_;  /// < @brief Whether or not the costmap should roll with the robot
 
   bool current_;
-  double minx_, miny_, maxx_, maxy_;
-  unsigned int bx0_, bxn_, by0_, byn_;
+  // 这个矩形框表示的是什么   世界坐标还是像素坐标
+  double minx_, miny_, maxx_, maxy_; // 世界坐标系
+  unsigned int bx0_, bxn_, by0_, byn_;   // map cell size
 
-  std::vector<boost::shared_ptr<Layer> > plugins_;
+  std::vector<boost::shared_ptr<Layer> > plugins_;  // costmap vector
 
   bool initialized_;
   bool size_locked_;

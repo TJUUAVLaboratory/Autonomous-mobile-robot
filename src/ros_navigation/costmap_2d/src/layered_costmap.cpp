@@ -48,7 +48,7 @@ namespace costmap_2d
 {
 
 LayeredCostmap::LayeredCostmap(std::string global_frame, bool rolling_window, bool track_unknown) :
-    costmap_(),
+    costmap_(), 
     global_frame_(global_frame),
     rolling_window_(rolling_window),
     current_(false),
@@ -70,6 +70,7 @@ LayeredCostmap::LayeredCostmap(std::string global_frame, bool rolling_window, bo
   else
     costmap_.setDefaultValue(0);
 }
+
 
 LayeredCostmap::~LayeredCostmap()
 {
@@ -124,6 +125,7 @@ void LayeredCostmap::updateMap(double robot_x, double robot_y, double robot_yaw)
     double prev_maxx = maxx_;
     double prev_maxy = maxy_;
     (*plugin)->updateBounds(robot_x, robot_y, robot_yaw, &minx_, &miny_, &maxx_, &maxy_);
+    
     if (minx_ > prev_minx || miny_ > prev_miny || maxx_ < prev_maxx || maxy_ < prev_maxy)
     {
       ROS_WARN_THROTTLE(1.0, "Illegal bounds change, was [tl: (%f, %f), br: (%f, %f)], but "
