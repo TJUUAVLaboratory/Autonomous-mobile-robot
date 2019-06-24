@@ -99,6 +99,7 @@ void InflationLayer::onInitialize()
   }
 
   matchSize();
+  ROS_WARN_STREAM("inflation_radius: " << inflation_radius_ );
 }
 
 void InflationLayer::reconfigureCB(costmap_2d::InflationPluginConfig &config, uint32_t level)

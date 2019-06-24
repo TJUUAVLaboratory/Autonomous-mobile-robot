@@ -64,12 +64,14 @@ void path_waypoint_Callback(const std_msgs::StringPtr& path_msg)
 {
     
     std::string path_string = path_msg->data;
+    if(path_string.find("pathfind_ok")==std::string::npos)
+        return ;
     char* cstr = new char [path_string.length()+1];
     std::strcpy(cstr, path_string.c_str());
 
     char *path = std::strtok(cstr, ",");
     std::vector<float> path_num;
-    for(int i=0; i<6; i++)
+    for(int i=0; i<4; i++)
     {
         path = std::strtok(NULL, "[[ , ]");
         path_num.push_back(stringToNum<float>(std::string(path))); 

@@ -42,4 +42,6 @@ target_link_libraries(cmd_control_node
     ${catkin_LIBRARIES}
     )
 
-
+  add_executable(cmd_control_pad src/cmd_control_pad.cpp)
+  target_link_libraries(cmd_control_pad
+    ${catkin_LIBRARIES})
