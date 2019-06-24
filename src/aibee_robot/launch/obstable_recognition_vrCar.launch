@@ -66,6 +66,7 @@
     <rosparam file="$(find aibee_robot)/config/mrobot/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find aibee_robot)/config/mrobot/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find aibee_robot)/config/mrobot/base_local_planner_params.yaml" command="load" />
+    <param  name="map_topic"   value="aibee_map" />
   </node>
 
     <!-- node function: 订阅ipad点位, 利用movebase 导航到对应位置-->
