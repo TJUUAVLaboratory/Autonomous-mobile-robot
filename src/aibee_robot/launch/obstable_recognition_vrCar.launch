@@ -60,7 +60,7 @@
 
 
 <!--move_base action-->
-  <node pkg="move_base" type="move_base"  name="move_base" output="screen" >
+  <node pkg="move_base" type="move_base"  name="move_base" output="                                                                             " >
     <param name="map_topic" value="aibee_map"/>  
     <rosparam file="$(find aibee_robot)/config/mrobot/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find aibee_robot)/config/mrobot/costmap_common_params.yaml" command="load" ns="local_costmap" />
@@ -78,7 +78,7 @@
 
 
 <!-- 运行rviz -->
-    <!--<node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>-->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>
 
 </launch>
 
