@@ -66,6 +66,8 @@
     <rosparam file="$(find aibee_robot)/config/mrobot/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find aibee_robot)/config/mrobot/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find aibee_robot)/config/mrobot/base_local_planner_params.yaml" command="load" />
+
+    
   </node>
 
     <!-- node function: 订阅ipad点位, 利用movebase 导航到对应位置-->
@@ -75,6 +77,7 @@
     <!--坐标系的转换-->
     <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 1 map odom 20" />
 
+<!--roslaunch cartographer_ros online_vr_bot_localization2.launch load_state_filename:=/home/aibee/zzx_ws/a.bag.pbstream-->
 
 <!-- 运行rviz -->
     <!--<node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>-->

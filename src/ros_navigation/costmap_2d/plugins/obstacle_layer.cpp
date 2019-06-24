@@ -96,7 +96,7 @@ void ObstacleLayer::onInitialize()
     source_node.param("sensor_frame", sensor_frame, std::string(""));
     source_node.param("observation_persistence", observation_keep_time, 0.0);
     source_node.param("expected_update_rate", expected_update_rate, 0.0);
-    source_node.param("data_type", data_type, std::string("PointCloud"));
+    source_node.param("data_type", data_type, std::string("PointCloud2"));
     source_node.param("min_obstacle_height", min_obstacle_height, 0.0);
     source_node.param("max_obstacle_height", max_obstacle_height, 2.0);
     source_node.param("inf_is_valid", inf_is_valid, false);
