@@ -43,7 +43,10 @@
     <!--<arg name="map" default="gridmap/wandaf1.yaml" />-->
     
     <!-- 运行地图服务器，并且加载设置的地图-->
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find aibee_robot)/maps/$(arg map)"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find aibee_robot)/maps/$(arg map)">
+    <param name="map_topic" value="aibee_map"/>  
+    <!--map server-->
+    </node>
 
 
 <!--AMCL 定位-->
@@ -94,6 +97,8 @@
     <rosparam file="$(find aibee_robot)/config/mrobot/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find aibee_robot)/config/mrobot/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find aibee_robot)/config/mrobot/base_local_planner_params.yaml" command="load" />
+    
+    <!--<param name="map_topic"     value="" />-->
   </node>
 
     <!-- node function: 订阅ipad点位, 利用movebase 导航到对应位置-->

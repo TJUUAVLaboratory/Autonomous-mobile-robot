@@ -71,9 +71,11 @@ class MapServer
       int negate;
       double occ_th, free_th;
       MapMode mode = TRINARY;
+      std::string map_topic; 
       std::string frame_id;
       ros::NodeHandle private_nh("~");
       private_nh.param("frame_id", frame_id, std::string("map"));
+      private_nh.param("map_topic", map_topic, std::string("map")); // pub topic name
       deprecated = (res != 0);
       if (!deprecated) {
         //mapfname = fname + ".pgm";
@@ -201,7 +203,7 @@ class MapServer
       metadata_pub.publish( meta_data_message_ );
 
       // Latched publisher for data
-      map_pub = n.advertise<nav_msgs::OccupancyGrid>("map", 1, true);
+      map_pub = n.advertise<nav_msgs::OccupancyGrid>(map_topic, 1, true);
       map_pub.publish( map_resp_.map );
     } //MapServer constructor function end
 
