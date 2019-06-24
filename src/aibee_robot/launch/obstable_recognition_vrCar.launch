@@ -60,7 +60,7 @@
 
 
 <!--move_base action-->
-  <node pkg="move_base" type="move_base"  name="move_base" output="                                                                             " >
+  <node pkg="move_base" type="move_base"  name="move_base" output="screen" >
     <param name="map_topic" value="aibee_map"/>  
     <rosparam file="$(find aibee_robot)/config/mrobot/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find aibee_robot)/config/mrobot/costmap_common_params.yaml" command="load" ns="local_costmap" />
