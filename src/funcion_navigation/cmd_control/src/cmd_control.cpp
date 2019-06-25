@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     ros::NodeHandle nh;
 
     pub_cmd_control = nh.advertise<cmd_control::keyDataOrParam>("keyDataOrParamU2D", 5, true);
-    ros::Subscriber cmd_vel_cmd = nh.subscribe("/cmd_vel", 1, &cmd_vel_Callback);
+    // ros::Subscriber cmd_vel_cmd = nh.subscribe("/cmd_vel", 1, &cmd_vel_Callback);
     
     cmd_control::keyDataOrParam msg_switch;
 

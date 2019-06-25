@@ -4,10 +4,12 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Global Options1
         - /Status1
         - /TF1
         - /Odometry1/Shape1
-        - /global_map1
+        - /IMU1
+        - /real_robot1
       Splitter Ratio: 0.5
     Tree Height: 721
   - Class: rviz/Selection
@@ -86,39 +88,19 @@ Visualization Manager:
       Value: true
       Visual Enabled: true
     - Class: rviz/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        base_link:
-          Value: false
-        horizontal_vlp16_link:
-          Value: true
-        imu_link:
-          Value: true
-        map:
-          Value: false
-        odom:
-          Value: false
-        vertical_vlp16_link:
-          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        map:
-          odom:
-            base_link:
-              horizontal_vlp16_link:
-                {}
-              imu_link:
-                {}
-              vertical_vlp16_link:
-                {}
+        {}
       Update Interval: 0
-      Value: true
+      Value: false
     - Angle Tolerance: 0.5
       Class: rviz/Odometry
       Covariance:
@@ -156,8 +138,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 0.235046655
-        Min Value: 0.209188923
+        Max Value: 0.15528819
+        Min Value: 0.140837103
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -272,16 +254,30 @@ Visualization Manager:
     - Alpha: 1
       Class: rviz/Polygon
       Color: 25; 255; 0
-      Enabled: true
+      Enabled: false
       Name: robot_footprint
       Topic: /move_base/local_costmap/footprint
       Unreliable: false
+      Value: false
+    - Class: rviz/Axes
+      Enabled: false
+      Length: 1
+      Name: IMU
+      Radius: 0.100000001
+      Reference Frame: base_link
+      Value: false
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 1
+      Name: real_robot
+      Radius: 0.100000001
+      Reference Frame: real_robot
       Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: odom
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:
@@ -302,7 +298,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 31.3044739
+      Distance: 42.3772354
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -317,10 +313,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.50979638
+      Pitch: 1.45479643
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.12724781
+      Yaw: 2.68724561
     Saved: ~
 Window Geometry:
   Displays:
@@ -338,5 +334,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1440
-  X: 128
-  Y: 27
+  X: 176
+  Y: 113
