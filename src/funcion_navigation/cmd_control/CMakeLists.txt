@@ -18,6 +18,11 @@ add_message_files(
    keyDataOrParam.msg
  )
 
+add_service_files(
+  FILES
+  cmd_control.srv
+)
+
 generate_messages(
    DEPENDENCIES
    std_msgs
