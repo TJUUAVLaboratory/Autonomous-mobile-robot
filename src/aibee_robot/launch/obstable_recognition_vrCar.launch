@@ -27,9 +27,7 @@
 
 
  <!--坐标系的转换-->
-<node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 1.57079633  0 0  base_link real_robot 50" />
-
-
+<node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0.055 0.877 0  1.57079633  0 0  base_link real_robot 50" />
 
   <arg name="ladir_name" default="velodyne_points" />
     <arg name="ladir_frame_id" default="horizontal_vlp16_link" />
