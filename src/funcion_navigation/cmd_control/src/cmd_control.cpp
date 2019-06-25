@@ -1,8 +1,6 @@
 
 #include <ros/ros.h>
 #include "cmd_control/keyDataOrParam.h"
-#include <geometry_msgs/Twist.h>
-#include <visualization_msgs/Marker.h>
 #include <cmd_control/cmd_control.h>
 
 

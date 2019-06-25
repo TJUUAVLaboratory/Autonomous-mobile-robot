@@ -324,7 +324,7 @@ local_cost map 包含
 
  ## local planner and global planner
  ----------------------------------------------------------
- MoveBaseActionServer ==
+ MoveBaseActionServer ==>
  
  
 
