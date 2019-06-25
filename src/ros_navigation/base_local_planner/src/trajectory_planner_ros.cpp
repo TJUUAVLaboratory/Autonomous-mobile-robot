@@ -81,13 +81,16 @@ namespace base_local_planner {
       initialize(name, tf, costmap_ros);
   }
 
+  // planner init
+  // 
   void TrajectoryPlannerROS::initialize(
       std::string name,
       tf::TransformListener* tf,
-      costmap_2d::Costmap2DROS* costmap_ros){
+      costmap_2d::Costmap2DROS* costmap_ros)
+  {
     if (! isInitialized()) {
 
-      ros::NodeHandle private_nh("~/" + name);
+      ros::NodeHandle private_nh("~/" + name); // 
       g_plan_pub_ = private_nh.advertise<nav_msgs::Path>("global_plan", 1);
       l_plan_pub_ = private_nh.advertise<nav_msgs::Path>("local_plan", 1);
 
@@ -369,8 +372,11 @@ namespace base_local_planner {
     return true;
   }
 
-  bool TrajectoryPlannerROS::computeVelocityCommands(geometry_msgs::Twist& cmd_vel){
-    if (! isInitialized()) {
+  bool TrajectoryPlannerROS::computeVelocityCommands(geometry_msgs::Twist& cmd_vel)
+  {
+
+    if (! isInitialized()) 
+    {
       ROS_ERROR("This planner has not been initialized, please call initialize() before using this planner");
       return false;
     }

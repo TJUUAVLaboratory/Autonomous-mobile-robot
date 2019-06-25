@@ -1,4 +1,5 @@
 
+
 controller_frequency: 3.0
 recovery_behavior_enabled: false
 clearing_rotation_allowed: false
@@ -8,19 +9,11 @@ TrajectoryPlannerROS:
    min_vel_x: 0.05
    max_vel_y: 0.0  # zero for a differential drive robot
    min_vel_y: 0.0
-<<<<<<< HEAD
-   min_in_place_vel_theta: 0.5  ##
-=======
    min_in_place_vel_theta: 0.3  ##
->>>>>>> 99ad52e1ca46d8e9851e800386e431267f00ae53
    escape_vel: -0.1
    acc_lim_x: 2.5  ##  2.5
    acc_lim_y: 0.0 # zero for a differential drive robot
-<<<<<<< HEAD
-   acc_lim_theta: 3.2  ## 3.2
-=======
    acc_lim_theta: 2.0  ## 3.2
->>>>>>> 99ad52e1ca46d8e9851e800386e431267f00ae53
 
    holonomic_robot: false
    yaw_goal_tolerance: 0.35 # about 6 degrees 10度 0.175  20度 0.35

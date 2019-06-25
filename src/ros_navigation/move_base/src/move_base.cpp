@@ -619,7 +619,7 @@ namespace move_base {
   geometry_msgs::PoseStamped MoveBase::goalToGlobalFrame(const geometry_msgs::PoseStamped& goal_pose_msg){
 
     ROS_WARN("MoveBase::goalToGlobalFrame");
-    std::string global_frame = planner_costmap_ros_->getGlobalFrameID();
+    std::string global_frame = planner_costmap_ros_->getGlobalFrameID();//map
     tf::Stamped<tf::Pose> goal_pose, global_pose;
     poseStampedMsgToTF(goal_pose_msg, goal_pose); //msg-->tf_msg
 
@@ -704,7 +704,7 @@ namespace move_base {
         latest_plan_ = temp_plan;
         last_valid_plan_ = ros::Time::now();
         planning_retries_ = 0;
-        new_global_plan_ = true;
+        new_global_plan_ = true;  //makePlan got global plan path
 
         ROS_DEBUG_NAMED("move_base_plan_thread","Generated a plan from the base_global_planner");
 
@@ -772,7 +772,7 @@ namespace move_base {
       return;
     }
 
-    // 坐标转换
+    // 坐标转换 转换到 /map系下 goal
     geometry_msgs::PoseStamped goal = goalToGlobalFrame(move_base_goal->target_pose);
 
     //we have a goal so start the planner
@@ -785,7 +785,7 @@ namespace move_base {
     current_goal_pub_.publish(goal); //publish goal
     std::vector<geometry_msgs::PoseStamped> global_plan;
 
-    ros::Rate r(controller_frequency_);
+    ros::Rate r(controller_frequency_); //3Hz
     if(shutdown_costmaps_){
       ROS_DEBUG_NAMED("move_base","Starting up costmaps that were shut down previously");
       planner_costmap_ros_->start();
@@ -801,7 +801,7 @@ namespace move_base {
     ros::NodeHandle n;
     while(n.ok())
     {
-      if(c_freq_change_)
+      if(c_freq_change_) // enable controller frequency
       {
         ROS_INFO("Setting controller frequency to %.2f", controller_frequency_);
         r = ros::Rate(controller_frequency_);
@@ -809,7 +809,8 @@ namespace move_base {
       }
 
       //判断 active server是否可抢占
-      if(as_->isPreemptRequested()){
+      if(as_->isPreemptRequested()) 
+      {
         if(as_->isNewGoalAvailable())
         {
           //if we're active and a new goal is available, we'll accept it, but we won't shut anything down
@@ -886,7 +887,7 @@ namespace move_base {
       ros::WallTime start = ros::WallTime::now();
 
       //the real work on pursuing a goal is done here
-      bool done = executeCycle(goal, global_plan);
+      bool done = executeCycle(goal, global_plan);  // input goal ,get global plan
 
       //if we're done, then we'll return from execute
       if(done)
@@ -928,7 +929,7 @@ namespace move_base {
   2. publishFeedback
   3. check oscillation
   4. check controller_costmap_ros_->isCurrent()
-  5. 
+  5. input goal, get global plan
   */
   bool MoveBase::executeCycle(geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& global_plan){
 
@@ -939,9 +940,9 @@ namespace move_base {
 
     //update feedback to correspond to our curent position
     tf::Stamped<tf::Pose> global_pose;
-    planner_costmap_ros_->getRobotPose(global_pose); 
+    planner_costmap_ros_->getRobotPose(global_pose);// tf中得到位置
     geometry_msgs::PoseStamped current_position;
-    tf::poseStampedTFToMsg(global_pose, current_position);
+    tf::poseStampedTFToMsg(global_pose, current_position); //tf-->msg  /map系下的位置
 
     //push the feedback out
     move_base_msgs::MoveBaseFeedback feedback;
@@ -960,7 +961,8 @@ namespace move_base {
     }
 
     //check that the observation buffers for the costmap are current, we don't want to drive blind
-    if(!controller_costmap_ros_->isCurrent()){
+    if(!controller_costmap_ros_->isCurrent())
+    {
       ROS_WARN("[%s]:Sensor data is out of date, we're not going to allow commanding of the base for safety",ros::this_node::getName().c_str());
       publishZeroVelocity();
       return false;
@@ -968,7 +970,7 @@ namespace move_base {
 
     //if we have a new plan then grab it and give it to the controller
     // 局部路径规划
-    if(new_global_plan_){
+    if(new_global_plan_){ //makePlan got global plan path
       //make sure to set the new plan flag to false
       new_global_plan_ = false;
 
@@ -1006,7 +1008,7 @@ namespace move_base {
     //the move_base state machine, handles the control logic for navigation
     switch(state_){
       //if we are in a planning state, then we'll attempt to make a plan
-      case PLANNING:
+      case PLANNING: //全局规划
         {
           boost::recursive_mutex::scoped_lock lock(planner_mutex_);
           runPlanner_ = true;
@@ -1016,11 +1018,12 @@ namespace move_base {
         break;
 
       //if we're controlling, we'll attempt to find valid velocity commands
-      case CONTROLLING:
+      case CONTROLLING: //局部规划
         ROS_DEBUG_NAMED("move_base","In controlling state.");
 
         //check to see if we've reached our goal
-        if(tc_->isGoalReached()){
+        if(tc_->isGoalReached())
+        {
           ROS_DEBUG_NAMED("move_base","Goal reached!");
           resetState();
 

@@ -324,10 +324,14 @@ local_cost map 包含
 
  ## local planner and global planner
  ----------------------------------------------------------
- MoveBaseActionServer ==>
+ MoveBaseActionServer ==> executeCb()  监听是否收到goalpoint
  
  
 
 
 
  ----------------------------------------------------------
+
+
+ ## 高级功能
+ - actionlib
