@@ -12,3 +12,6 @@
 /el_isolated
 
 /data
+
+/install_isolated/*
+/build_isolated/*
