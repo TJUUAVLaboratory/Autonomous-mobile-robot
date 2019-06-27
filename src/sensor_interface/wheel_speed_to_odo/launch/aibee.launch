@@ -1,0 +1,4 @@
+<launch>
+    <include file="$(find wheel_speed_odo)/launch/amcl_diff.launch"/> 
+    <include file="$(find wheel_speed_odo)/launch/odom.launch"/> 
+</launch>

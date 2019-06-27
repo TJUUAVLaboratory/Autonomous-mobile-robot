@@ -1,0 +1,3 @@
+<launch>
+    <node name="wheel_speed_odo" pkg="wheel_speed_odo" type="wheel_speed_odo" output="log"/>
+</launch>
