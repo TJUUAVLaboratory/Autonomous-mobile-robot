@@ -34,9 +34,9 @@ TrajectoryPlannerROS:
    sim_time: 1.0
    sim_granularity: 0.025
    angular_sim_granularity: 0.025
-   vx_samples: 8
+   vx_samples: 10  ## 默认8
    vy_samples: 0 # zero for a differential drive robot
-   vtheta_samples: 20
+   vtheta_samples: 10 ## 默认20
    dwa: true
    simple_attractor: false
 
