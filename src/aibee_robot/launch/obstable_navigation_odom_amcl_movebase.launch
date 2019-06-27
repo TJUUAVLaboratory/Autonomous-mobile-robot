@@ -33,7 +33,9 @@
 
 <!--map server 提供 /map -->
 <arg name="map" default="office_map/map.yaml" />
-<node name="map_server" pkg="map_server" type="map_server" args="$(find aibee_robot)/maps/$(arg map)"/>
+<node name="map_server" pkg="map_server" type="map_server" args="$(find aibee_robot)/maps/$(arg map)">
+<param name="map_topic" value="map"/> 
+</node>
 
 <!-- cmd or ipad control change-->
 <node pkg="cmd_control" type="cmd_control_node"  name="cmd_control_node" output="screen"/>
