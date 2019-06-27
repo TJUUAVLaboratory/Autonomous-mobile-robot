@@ -55,6 +55,6 @@
     <node name="obstable_navigatoin" pkg="obstable_navigatoin" type="obstable_navigatoin_node" output="screen" >
     </node>
 
- <!--<node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>-->
+ <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>
 
 </launch>

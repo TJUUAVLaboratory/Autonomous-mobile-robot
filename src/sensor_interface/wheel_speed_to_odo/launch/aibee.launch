@@ -1,4 +1,5 @@
 <launch>
+     <param name="use_sim_time" value="true" />
     <include file="$(find wheel_speed_odo)/launch/amcl_diff.launch"/> 
     <include file="$(find wheel_speed_odo)/launch/odom.launch"/> 
 </launch>
