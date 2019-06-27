@@ -39,3 +39,7 @@ TrajectoryPlannerROS:
    vtheta_samples: 20
    dwa: true
    simple_attractor: false
+
+
+
+
