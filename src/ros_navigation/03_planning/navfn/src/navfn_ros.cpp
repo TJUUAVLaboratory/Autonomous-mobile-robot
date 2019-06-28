@@ -35,7 +35,7 @@
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
 #include <navfn/navfn_ros.h>
-#include <pluginlib/class_list_macros.h>
+#include <pluginlib/class_list_macros.h> //注册plugin用
 #include <tf/transform_listener.h>
 #include <costmap_2d/cost_values.h>
 #include <costmap_2d/costmap_2d.h>

@@ -33,7 +33,9 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *
 * Author: Bhaskara Marthi
+* 
 *********************************************************************/
+// 测试全局路基规划 Dijkstra/A*star的node
 #include <navfn/navfn_ros.h>
 #include <navfn/MakeNavPlan.h>
 #include <boost/shared_ptr.hpp>

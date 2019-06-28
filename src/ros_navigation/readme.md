@@ -40,5 +40,29 @@ virtual void runBehavior()
 
 ```
 
-#### global_planning
+#### global_planning  plugin
+
+**navfn Dijkstra/A*star全局路径规划**
+`navfn::NavfnROS`
+```
+bgp_plugin.xml  lib/libnavfn
+plugin_name: navfn::NavfnROS
+
+
+void initialize(std::string name, costmap_2d::Costmap2D* costmap, std::string global_frame)
+
+bool makePlan(const geometry_msgs::PoseStamped& start, 
+          const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan);
+
+bool computePotential(const geometry_msgs::Point& world_point)
+double getPointPotential(const geometry_msgs::Point& world_point)
+bool validPointPotential(const geometry_msgs::Point& world_point)
+
+
+bool getPlanFromPotential(const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan);
+
+bool makePlanService(nav_msgs::GetPlan::Request& req, nav_msgs::GetPlan::Response& resp)
+void publishPlan(const std::vector<geometry_msgs::PoseStamped>& path, double r, double g, double b, double a);
+
+```
 
