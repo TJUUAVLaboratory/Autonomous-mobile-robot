@@ -2,11 +2,11 @@
 ## ros navigation 重构
 
 
-### planning 结构
+### 3. planning 结构
 
-#### nav_core  planning_plugin 基类
+#### 3.0. nav_core  planning_plugin 基类
 
-**base_global_planner [`global_planner基类`]**
+**3.0.1. base_global_planner [`global_planner基类`]**
 ```
 基类名称： nav_core::BaseGlobalPlanner
 方法：
@@ -17,7 +17,7 @@ virtual bool makePlan(const geometry_msgs::PoseStamped& start,
                             double& cost)                            
 ```
 
-**base_local_planner [`local_planner基类`]**
+**3.0.2. base_local_planner [`local_planner基类`]**
 ```
 基类名称： nav_core::BaseLocalPlanner
 virtual void initialize(std::string name, tf::TransformListener* tf, costmap_2d::Costmap2DROS* costmap_ros)
@@ -30,7 +30,7 @@ virtual bool isGoalReached()
 
 ```
 
-**recovery_behavior [`recovery_behavior基类`]**
+**3.0.3. recovery_behavior [`recovery_behavior基类`]**
 ```
 基类名称： nav_core::RecoveryBehavior
 virtual void initialize(std::string name, tf::TransformListener* tf, costmap_2d::Costmap2DROS* global_costmap, costmap_2d::Costmap2DROS* local_costmap)
@@ -40,7 +40,7 @@ virtual void runBehavior()
 
 ```
 
-#### global_planning  plugin
+#### 3.1. global_planning  plugin
 
 **navfn Dijkstra/A*star全局路径规划**
 `navfn::NavfnROS`
@@ -66,3 +66,26 @@ void publishPlan(const std::vector<geometry_msgs::PoseStamped>& path, double r, 
 
 ```
 
+#### 3.2. local_planning  plugin
+
+**base_local_planner DWA动态路径规划**
+`base_local_planner::TrajectoryPlannerROS`
+```
+blp_plugin.xml  lib/libtrajectory_planner_ros
+
+void initialize(std::string name, tf::TransformListener* tf,
+          costmap_2d::Costmap2DROS* costmap_ros)
+
+bool setPlan(const std::vector<geometry_msgs::PoseStamped>& orig_global_plan)
+
+bool computeVelocityCommands(geometry_msgs::Twist& cmd_vel)
+
+bool isGoalReached()        
+
+bool checkTrajectory(double vx_samp, double vy_samp, double vtheta_samp, bool update_map = true)
+
+double scoreTrajectory(double vx_samp, double vy_samp, double vtheta_samp, bool update_map = true)
+
+TrajectoryPlanner* getPlanner() const { return tc_; }
+
+```
