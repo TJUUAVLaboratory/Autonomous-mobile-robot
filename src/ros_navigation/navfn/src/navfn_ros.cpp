@@ -61,7 +61,7 @@ namespace navfn {
       //initialize the planner
       initialize(name, costmap, global_frame);
   }
-
+//初始化一个global_planner
   void NavfnROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, std::string global_frame){
     if(!initialized_){
       costmap_ = costmap;
@@ -99,12 +99,17 @@ namespace navfn {
     initialize(name, costmap_ros->getCostmap(), costmap_ros->getGlobalFrameID());
   }
 
-  bool NavfnROS::validPointPotential(const geometry_msgs::Point& world_point){
+
+
+  //
+  bool NavfnROS::validPointPotential(const geometry_msgs::Point& world_point)
+  {
     return validPointPotential(world_point, default_tolerance_);
   }
-
-  bool NavfnROS::validPointPotential(const geometry_msgs::Point& world_point, double tolerance){
-    if(!initialized_){
+  bool NavfnROS::validPointPotential(const geometry_msgs::Point& world_point, double tolerance)
+  {
+    if(!initialized_)
+    {
       ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
       return false;
     }
@@ -131,7 +136,8 @@ namespace navfn {
   }
 
   double NavfnROS::getPointPotential(const geometry_msgs::Point& world_point){
-    if(!initialized_){
+    if(!initialized_)
+    {
       ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
       return -1.0;
     }

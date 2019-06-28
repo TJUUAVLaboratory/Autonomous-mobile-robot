@@ -137,7 +137,7 @@ namespace move_base {
     try
     {
       planner_ = bgp_loader_.createInstance(global_planner);
-      planner_->initialize(bgp_loader_.getName(global_planner), planner_costmap_ros_);
+      planner_->initialize(bgp_loader_.getName(global_planner), planner_costmap_ros_); //初始化一个global_planner navfn_ros
     } 
     catch (const pluginlib::PluginlibException& ex) {
       ROS_FATAL("Failed to create the %s planner, are you sure it is properly registered and that the containing library is built? Exception: %s", global_planner.c_str(), ex.what());
