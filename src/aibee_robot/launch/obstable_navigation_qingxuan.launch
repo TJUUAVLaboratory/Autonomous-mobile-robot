@@ -1,0 +1,22 @@
+
+<launch>
+ <!--
+  1. 启动pad cartographer 
+  2. 启动launch文件
+  3. 启动docker navigation
+ -->
+
+<!-- cmd or ipad control change-->
+<node pkg="cmd_control" type="cmd_control_node"  name="cmd_control_node" output="screen"/>
+
+<!-- sub move_base_simple goal-->
+<node pkg="map_srv" type="click_move_to_goal"  name="click_move_to_goal" output="screen"/>
+
+<!-- ***************************** ROS Navigation ************************************ -->
+<!--wheel speed  提供/odom-->
+<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/> 
+
+
+ <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>
+
+</launch>
