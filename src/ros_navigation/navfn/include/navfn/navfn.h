@@ -87,7 +87,6 @@ NOTE: will be modified to have a border of obstacle costs
 \param ny Height of map in cells
 \param goal X,Y position of goal cell
 \param start X,Y position of start cell
-
 Returns length of plan if found, and fills an array with x,y interpolated 
 positions at about 1/2 cell resolution; else returns 0.
 

@@ -58,16 +58,16 @@ catkin_package(
         visualization_msgs
 )
 
+## 生成 D-star A*star dynamic lib
 add_library (navfn src/navfn.cpp src/navfn_ros.cpp)
 target_link_libraries(navfn
     ${catkin_LIBRARIES}
     )
 add_dependencies(navfn ${PROJECT_NAME}_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 
+## 生成 navfn_node
 add_executable(navfn_node src/navfn_node.cpp)
-target_link_libraries(navfn_node
-    navfn
-    )
+target_link_libraries(navfn_node    navfn  )
 
 install(TARGETS navfn navfn_node
        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

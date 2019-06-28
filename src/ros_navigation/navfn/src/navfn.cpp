@@ -54,10 +54,9 @@ namespace navfn {
   //   if the size of the environment does not change
   //
 
-  int
-    create_nav_plan_astar(COSTTYPE *costmap, int nx, int ny,
-        int* goal, int* start,
-        float *plan, int nplan)
+  int create_nav_plan_astar(COSTTYPE *costmap, int nx, int ny,
+                            int* goal, int* start,
+                            float *plan, int nplan)
     {
       static NavFn *nav = NULL;
 
@@ -167,18 +166,14 @@ namespace navfn {
 
   //
   // set goal, start positions for the nav fn
-  //
-
-  void
-    NavFn::setGoal(int *g)
+  void NavFn::setGoal(int *g)
     {
       goal[0] = g[0];
       goal[1] = g[1];
       ROS_DEBUG("[NavFn] Setting goal to %d,%d\n", goal[0], goal[1]);
     }
 
-  void
-    NavFn::setStart(int *g)
+  void NavFn::setStart(int *g)
     {
       start[0] = g[0];
       start[1] = g[1];
@@ -186,17 +181,14 @@ namespace navfn {
     }
 
   //
-  // Set/Reset map size
-  //
-
-  void
-    NavFn::setNavArr(int xs, int ys)
+  // Set/Reset map size cell size
+  void NavFn::setNavArr(int xs, int ys)
     {
       ROS_DEBUG("[NavFn] Array is %d x %d\n", xs, ys);
 
       nx = xs;
       ny = ys;
-      ns = nx*ny;
+      ns = nx*ny;  // nums of cells
 
       if(costarr)
         delete[] costarr;
@@ -221,11 +213,8 @@ namespace navfn {
 
 
   //
-  // set up cost array, usually from ROS
-  //
-
-  void
-    NavFn::setCostmap(const COSTTYPE *cmap, bool isROS, bool allow_unknown)
+  // set up cost array, usually from ROS  
+  void NavFn::setCostmap(const COSTTYPE *cmap, bool isROS, bool allow_unknown)
     {
       COSTTYPE *cm = costarr;
       if (isROS)			// ROS-type cost array
@@ -255,7 +244,7 @@ namespace navfn {
             }
           }
         }
-      }
+      } //isROS
 
       else				// not a ROS map, just a PGM
       {
@@ -283,11 +272,10 @@ namespace navfn {
           }
         }
 
-      }
+      } // not ROS
     }
 
-  bool
-    NavFn::calcNavFnDijkstra(bool atStart)
+  bool  NavFn::calcNavFnDijkstra(bool atStart)
     {
 #if 0
       static char costmap_filename[1000];
@@ -319,10 +307,7 @@ namespace navfn {
 
   //
   // calculate navigation function, given a costmap, goal, and start
-  //
-
-  bool
-    NavFn::calcNavFnAstar()
+  bool NavFn::calcNavFnAstar()
     {
       setupNavFn(true);
 
@@ -345,10 +330,7 @@ namespace navfn {
     }
 
 
-  //
   // returning values
-  //
-
   float *NavFn::getPathX() { return pathx; }
   float *NavFn::getPathY() { return pathy; }
   int    NavFn::getPathLen() { return npath; }
@@ -356,10 +338,7 @@ namespace navfn {
 
   //
   // simple obstacle setup for tests
-  //
-
-  void
-    NavFn::setObs()
+  void   NavFn::setObs()
     {
 #if 0
       // set up a simple obstacle
@@ -384,22 +363,23 @@ namespace navfn {
     }
 
 
-  // inserting onto the priority blocks
+  // inserting onto the priority blocks 类似与内联函数
 #define push_cur(n)  { if (n>=0 && n<ns && !pending[n] && \
     costarr[n]<COST_OBS && curPe<PRIORITYBUFSIZE) \
   { curP[curPe++]=n; pending[n]=true; }}
+
 #define push_next(n) { if (n>=0 && n<ns && !pending[n] && \
     costarr[n]<COST_OBS && nextPe<PRIORITYBUFSIZE) \
   { nextP[nextPe++]=n; pending[n]=true; }}
+
 #define push_over(n) { if (n>=0 && n<ns && !pending[n] && \
     costarr[n]<COST_OBS && overPe<PRIORITYBUFSIZE) \
   { overP[overPe++]=n; pending[n]=true; }}
 
 
-  // Set up navigation potential arrays for new propagation
 
-  void
-    NavFn::setupNavFn(bool keepit)
+  // Set up navigation potential arrays for new propagation
+  void NavFn::setupNavFn(bool keepit)
     {
       // reset values in propagation arrays
       for (int i=0; i<ns; i++)
@@ -451,9 +431,7 @@ namespace navfn {
 
 
   // initialize a goal-type cost for starting propagation
-
-  void
-    NavFn::initCost(int k, float v)
+  void  NavFn::initCost(int k, float v)
     {
       potarr[k] = v;
       push_cur(k+1);
@@ -469,8 +447,6 @@ namespace navfn {
   // Planar-wave update calculation from two lowest neighbors in a 4-grid
   // Quadratic approximation to the interpolated value 
   // No checking of bounds here, this function should be fast
-  //
-
 #define INVSQRT2 0.707106781
 
   inline void

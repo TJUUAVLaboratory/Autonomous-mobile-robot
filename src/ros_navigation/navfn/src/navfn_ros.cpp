@@ -39,14 +39,13 @@
 #include <tf/transform_listener.h>
 #include <costmap_2d/cost_values.h>
 #include <costmap_2d/costmap_2d.h>
-
 #include <pcl_conversions/pcl_conversions.h>
 
 //register this planner as a BaseGlobalPlanner plugin
+//this plugin name:navfn::NavfnROS    base_plugin_name:nav_core::BaseGlobalPlanner
 PLUGINLIB_EXPORT_CLASS(navfn::NavfnROS, nav_core::BaseGlobalPlanner)
 
 namespace navfn {
-
   NavfnROS::NavfnROS() 
     : costmap_(NULL),  planner_(), initialized_(false), allow_unknown_(true) {}
 
@@ -197,6 +196,7 @@ namespace navfn {
     return true;
   } 
 
+  // map cell ==> world position
   void NavfnROS::mapToWorld(double mx, double my, double& wx, double& wy) {
     wx = costmap_->getOriginX() + mx * costmap_->getResolution();
     wy = costmap_->getOriginY() + my * costmap_->getResolution();
@@ -208,8 +208,6 @@ namespace navfn {
       const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan){
     return makePlan(start, goal, default_tolerance_, plan);
   }
-
-
   bool NavfnROS::makePlan(const geometry_msgs::PoseStamped& start, 
       const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan)
       {

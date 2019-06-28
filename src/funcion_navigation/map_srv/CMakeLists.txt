@@ -56,7 +56,7 @@ target_link_libraries(fake_odom_node
     ${catkin_LIBRARIES}  cjson
     )
 
-
+## 使用pad 预约点位
 add_executable(check_odom_node src/check_odom_position.cpp)
 target_link_libraries(check_odom_node
     ${catkin_LIBRARIES}
@@ -64,3 +64,11 @@ target_link_libraries(check_odom_node
     ${catkin_LIBRARIES}  cjson
     )
 
+
+## load costmap and click move to goal 订阅 /move_base_simple/goal
+add_executable(click_move_to_goal src/click_move_to_goal.cpp)
+target_link_libraries(click_move_to_goal
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
+    ${catkin_LIBRARIES}  cjson
+    )

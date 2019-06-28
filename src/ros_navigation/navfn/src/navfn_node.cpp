@@ -96,7 +96,7 @@ void NavfnWithCostmap::poseCallback(const rm::PoseStamped::ConstPtr& goal) {
     makePlan(start, *goal, path);
 }
 
-
+// 构造一个 global planner
 NavfnWithCostmap::NavfnWithCostmap(string name, Costmap2DROS* cmap) : 
   NavfnROS(name, cmap)
 {
@@ -108,6 +108,7 @@ NavfnWithCostmap::NavfnWithCostmap(string name, Costmap2DROS* cmap) :
 
 } // namespace
 
+// 创建一个 global planner, 收到一次goal,进行一次路径规划
 int main (int argc, char** argv)
 {
   ros::init(argc, argv, "global_planner");

@@ -26,7 +26,7 @@
     <build_depend>costmap_2d</build_depend>
     <build_depend>geometry_msgs</build_depend>
     <build_depend>message_generation</build_depend>
-    <build_depend>nav_core</build_depend>
+    <build_depend>nav_core</build_depend>  <!--添加plgin 基类依赖 -->
     <build_depend>nav_msgs</build_depend>
     <build_depend>netpbm</build_depend> <!-- This is a test dependency -->
     <build_depend>pcl_conversions</build_depend>
@@ -41,7 +41,7 @@
     <run_depend>costmap_2d</run_depend>
     <run_depend>geometry_msgs</run_depend>
     <run_depend>message_runtime</run_depend>
-    <run_depend>nav_core</run_depend>
+    <run_depend>nav_core</run_depend>  <!--添加plgin 基类依赖 -->
     <run_depend>nav_msgs</run_depend>
     <run_depend>pcl_conversions</run_depend>
     <run_depend>pcl_ros</run_depend>

@@ -38,14 +38,14 @@
 #define NAVFN_NAVFN_ROS_H_
 
 #include <ros/ros.h>
-#include <navfn/navfn.h>
-#include <costmap_2d/costmap_2d.h>
+#include <navfn/navfn.h> // Dijstar A*star class
+#include <costmap_2d/costmap_2d.h> //依赖的costmap
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Point.h>
 #include <nav_msgs/Path.h>
 #include <tf/transform_datatypes.h>
 #include <vector>
-#include <nav_core/base_global_planner.h>
+#include <nav_core/base_global_planner.h>  // plugin base class
 #include <nav_msgs/GetPlan.h>
 #include <navfn/potarr_point.h>
 #include <pcl_ros/publisher.h>
