@@ -1,6 +1,22 @@
 
 ## ros navigation 重构
 
+### 2. mapping 
+
+**2.0.1 map_server: load map**
+```
+loadMapFromFile(nav_msgs::GetMap::Response* resp,
+                const char* fname, double res, bool negate,
+                double occ_th, double free_th, double* origin,
+                MapMode mode)
+```
+
+**costmap_2d: use occupied map generate layered costmap**
+
+```
+
+```
+
 
 ### 3. planning 结构
 
