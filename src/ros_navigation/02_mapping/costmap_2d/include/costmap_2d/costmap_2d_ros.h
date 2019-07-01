@@ -46,11 +46,12 @@
 #include <geometry_msgs/Polygon.h>
 #include <geometry_msgs/PolygonStamped.h>
 #include <dynamic_reconfigure/server.h>
-#include <pluginlib/class_loader.h>
+#include <pluginlib/class_loader.h>  // 调用插件
 
 class SuperValue : public XmlRpc::XmlRpcValue
 {
 public:
+  //设置 xmlRpcValue的数据类型 struct and array
   void setStruct(XmlRpc::XmlRpcValue::ValueStruct* a)
   {
     _type = TypeStruct;
@@ -238,13 +239,13 @@ private:
   bool map_update_thread_shutdown_;
   bool stop_updates_, initialized_, stopped_, robot_stopped_;
   boost::thread* map_update_thread_;  ///< @brief A thread for updating the map
-  ros::Timer timer_;
+  ros::Timer timer_; //ros 定时器
   ros::Time last_publish_;
   ros::Duration publish_cycle;
-  pluginlib::ClassLoader<Layer> plugin_loader_;
+  pluginlib::ClassLoader<Layer> plugin_loader_; //加载插件类
   tf::Stamped<tf::Pose> old_pose_;
   Costmap2DPublisher* publisher_;
-  dynamic_reconfigure::Server<costmap_2d::Costmap2DConfig> *dsrv_;
+  dynamic_reconfigure::Server<costmap_2d::Costmap2DConfig> *dsrv_; //动态参数配置server
 
   boost::recursive_mutex configuration_mutex_;
 

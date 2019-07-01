@@ -48,12 +48,14 @@ using namespace std;
 namespace costmap_2d
 {
 
+//两个 NodeHandle之间的参数转移
 void move_parameter(ros::NodeHandle& old_h, ros::NodeHandle& new_h, std::string name, bool should_delete = true)
 {
   if (!old_h.hasParam(name))
     return;
 
   XmlRpc::XmlRpcValue value;
+  //Get an arbitrary XML/RPC value from the parameter server
   old_h.getParam(name, value);
   new_h.setParam(name, value);
   if (should_delete) old_h.deleteParam(name);
@@ -95,10 +97,13 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
   // get two frames
   private_nh.param("global_frame", global_frame_, std::string("/map"));
   private_nh.param("robot_base_frame", robot_base_frame_, std::string("base_link"));
-
+  // ROS_WARN_STREAM("tf_prefix: " << tf_prefix);
+  // ROS_WARN_STREAM("global_frame_: " << global_frame_);
   // make sure that we set the frames appropriately based on the tf_prefix
   global_frame_ = tf::resolve(tf_prefix, global_frame_);
   robot_base_frame_ = tf::resolve(tf_prefix, robot_base_frame_);
+  // ROS_WARN_STREAM("global_frame_: " << global_frame_);
+  // ROS_WARN_STREAM("robot_base_frame_: " << robot_base_frame_);
 
   ros::Time last_error = ros::Time::now();
   std::string tf_error;
@@ -128,7 +133,8 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
 
   layered_costmap_ = new LayeredCostmap(global_frame_, rolling_window, track_unknown_space);
 
-
+  //
+  ROS_WARN_STREAM("name:" << name << "load costmap layers");
   if (!private_nh.hasParam("plugins"))
   {
     ROS_WARN("costmap don't have plugins list, reset Old Parameters");
@@ -222,20 +228,20 @@ void Costmap2DROS::resetOldParameters(ros::NodeHandle& nh)
   std::string s;
   std::vector < XmlRpc::XmlRpcValue > plugins;
 
-  XmlRpc::XmlRpcValue::ValueStruct map;
+  XmlRpc::XmlRpcValue::ValueStruct map; // struct类型的XmlRpc::XmlRpcValue
   SuperValue super_map;
   SuperValue super_array;
 
   // static_layer [static_map=ture]
-  if (nh.getParam("static_map", flag) && flag)
+  if (nh.getParam("static_map", flag) && flag) // yaml参数
   {
     ROS_INFO("load static_costmap layer");
     map["name"] = XmlRpc::XmlRpcValue("static_layer");
     map["type"] = XmlRpc::XmlRpcValue("costmap_2d::StaticLayer");
-    super_map.setStruct(&map);
-    plugins.push_back(super_map);
+    super_map.setStruct(&map); //
+    plugins.push_back(super_map); // add a layer: static_layer
 
-    ros::NodeHandle map_layer(nh, "static_layer");
+    ros::NodeHandle map_layer(nh, "static_layer");  //parent + ns
     move_parameter(nh, map_layer, "map_topic");
     move_parameter(nh, map_layer, "unknown_cost_value");
     move_parameter(nh, map_layer, "lethal_cost_threshold");
@@ -289,10 +295,10 @@ void Costmap2DROS::resetOldParameters(ros::NodeHandle& nh)
   map["name"] = XmlRpc::XmlRpcValue("inflation_layer");
   map["type"] = XmlRpc::XmlRpcValue("costmap_2d::InflationLayer");
   super_map.setStruct(&map);
-  plugins.push_back(super_map);
+  plugins.push_back(super_map); //add inflation_layer to xmp_RPC
 
   super_array.setArray(&plugins);
-  nh.setParam("plugins", super_array);
+  nh.setParam("plugins", super_array); //变成一个xmp_RPC类型的 param 
 }
 
 void Costmap2DROS::reconfigureCB(costmap_2d::Costmap2DConfig &config, uint32_t level)

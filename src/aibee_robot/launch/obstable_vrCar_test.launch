@@ -1,0 +1,60 @@
+
+<launch>
+ <!-- ***************************** 
+ needed :
+
+ - ipad 启动 cartographer, 预约点位
+ - 不需要map server, cartographer直接publisher /map  nav_msgs/OccupancyGrid
+ - 不需要 AMCL定位, catographer SLAM定位
+
+ - /odom信息 在 /tf中
+
+ ********************************* -->
+
+
+ <!-- ***************************** 
+ action :
+
+ -  3D  PointCloud2 ==> LaserScan 
+ -  moveBase action
+ -  obstable_navigatoin 
+ -  set the control mode 
+
+ ************************************ -->
+
+
+<!-- ***************************** ROS Navigation ************************************ -->
+<!--wheel speed  提供/odom-->
+<include file="$(find wheel_speed_odo)/launch/aibee.launch"/> 
+
+
+<!--pointCloud to Laserscan 提供/scan -->
+<include file="$(find pointcloud_to_laserscan)/launch/vscan.launch"/>
+
+<!--map server 提供 /map -->
+<arg name="map" default="office_map/map.yaml" />
+<node name="map_server" pkg="map_server" type="map_server" args="$(find aibee_robot)/maps/$(arg map)">
+<param name="map_topic" value="map"/> 
+</node>
+
+<!-- cmd or ipad control change-->
+<node pkg="cmd_control" type="cmd_control_node"  name="cmd_control_node" output="screen"/>
+
+<!--move_base action-->
+  <node pkg="move_base" type="move_base"  name="move_base" output="screen" >
+    <param name="map_topic" value="map"/>  
+    <rosparam file="$(find aibee_robot)/config/mrobot/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/base_local_planner_params.yaml" command="load" />
+
+  </node>
+
+    <!-- node function: 订阅ipad点位, 利用movebase 导航到对应位置-->
+    <!--<node name="obstable_navigatoin" pkg="obstable_navigatoin" type="obstable_navigatoin_node" output="screen" >
+    </node>-->
+
+ <!--<node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>-->
+
+</launch>

@@ -13,7 +13,35 @@ loadMapFromFile(nav_msgs::GetMap::Response* resp,
 
 **costmap_2d: use occupied map generate layered costmap**
 
-```
+```bash
+## plugin 基类名称 Layer
+pluginlib::ClassLoader<Layer> plugin_loader_;
+## 根据type生成相应的 plugin实例，每一个实例都是给予Layer的 comtmap Layer层
+boost::shared_ptr<Layer> plugin = plugin_loader_.createInstance(type);
+
+costmap_plugins.xml
+基类：costmap_2d::Layer
+
+plugin类： 
+costmap_2d::InflationLayer
+costmap_2d::ObstacleLayer
+costmap_2d::StaticLayer
+costmap_2d::VoxelLayer
+
+
+initialize(LayeredCostmap* parent, std::string name, tf::TransformListener *tf)
+
+
+void updateBounds(double robot_x, double robot_y, double robot_yaw, double* min_x, double* min_y,
+                            double* max_x, double* max_y)
+
+void updateCosts(Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
+
+void deactivate()
+void activate() 
+void activate() 
+
+
 
 ```
 

@@ -31,7 +31,7 @@
     </node>
 
     <!-- 在gazebo中加载机器人模型-->
-    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="log"
           args="-urdf -model mrobot -param robot_description"/> 
 
 
@@ -43,7 +43,7 @@
     <!--<arg name="map" default="gridmap/wandaf1.yaml" />-->
     
     <!-- 运行地图服务器，并且加载设置的地图-->
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find aibee_robot)/maps/$(arg map)">
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find aibee_robot)/maps/test_gazeboMap/$(arg map)">
     <param name="map_topic" value="aibee_map"/>  
     <!--map server-->
     </node>
