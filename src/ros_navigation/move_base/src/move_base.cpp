@@ -63,7 +63,8 @@ namespace move_base {
 
     //pose list
     planner_plan_(NULL), latest_plan_(NULL), controller_plan_(NULL), 
-    runPlanner_(false), setup_(false), p_freq_change_(false), c_freq_change_(false), new_global_plan_(false) {
+    runPlanner_(false), setup_(false), p_freq_change_(false), c_freq_change_(false), new_global_plan_(false) 
+  {
 
     //move_base action server  监听 move_base_msgs::MoveBaseGoal消息
     as_ = new MoveBaseActionServer(ros::NodeHandle(), "move_base", boost::bind(&MoveBase::executeCb, this, _1), false);
@@ -200,7 +201,8 @@ namespace move_base {
 
 
   //动态参数调节的服务
-  void MoveBase::reconfigureCB(move_base::MoveBaseConfig &config, uint32_t level){
+  void MoveBase::reconfigureCB(move_base::MoveBaseConfig &config, uint32_t level)
+  {
     boost::recursive_mutex::scoped_lock l(configuration_mutex_);
 
     //The first time we're called, we just want to make sure we have the
@@ -289,6 +291,7 @@ namespace move_base {
 
     last_config_ = config;
   }
+  
 
   //订阅目标点的回调函数 发给action server
   void MoveBase::goalCB(const geometry_msgs::PoseStamped::ConstPtr& goal){

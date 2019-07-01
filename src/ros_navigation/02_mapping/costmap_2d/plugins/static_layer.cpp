@@ -66,7 +66,7 @@ void StaticLayer::onInitialize()
 
   std::string map_topic;
   nh.param("map_topic", map_topic, std::string("map"));
-  ROS_WARN_STREAM("the static layer map_topic:" << map_topic); //map topic
+  // ROS_WARN_STREAM("the static layer map_topic:" << map_topic); //map topic
   nh.param("first_map_only", first_map_only_, false);
   nh.param("subscribe_to_updates", subscribe_to_updates_, false);
 

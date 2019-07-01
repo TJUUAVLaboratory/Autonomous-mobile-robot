@@ -43,10 +43,8 @@
 <!--move_base action-->
   <node pkg="move_base" type="move_base"  name="move_base" output="screen" >
     <param name="map_topic" value="map"/>  
-    <rosparam file="$(find aibee_robot)/config/mrobot/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find aibee_robot)/config/mrobot/costmap_common_params.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find aibee_robot)/config/mrobot/local_costmap_params.yaml" command="load" />
-    <rosparam file="$(find aibee_robot)/config/mrobot/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find aibee_robot)/config/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find aibee_robot)/config/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find aibee_robot)/config/mrobot/base_local_planner_params.yaml" command="load" />
 
   </node>

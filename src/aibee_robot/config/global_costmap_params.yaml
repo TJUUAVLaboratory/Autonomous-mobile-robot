@@ -1,10 +1,10 @@
-## global_costmap: 主要包含 static_layer obstacle_layer  inflation_layer
+## global_costmap: static_layer obstacle_layer  inflation_layer
 global_costmap:
    global_frame: /map
    robot_base_frame: /base_link
    update_frequency: 1.0
    publish_frequency: 0   
-   robot_radius:   0.3     ## robot机体 footprint 300mm
+   robot_radius:   0.3     ## robot footprint 300mm
    rolling_window: false
    resolution: 0.05  ## m/pixel
    transform_tolerance: 1.0
@@ -18,18 +18,19 @@ global_costmap:
 
 
 ### obstacle_layer
-   map_type: costmap  ## voxel 是另一类
+   map_type: costmap  ## voxel 
    max_obstacle_height: 2.0
    min_obstacle_height: 0.2
    raytrace_range: 3.0
-   obstacle_range: 2.5   ## local_costmap 探测范围  
+   obstacle_range: 2.5   ## local_costmap 
   # track_unknown_space:
    observation_sources: scan
    scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true, expected_update_rate: 0}
 
 ### inflation_layer
+   inflation_radius: 0.15
     # cost_scaling_factor:
-    inflation_radius: 0.15    ## 膨胀半径 local & global
+    
 
   
    
