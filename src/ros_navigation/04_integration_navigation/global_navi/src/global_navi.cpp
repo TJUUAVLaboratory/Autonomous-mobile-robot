@@ -612,7 +612,6 @@ namespace global_navi {
     if(shutdown_costmaps_){
       ROS_DEBUG_NAMED("move_base","Starting up costmaps that were shut down previously");
       planner_costmap_ros_->start();
-      controller_costmap_ros_->start();
     }
 
     //we want to make sure that we reset the last time we had a valid plan and control
@@ -624,14 +623,10 @@ namespace global_navi {
     ros::NodeHandle n;
     while(n.ok())
     {
-      if(c_freq_change_) // enable controller frequency
-      {
-        c_freq_change_ = false;
-      }
-
       //判断 active server是否可抢占
       if(as_->isPreemptRequested()) 
       {
+        ROS_WARN("action server is PreemptRequested ");
         if(as_->isNewGoalAvailable())
         {
           //if we're active and a new goal is available, we'll accept it, but we won't shut anything down
@@ -702,21 +697,7 @@ namespace global_navi {
         last_oscillation_reset_ = ros::Time::now();
         planning_retries_ = 0;
       }
-
-      //for timing that gives real time even in simulation
-      ros::WallTime start = ros::WallTime::now();
-
-      //the real work on pursuing a goal is done here
-      bool done = executeCycle(goal, global_plan);  // input goal ,get global plan
-
-      //if we're done, then we'll return from execute
-      if(done)
-        return;
-
       //check if execution of the goal has completed in some way
-
-      ros::WallDuration t_diff = ros::WallTime::now() - start;
-      ROS_DEBUG_NAMED("move_base","Full control cycle time: %.9f\n", t_diff.toSec());
 
     }
 
