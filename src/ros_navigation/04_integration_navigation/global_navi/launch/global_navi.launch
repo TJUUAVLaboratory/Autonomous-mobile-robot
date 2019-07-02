@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+    
+<node pkg="global_navi" type="global_navi" name="global_navi" output="screen">
+<rosparam file="$(find global_navi)/config/global_costmap_params.yaml" command="load" />
+    
+</node>
+
+</launch>

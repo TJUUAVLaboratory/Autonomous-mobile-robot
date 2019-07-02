@@ -45,9 +45,7 @@
 #include <actionlib/server/simple_action_server.h>
 #include <move_base_msgs/MoveBaseAction.h>
 
-#include <nav_core/base_local_planner.h>
 #include <nav_core/base_global_planner.h>
-#include <nav_core/recovery_behavior.h>
 
 #include <geometry_msgs/PoseStamped.h>
 #include <costmap_2d/costmap_2d_ros.h>
@@ -92,12 +90,7 @@ namespace global_navi
     CLEARING
   };
 
-  enum RecoveryTrigger
-  {
-    PLANNING_R,
-    CONTROLLING_R,
-    OSCILLATION_R
-  };
+
 
   /**
    * @class MoveBase
@@ -152,17 +145,6 @@ namespace global_navi
        */
       bool makePlan(const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan);
 
-      /**
-       * @brief  Load the recovery behaviors for the navigation stack from the parameter server
-       * @param node The ros::NodeHandle to be used for loading parameters 
-       * @return True if the recovery behaviors were loaded successfully, false otherwise
-       */
-      bool loadRecoveryBehaviors(ros::NodeHandle node);
-
-      /**
-       * @brief  Loads the default recovery behaviors for the navigation stack
-       */
-      void loadDefaultRecoveryBehaviors();
 
       /**
        * @brief  Clears obstacles within a window around the robot
@@ -185,6 +167,7 @@ namespace global_navi
 
       void planThread();
 
+      // 
       void executeCb(const move_base_msgs::MoveBaseGoalConstPtr& move_base_goal);
 
       bool isQuaternionValid(const geometry_msgs::Quaternion& q);
@@ -209,44 +192,40 @@ namespace global_navi
 
       MoveBaseActionServer* as_; // Action server
 
-      boost::shared_ptr<nav_core::BaseLocalPlanner> tc_;   //local_planner
       boost::shared_ptr<nav_core::BaseGlobalPlanner> planner_; //global planner实例化对象
       costmap_2d::Costmap2DROS* planner_costmap_ros_, *controller_costmap_ros_; //维护costMap的类, 有global costMap和 local costMap
 
       
       std::string robot_base_frame_, global_frame_;
 
-      std::vector<boost::shared_ptr<nav_core::RecoveryBehavior> > recovery_behaviors_;  //修复机制接口的类
-      unsigned int recovery_index_;
 
       tf::Stamped<tf::Pose> global_pose_;  //定义一个全局坐标系
-      double planner_frequency_, controller_frequency_, inscribed_radius_, circumscribed_radius_; //全局规划,局部规划的频率, 内切,外切半径的控制
-      double planner_patience_, controller_patience_;  //全局规划 局部规划的 容耐值
+      double planner_frequency_,  inscribed_radius_, circumscribed_radius_; //全局规划,局部规划的频率, 内切,外切半径的控制
+      double planner_patience_;  //全局规划 局部规划的 容耐值
       int32_t max_planning_retries_;  //规划失败 重试的次数
       uint32_t planning_retries_;
       double conservative_reset_dist_, clearing_radius_; 
       ros::Publisher current_goal_pub_, vel_pub_, action_goal_pub_;  //发布话题
       ros::Subscriber goal_sub_;        //订阅话题
       ros::ServiceServer make_plan_srv_, clear_costmaps_srv_; //定义两个服务
-      bool shutdown_costmaps_, clearing_rotation_allowed_, recovery_behavior_enabled_;
+      bool shutdown_costmaps_, clearing_rotation_allowed_;
       double oscillation_timeout_, oscillation_distance_; //震荡
 
 
       MoveBaseState state_; //movebase state enum
-      RecoveryTrigger recovery_trigger_;
+
 
       ros::Time last_valid_plan_, last_valid_control_, last_oscillation_reset_; //时间记录
       geometry_msgs::PoseStamped oscillation_pose_;
 
       // 加载类 pluginlib::ClassLoader 
       pluginlib::ClassLoader<nav_core::BaseGlobalPlanner> bgp_loader_;
-      pluginlib::ClassLoader<nav_core::BaseLocalPlanner> blp_loader_;
-      pluginlib::ClassLoader<nav_core::RecoveryBehavior> recovery_loader_;
+
 
       //set up plan triple buffer
       std::vector<geometry_msgs::PoseStamped>* planner_plan_;
       std::vector<geometry_msgs::PoseStamped>* latest_plan_;
-      std::vector<geometry_msgs::PoseStamped>* controller_plan_;
+
 
       // set up the planner's thread
       // runPlanner_  planner_cond_ 通过这两个变量来控制planThread的运行

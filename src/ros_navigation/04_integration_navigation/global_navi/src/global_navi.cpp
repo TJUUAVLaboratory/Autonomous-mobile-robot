@@ -20,35 +20,26 @@ namespace global_navi {
   GlobalNavi::GlobalNavi(tf::TransformListener& tf) :
     tf_(tf),
     as_(NULL),  //action server
-    planner_costmap_ros_(NULL), controller_costmap_ros_(NULL),
+    planner_costmap_ros_(NULL), 
     bgp_loader_("nav_core", "nav_core::BaseGlobalPlanner"), //模板类 ClassLoader
-    blp_loader_("nav_core", "nav_core::BaseLocalPlanner"), 
-    recovery_loader_("nav_core", "nav_core::RecoveryBehavior"),
-
     //pose list
-    planner_plan_(NULL), latest_plan_(NULL), controller_plan_(NULL), 
+    planner_plan_(NULL), latest_plan_(NULL), 
     runPlanner_(false), setup_(false), p_freq_change_(false), c_freq_change_(false), new_global_plan_(false) 
   {
 
     //move_base action server  监听 move_base_msgs::MoveBaseGoal消息
-    as_ = new MoveBaseActionServer(ros::NodeHandle(), "global_navi", boost::bind(&GlobalNavi::executeCb, this, _1), false);
+    as_ = new MoveBaseActionServer(ros::NodeHandle(), "global_planner", boost::bind(&GlobalNavi::executeCb, this, _1), false);
     ros::NodeHandle private_nh("~");
     ros::NodeHandle nh;
 
-    recovery_trigger_ = PLANNING_R;
-
     //get some parameters that will be global to the move base node
-    std::string global_planner, local_planner;
-    private_nh.param("base_global_planner", global_planner, std::string("navfn/NavfnROS"));
-    private_nh.param("base_local_planner", local_planner, std::string("base_local_planner/TrajectoryPlannerROS"));
-    
+    std::string global_planner;
+    private_nh.param("base_global_planner", global_planner, std::string("navfn/NavfnROS"));    
     private_nh.param("global_costmap/robot_base_frame", robot_base_frame_, std::string("base_link"));
     private_nh.param("global_costmap/global_frame", global_frame_, std::string("/map"));
     
     private_nh.param("planner_frequency", planner_frequency_, 0.0);
-    private_nh.param("controller_frequency", controller_frequency_, 20.0);
     private_nh.param("planner_patience", planner_patience_, 5.0);
-    private_nh.param("controller_patience", controller_patience_, 15.0);
     private_nh.param("max_planning_retries", max_planning_retries_, -1);  // disabled by default
 
     private_nh.param("oscillation_timeout", oscillation_timeout_, 0.0);
@@ -57,17 +48,16 @@ namespace global_navi {
     //set up plan triple buffer
     planner_plan_ = new std::vector<geometry_msgs::PoseStamped>();
     latest_plan_  = new std::vector<geometry_msgs::PoseStamped>();
-    controller_plan_ = new std::vector<geometry_msgs::PoseStamped>();
 
     //set up the planner's thread  配置全局规划的线程
-    planner_thread_ = new boost::thread(boost::bind(&GlobalNavi::planThread, this));    
+    planner_thread_ = new boost::thread(boost::bind(&GlobalNavi::planThread, this)); //开启 planThread线程
 
     //for comanding the base  发布命令
     vel_pub_ = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
     current_goal_pub_ = private_nh.advertise<geometry_msgs::PoseStamped>("current_goal", 0 );
 
     // /move_base/goal target_pose send to move_bashe action server
-    ros::NodeHandle action_nh("move_base"); //发布action goal
+    ros::NodeHandle action_nh("global_planner"); //发布action goal
     action_goal_pub_ = action_nh.advertise<move_base_msgs::MoveBaseActionGoal>("goal", 1);
 
     //we'll provide a mechanism for some people to send goals as PoseStamped messages over a topic
@@ -81,17 +71,9 @@ namespace global_navi {
     //发布障碍物信息
     obstableMsg_pub = nh.advertise<std_msgs::String>("obstableMsg", 10, true);
     
-
-    //we'll assume the radius of the robot to be consistent with what's specified for the costmaps
-    private_nh.param("local_costmap/inscribed_radius", inscribed_radius_, 0.325);
-    private_nh.param("local_costmap/circumscribed_radius", circumscribed_radius_, 0.46);
-    private_nh.param("clearing_radius", clearing_radius_, circumscribed_radius_);
-    private_nh.param("conservative_reset_dist", conservative_reset_dist_, 3.0);
-
     private_nh.param("shutdown_costmaps", shutdown_costmaps_, false);
     private_nh.param("clearing_rotation_allowed", clearing_rotation_allowed_, true);
-    private_nh.param("recovery_behavior_enabled", recovery_behavior_enabled_, true);
-
+  
 
     // costmap part ********************
     //create the ros wrapper for the planner's costmap... and initializer a pointer we'll use with the underlying map
@@ -109,25 +91,11 @@ namespace global_navi {
       exit(1);
     }
 
-    //create the ros wrapper for the controller's costmap... and initializer a pointer we'll use with the underlying map
-    controller_costmap_ros_ = new costmap_2d::Costmap2DROS("local_costmap", tf_);  //注意tf tree
-    controller_costmap_ros_->pause();
     
-    //create a local planner
-    try {
-      tc_ = blp_loader_.createInstance(local_planner);
-      ROS_WARN("Created + %s", local_planner.c_str());
-      //local planner
-      tc_->initialize(blp_loader_.getName(local_planner), &tf_, controller_costmap_ros_);
-    } catch (const pluginlib::PluginlibException& ex) {
-      ROS_FATAL("Failed to create the %s planner, are you sure it is properly registered and that the containing library is built? Exception: %s", local_planner.c_str(), ex.what());
-      exit(1);
-    }
-
     // Start actively updating costmaps based on sensor data
     planner_costmap_ros_->start();
-    controller_costmap_ros_->start();
-    ROS_WARN("start update global cospmap and local costmap");
+    
+    ROS_WARN("start update global cospmap");
 
     //advertise a service for getting a plan  [发布 start and goal 请求 global plan]
     make_plan_srv_ = private_nh.advertiseService("make_plan", &GlobalNavi::planService, this);
@@ -142,16 +110,8 @@ namespace global_navi {
       controller_costmap_ros_->stop();
     }
 
-    //load any user specified recovery behaviors, and if that fails load the defaults
-    if(!loadRecoveryBehaviors(private_nh)){
-      loadDefaultRecoveryBehaviors();
-    }
-
     //initially, we'll need to make a plan
     state_ = PLANNING;
-
-    //we'll start executing recovery behaviors at the beginning of our list
-    recovery_index_ = 0;
 
     //we're all set up now so we can start the action server
     as_->start();
@@ -168,7 +128,6 @@ namespace global_navi {
     move_base_msgs::MoveBaseActionGoal action_goal;
     action_goal.header.stamp = ros::Time::now();
     action_goal.goal.target_pose = *goal;
-
     action_goal_pub_.publish(action_goal);
   }
 
@@ -181,7 +140,8 @@ namespace global_navi {
     2. 然后以机器人位置中心圈一个矩形, 并清除 getCostmap()->setConvexPolygonCost
     对 controller_costmap_ros_ 同样操作一遍
   */
-  void GlobalNavi::clearCostmapWindows(double size_x, double size_y){
+  void GlobalNavi::clearCostmapWindows(double size_x, double size_y)
+  {
 
     ROS_WARN("GlobalNavi::clearCostmapWindows");
     tf::Stamped<tf::Pose> global_pose;
@@ -239,7 +199,8 @@ namespace global_navi {
     controller_costmap_ros_->getCostmap()->setConvexPolygonCost(clear_poly, costmap_2d::FREE_SPACE);
   }
 
-  bool GlobalNavi::clearCostmapsService(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp){
+  bool GlobalNavi::clearCostmapsService(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp)
+  {
     ROS_WARN("GlobalNavi::clearCostmapService");
     //clear the costmaps
     boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock_controller(*(controller_costmap_ros_->getCostmap()->getMutex()));
@@ -361,9 +322,7 @@ namespace global_navi {
   
   GlobalNavi::~GlobalNavi()
   {
-    recovery_behaviors_.clear();
-
-
+    
     if(as_ != NULL)
       delete as_;
 
@@ -380,10 +339,8 @@ namespace global_navi {
 
     delete planner_plan_;
     delete latest_plan_;
-    delete controller_plan_;
 
     planner_.reset();
-    tc_.reset();
   }
 
  
@@ -538,7 +495,6 @@ namespace global_navi {
   void GlobalNavi::planThread(){
 
     ROS_WARN("GlobalNavi::planThread");
-    ROS_DEBUG("move_base_plan_thread ----- Starting planner thread...");
     ros::NodeHandle n;
     ros::Timer timer;
     bool wait_for_wake = false;
@@ -568,7 +524,6 @@ namespace global_navi {
         ROS_DEBUG_NAMED("move_base_plan_thread","Got Plan with %zu points!", planner_plan_->size());
         //pointer swap the plans under mutex (the controller will pull from latest_plan_)
         std::vector<geometry_msgs::PoseStamped>* temp_plan = planner_plan_;
-
         lock.lock();
         planner_plan_ = latest_plan_;
         latest_plan_ = temp_plan;
@@ -601,7 +556,6 @@ namespace global_navi {
           state_ = CLEARING;
           runPlanner_ = false;  // proper solution for issue #523
           publishZeroVelocity();
-          recovery_trigger_ = PLANNING_R;
         }
 
         lock.unlock();
@@ -655,7 +609,6 @@ namespace global_navi {
     current_goal_pub_.publish(goal); //publish goal
     std::vector<geometry_msgs::PoseStamped> global_plan;
 
-    ros::Rate r(controller_frequency_); //3Hz
     if(shutdown_costmaps_){
       ROS_DEBUG_NAMED("move_base","Starting up costmaps that were shut down previously");
       planner_costmap_ros_->start();
@@ -673,8 +626,6 @@ namespace global_navi {
     {
       if(c_freq_change_) // enable controller frequency
       {
-        ROS_INFO("Setting controller frequency to %.2f", controller_frequency_);
-        r = ros::Rate(controller_frequency_);
         c_freq_change_ = false;
       }
 
@@ -694,7 +645,7 @@ namespace global_navi {
           goal = goalToGlobalFrame(new_goal.target_pose);
 
           //we'll make sure that we reset our state for the next execution cycle
-          recovery_index_ = 0;
+
           state_ = PLANNING;
 
           //we have a new goal so make sure the planner is awake
@@ -732,7 +683,6 @@ namespace global_navi {
         goal = goalToGlobalFrame(goal);
 
         //we want to go back to the planning state for the next execution cycle
-        recovery_index_ = 0;
         state_ = PLANNING;
 
         //we have a new goal so make sure the planner is awake
@@ -768,10 +718,6 @@ namespace global_navi {
       ros::WallDuration t_diff = ros::WallTime::now() - start;
       ROS_DEBUG_NAMED("move_base","Full control cycle time: %.9f\n", t_diff.toSec());
 
-      r.sleep();
-      //make sure to sleep for the remainder of our cycle time
-      if(r.cycleTime() > ros::Duration(1 / controller_frequency_) && state_ == CONTROLLING)
-        ROS_WARN("Control loop missed its desired rate of %.4fHz... the loop actually took %.4f seconds", controller_frequency_, r.cycleTime().toSec());
     }
 
     //wake up the planner thread so that it can exit cleanly
@@ -823,335 +769,25 @@ namespace global_navi {
       last_oscillation_reset_ = ros::Time::now();
       oscillation_pose_ = current_position;
 
-      //if our last recovery was caused by oscillation, we want to reset the recovery index 
-      if(recovery_trigger_ == OSCILLATION_R)
-        recovery_index_ = 0;
-    }
-
-    //check that the observation buffers for the costmap are current, we don't want to drive blind
-    if(!controller_costmap_ros_->isCurrent())
-    {
-      ROS_WARN("[%s]:Sensor data is out of date, we're not going to allow commanding of the base for safety",ros::this_node::getName().c_str());
-      publishZeroVelocity();
-      return false;
-    }
-
-    //if we have a new plan then grab it and give it to the controller
-    // 局部路径规划
-    if(new_global_plan_){ //makePlan got global plan path
-      //make sure to set the new plan flag to false
-      new_global_plan_ = false;
-
-      ROS_DEBUG_NAMED("move_base","Got a new plan...swap pointers");
-
-      //do a pointer swap under mutex
-      std::vector<geometry_msgs::PoseStamped>* temp_plan = controller_plan_;
-
-      boost::unique_lock<boost::recursive_mutex> lock(planner_mutex_);
-      controller_plan_ = latest_plan_; // global_plan list
-      latest_plan_ = temp_plan;
-      lock.unlock();
-      ROS_DEBUG_NAMED("move_base","pointers swapped!");
-
-      //全局路径规划 --> 局部路径规划 
-      if(!tc_->setPlan(*controller_plan_)){
-        //ABORT and SHUTDOWN COSTMAPS
-        ROS_ERROR("Failed to pass global plan to the controller, aborting.");
-        resetState();
-
-        //disable the planner thread
-        lock.lock();
-        runPlanner_ = false;
-        lock.unlock();
-
-        as_->setAborted(move_base_msgs::MoveBaseResult(), "Failed to pass global plan to the controller.");
-        return true;
-      }
-
-      //make sure to reset recovery_index_ since we were able to find a valid plan
-      if(recovery_trigger_ == PLANNING_R)
-        recovery_index_ = 0;
     }
 
     //the move_base state machine, handles the control logic for navigation
-    switch(state_){
       //if we are in a planning state, then we'll attempt to make a plan
-      case PLANNING: //全局规划
+      if(state_ == PLANNING)
         {
           boost::recursive_mutex::scoped_lock lock(planner_mutex_);
           runPlanner_ = true;
           planner_cond_.notify_one();
         }
         ROS_DEBUG_NAMED("move_base","Waiting for plan, in the planning state.");
-        break;
-
-      //if we're controlling, we'll attempt to find valid velocity commands
-      case CONTROLLING: //局部规划
-        ROS_DEBUG_NAMED("move_base","In controlling state.");
-
-        //check to see if we've reached our goal
-        if(tc_->isGoalReached())
-        {
-          ROS_DEBUG_NAMED("move_base","Goal reached!");
-          resetState();
-
-          //disable the planner thread
-          boost::unique_lock<boost::recursive_mutex> lock(planner_mutex_);
-          runPlanner_ = false;
-          lock.unlock();
-
-          as_->setSucceeded(move_base_msgs::MoveBaseResult(), "Goal reached.");
-          return true;
-        }
-
-        //check for an oscillation condition
-        if(oscillation_timeout_ > 0.0 &&
-            last_oscillation_reset_ + ros::Duration(oscillation_timeout_) < ros::Time::now())
-        {
-          publishZeroVelocity();
-          state_ = CLEARING;
-          recovery_trigger_ = OSCILLATION_R;
-        }
-
-//局部路径规划      
-        {
-         boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock(*(controller_costmap_ros_->getCostmap()->getMutex()));
         
-        //base local planner计算速度命令 cmd_vel
-        if(tc_->computeVelocityCommands(cmd_vel))
-        {
-          ROS_DEBUG_NAMED( "move_base", "Got a valid command from the local planner: %.3lf, %.3lf, %.3lf",
-                           cmd_vel.linear.x, cmd_vel.linear.y, cmd_vel.angular.z );
-          last_valid_control_ = ros::Time::now();
 
-          /* ******************************************************************************
-          add obstable navigation 
-          if have Obstable Points, need to stop
-          ******************************************************************************* */
-          if(hasObstablePoints)
-          {
-            publishZeroVelocity(); //
-            ROS_WARN("before send cmd_vel, have detected Obstable Points");
-          }
-
-          else
-            vel_pub_.publish(cmd_vel);
-          //make sure that we send the velocity command to the base
-          
-          if(recovery_trigger_ == CONTROLLING_R)
-            recovery_index_ = 0;
-        }
-        else 
-        { // 局部路径规划找不到合适的通行
-          ROS_DEBUG_NAMED("move_base", "The local planner could not find a valid plan.");
-          ros::Time attempt_end = last_valid_control_ + ros::Duration(controller_patience_);
-
-          //check if we've tried to find a valid control for longer than our time limit
-          if(ros::Time::now() > attempt_end){
-            //we'll move into our obstacle clearing mode
-            publishZeroVelocity();
-            state_ = CLEARING;
-            recovery_trigger_ = CONTROLLING_R;
-            }
-          else{
-            //otherwise, if we can't find a valid control, we'll go back to planning
-            last_valid_plan_ = ros::Time::now();
-            planning_retries_ = 0;
-            state_ = PLANNING;
-            publishZeroVelocity();
-
-            //enable the planner thread in case it isn't running on a clock
-            boost::unique_lock<boost::recursive_mutex> lock(planner_mutex_);
-            runPlanner_ = true;
-            planner_cond_.notify_one();
-            lock.unlock();
-          }
-        }
-        }
-
-        break;
-
-      //we'll try to clear out space with any user-provided recovery behaviors
-      case CLEARING:
-        ROS_DEBUG_NAMED("move_base","In clearing/recovery state");
-        //we'll invoke whatever recovery behavior we're currently on if they're enabled
-        if(recovery_behavior_enabled_ && recovery_index_ < recovery_behaviors_.size()){
-          ROS_DEBUG_NAMED("move_base_recovery","Executing behavior %u of %zu", recovery_index_, recovery_behaviors_.size());
-          recovery_behaviors_[recovery_index_]->runBehavior();
-
-          //we at least want to give the robot some time to stop oscillating after executing the behavior
-          last_oscillation_reset_ = ros::Time::now();
-
-          //we'll check if the recovery behavior actually worked
-          ROS_DEBUG_NAMED("move_base_recovery","Going back to planning state");
-          last_valid_plan_ = ros::Time::now();
-          planning_retries_ = 0;
-          state_ = PLANNING;
-
-          //update the index of the next recovery behavior that we'll try
-          recovery_index_++;
-        }
-        else{
-          ROS_DEBUG_NAMED("move_base_recovery","All recovery behaviors have failed, locking the planner and disabling it.");
-          //disable the planner thread
-          boost::unique_lock<boost::recursive_mutex> lock(planner_mutex_);
-          runPlanner_ = false;
-          lock.unlock();
-
-          ROS_DEBUG_NAMED("move_base_recovery","Something should abort after this.");
-
-          if(recovery_trigger_ == CONTROLLING_R){
-            ROS_ERROR("Aborting because a valid control could not be found. Even after executing all recovery behaviors");
-            as_->setAborted(move_base_msgs::MoveBaseResult(), "Failed to find a valid control. Even after executing recovery behaviors.");
-          }
-          else if(recovery_trigger_ == PLANNING_R){
-            ROS_ERROR("Aborting because a valid plan could not be found. Even after executing all recovery behaviors");
-            as_->setAborted(move_base_msgs::MoveBaseResult(), "Failed to find a valid plan. Even after executing recovery behaviors.");
-          }
-          else if(recovery_trigger_ == OSCILLATION_R){
-            ROS_ERROR("Aborting because the robot appears to be oscillating over and over. Even after executing all recovery behaviors");
-            as_->setAborted(move_base_msgs::MoveBaseResult(), "Robot is oscillating. Even after executing recovery behaviors.");
-          }
-          resetState();
-          return true;
-        }
-        break;
-      default:
-        ROS_ERROR("This case should never be reached, something is wrong, aborting");
-        resetState();
-        //disable the planner thread
-        boost::unique_lock<boost::recursive_mutex> lock(planner_mutex_);
-        runPlanner_ = false;
-        lock.unlock();
-        as_->setAborted(move_base_msgs::MoveBaseResult(), "Reached a case that should not be hit in move_base. This is a bug, please report it.");
-        return true;
-    }
 
     //we aren't done yet
     return false;
   }
 
-  //revoveryBehaviors
-  bool GlobalNavi::loadRecoveryBehaviors(ros::NodeHandle node){
-    XmlRpc::XmlRpcValue behavior_list;
-    if(node.getParam("recovery_behaviors", behavior_list)){
-      if(behavior_list.getType() == XmlRpc::XmlRpcValue::TypeArray){
-        for(int i = 0; i < behavior_list.size(); ++i){
-          if(behavior_list[i].getType() == XmlRpc::XmlRpcValue::TypeStruct){
-            if(behavior_list[i].hasMember("name") && behavior_list[i].hasMember("type")){
-              //check for recovery behaviors with the same name
-              for(int j = i + 1; j < behavior_list.size(); j++){
-                if(behavior_list[j].getType() == XmlRpc::XmlRpcValue::TypeStruct){
-                  if(behavior_list[j].hasMember("name") && behavior_list[j].hasMember("type")){
-                    std::string name_i = behavior_list[i]["name"];
-                    std::string name_j = behavior_list[j]["name"];
-                    if(name_i == name_j){
-                      ROS_ERROR("A recovery behavior with the name %s already exists, this is not allowed. Using the default recovery behaviors instead.", 
-                          name_i.c_str());
-                      return false;
-                    }
-                  }
-                }
-              }
-            }
-            else{
-              ROS_ERROR("Recovery behaviors must have a name and a type and this does not. Using the default recovery behaviors instead.");
-              return false;
-            }
-          }
-          else{
-            ROS_ERROR("Recovery behaviors must be specified as maps, but they are XmlRpcType %d. We'll use the default recovery behaviors instead.",
-                behavior_list[i].getType());
-            return false;
-          }
-        }
 
-        //if we've made it to this point, we know that the list is legal so we'll create all the recovery behaviors
-        for(int i = 0; i < behavior_list.size(); ++i){
-          try{
-            //check if a non fully qualified name has potentially been passed in
-            if(!recovery_loader_.isClassAvailable(behavior_list[i]["type"])){
-              std::vector<std::string> classes = recovery_loader_.getDeclaredClasses();
-              for(unsigned int i = 0; i < classes.size(); ++i){
-                if(behavior_list[i]["type"] == recovery_loader_.getName(classes[i])){
-                  //if we've found a match... we'll get the fully qualified name and break out of the loop
-                  ROS_WARN("Recovery behavior specifications should now include the package name. You are using a deprecated API. Please switch from %s to %s in your yaml file.",
-                      std::string(behavior_list[i]["type"]).c_str(), classes[i].c_str());
-                  behavior_list[i]["type"] = classes[i];
-                  break;
-                }
-              }
-            }
-
-            boost::shared_ptr<nav_core::RecoveryBehavior> behavior(recovery_loader_.createInstance(behavior_list[i]["type"]));
-
-            //shouldn't be possible, but it won't hurt to check
-            if(behavior.get() == NULL){
-              ROS_ERROR("The ClassLoader returned a null pointer without throwing an exception. This should not happen");
-              return false;
-            }
-
-            //initialize the recovery behavior with its name
-            behavior->initialize(behavior_list[i]["name"], &tf_, planner_costmap_ros_, controller_costmap_ros_);
-            recovery_behaviors_.push_back(behavior);
-          }
-          catch(pluginlib::PluginlibException& ex){
-            ROS_ERROR("Failed to load a plugin. Using default recovery behaviors. Error: %s", ex.what());
-            return false;
-          }
-        }
-      }
-      else{
-        ROS_ERROR("The recovery behavior specification must be a list, but is of XmlRpcType %d. We'll use the default recovery behaviors instead.", 
-            behavior_list.getType());
-        return false;
-      }
-    }
-    else{
-      //if no recovery_behaviors are specified, we'll just load the defaults
-      return false;
-    }
-
-    //if we've made it here... we've constructed a recovery behavior list successfully
-    return true;
-  }
-
-  //we'll load our default recovery behaviors here
-  void GlobalNavi::loadDefaultRecoveryBehaviors(){
-    recovery_behaviors_.clear();
-    try{
-      //we need to set some parameters based on what's been passed in to us to maintain backwards compatibility
-      ros::NodeHandle n("~");
-      n.setParam("conservative_reset/reset_distance", conservative_reset_dist_);
-      n.setParam("aggressive_reset/reset_distance", circumscribed_radius_ * 4);
-
-      //first, we'll load a recovery behavior to clear the costmap
-      boost::shared_ptr<nav_core::RecoveryBehavior> cons_clear(recovery_loader_.createInstance("clear_costmap_recovery/ClearCostmapRecovery"));
-      cons_clear->initialize("conservative_reset", &tf_, planner_costmap_ros_, controller_costmap_ros_);
-      recovery_behaviors_.push_back(cons_clear);
-
-      //next, we'll load a recovery behavior to rotate in place
-      boost::shared_ptr<nav_core::RecoveryBehavior> rotate(recovery_loader_.createInstance("rotate_recovery/RotateRecovery"));
-      if(clearing_rotation_allowed_){
-        rotate->initialize("rotate_recovery", &tf_, planner_costmap_ros_, controller_costmap_ros_);
-        recovery_behaviors_.push_back(rotate);
-      }
-
-      //next, we'll load a recovery behavior that will do an aggressive reset of the costmap
-      boost::shared_ptr<nav_core::RecoveryBehavior> ags_clear(recovery_loader_.createInstance("clear_costmap_recovery/ClearCostmapRecovery"));
-      ags_clear->initialize("aggressive_reset", &tf_, planner_costmap_ros_, controller_costmap_ros_);
-      recovery_behaviors_.push_back(ags_clear);
-
-      //we'll rotate in-place one more time
-      if(clearing_rotation_allowed_)
-        recovery_behaviors_.push_back(rotate);
-    }
-    catch(pluginlib::PluginlibException& ex){
-      ROS_FATAL("Failed to load a plugin. This should not happen on default recovery behaviors. Error: %s", ex.what());
-    }
-
-    return;
-  }
 
   void GlobalNavi::resetState(){
     ROS_WARN("GlobalNavi::resetState");
@@ -1162,8 +798,6 @@ namespace global_navi {
 
     // Reset statemachine
     state_ = PLANNING;
-    recovery_index_ = 0;
-    recovery_trigger_ = PLANNING_R;
     publishZeroVelocity();
 
     //if we shutdown our costmaps when we're deactivated... we'll do that now
