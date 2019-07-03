@@ -531,7 +531,7 @@ namespace global_navi {
 
 
       // visiualization path waypoints
-    
+      visiualization_waypoints(*planner_plan_);
 
 
         //make sure we only start the controller if we still haven't reached the goal
