@@ -7,6 +7,7 @@ find_package(catkin REQUIRED
         rospy
         tf
         geometry_msgs
+        visualization_msgs
         message_generation
         pluginlib  ## load ros plugin
         actionlib  ## move base action

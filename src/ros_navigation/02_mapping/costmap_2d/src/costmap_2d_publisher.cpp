@@ -117,7 +117,7 @@ void Costmap2DPublisher::prepareGrid()
   }
 }
 
-
+// costmap publish
 void Costmap2DPublisher::publishCostmap()
 {
   if (costmap_pub_.getNumSubscribers() == 0)
@@ -128,6 +128,7 @@ void Costmap2DPublisher::publishCostmap()
 
   float resolution = costmap_->getResolution();
 
+  
   if (always_send_full_costmap_ || grid_.info.resolution != resolution ||
       grid_.info.width != costmap_->getSizeInCellsX() ||
       grid_.info.height != costmap_->getSizeInCellsY() ||

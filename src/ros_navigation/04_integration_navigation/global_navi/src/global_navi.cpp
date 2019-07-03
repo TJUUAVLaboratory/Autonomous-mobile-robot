@@ -11,20 +11,28 @@ controller是局部规划
 #include <geometry_msgs/Twist.h> //下发指令
 #include <sensor_msgs/PointCloud2.h>
 #include <std_msgs/String.h>
+#include <visualization_msgs/Marker.h>
 #include <pcl/point_cloud.h>
 #include <laser_geometry/laser_geometry.h> // laserScan ==>Pointcloud2
 #include <pcl_conversions/pcl_conversions.h>
 
 namespace global_navi {
 
+/* ******************************************************* 
+  global_planner 构造函数
+
+  - create global planner costmap ==> static+inflation+obstacle
+  - create global planner thread ==> navfn/NavfnROS
+*******************************************************
+ */ 
   GlobalNavi::GlobalNavi(tf::TransformListener& tf) :
     tf_(tf),
     as_(NULL),  //action server
     planner_costmap_ros_(NULL), 
-    bgp_loader_("nav_core", "nav_core::BaseGlobalPlanner"), //模板类 ClassLoader
+    bgp_loader_("nav_core", "nav_core::BaseGlobalPlanner"), 
     //pose list
     planner_plan_(NULL), latest_plan_(NULL), 
-    runPlanner_(false), setup_(false), p_freq_change_(false), c_freq_change_(false), new_global_plan_(false) 
+    runPlanner_(false),  new_global_plan_(false) 
   {
 
     //move_base action server  监听 move_base_msgs::MoveBaseGoal消息
@@ -34,16 +42,13 @@ namespace global_navi {
 
     //get some parameters that will be global to the move base node
     std::string global_planner;
-    private_nh.param("base_global_planner", global_planner, std::string("navfn/NavfnROS"));    
+    private_nh.param("base_global_planner", global_planner, std::string("navfn/NavfnROS"));  // global_planner plugin  
     private_nh.param("global_costmap/robot_base_frame", robot_base_frame_, std::string("base_link"));
     private_nh.param("global_costmap/global_frame", global_frame_, std::string("/map"));
     
     private_nh.param("planner_frequency", planner_frequency_, 0.0);
     private_nh.param("planner_patience", planner_patience_, 5.0);
     private_nh.param("max_planning_retries", max_planning_retries_, -1);  // disabled by default
-
-    private_nh.param("oscillation_timeout", oscillation_timeout_, 0.0);
-    private_nh.param("oscillation_distance", oscillation_distance_, 0.5);
 
     //set up plan triple buffer
     planner_plan_ = new std::vector<geometry_msgs::PoseStamped>();
@@ -66,8 +71,9 @@ namespace global_navi {
     ros::NodeHandle simple_nh("move_base_simple"); //从RVIZ订阅目标点
     goal_sub_ = simple_nh.subscribe<geometry_msgs::PoseStamped>("goal", 1, boost::bind(&GlobalNavi::goalCB, this, _1));
 
-
+    path_waypoints_pub = nh.advertise<visualization_msgs::Marker>("waypoints_marker", 1);
     laserScan_sub = nh.subscribe("/scan", 1, &GlobalNavi::laserDataCallBack, this);
+
     //发布障碍物信息
     obstableMsg_pub = nh.advertise<std_msgs::String>("obstableMsg", 10, true);
     
@@ -107,7 +113,6 @@ namespace global_navi {
     if(shutdown_costmaps_){
       ROS_DEBUG_NAMED("move_base","Stopping costmaps initially");
       planner_costmap_ros_->stop();
-      controller_costmap_ros_->stop();
     }
 
     //initially, we'll need to make a plan
@@ -116,9 +121,16 @@ namespace global_navi {
     //we're all set up now so we can start the action server
     as_->start();
     ROS_WARN("MoveBaseAction service start");
-
   }
 
+
+
+/* ******************************************************* 
+  回调函数
+    - goalCB  from RVIZ or other sub move_base_simple topic ==> actiongoal
+    - 
+*******************************************************
+ */ 
   
 
   //订阅目标点的回调函数 发给action server
@@ -132,87 +144,24 @@ namespace global_navi {
   }
 
 
+/* ******************************************************* 
+  server function
+  - clearCostmapsService 把没一层costmap都reset 一下
+   
 
-  /*
-    >> 清除在costmap上机器人周围的的obstable
-    对 planner_costmap_ros_操作
-    1. 先得到机器人在costmap上的global pose (getRobotPose)
-    2. 然后以机器人位置中心圈一个矩形, 并清除 getCostmap()->setConvexPolygonCost
-    对 controller_costmap_ros_ 同样操作一遍
-  */
-  void GlobalNavi::clearCostmapWindows(double size_x, double size_y)
-  {
-
-    ROS_WARN("GlobalNavi::clearCostmapWindows");
-    tf::Stamped<tf::Pose> global_pose;
-
-    //clear the planner's costmap
-    planner_costmap_ros_->getRobotPose(global_pose);
-
-    std::vector<geometry_msgs::Point> clear_poly;
-    double x = global_pose.getOrigin().x();
-    double y = global_pose.getOrigin().y();
-    geometry_msgs::Point pt;
-
-    //上下左右的四个点
-    pt.x = x - size_x / 2;
-    pt.y = y - size_y / 2;
-    clear_poly.push_back(pt);
-
-    pt.x = x + size_x / 2;
-    pt.y = y - size_y / 2;
-    clear_poly.push_back(pt);
-
-    pt.x = x + size_x / 2;
-    pt.y = y + size_y / 2;
-    clear_poly.push_back(pt);
-
-    pt.x = x - size_x / 2;
-    pt.y = y + size_y / 2;
-    clear_poly.push_back(pt);
-
-    //清空这个矩形, 设定为free space
-    planner_costmap_ros_->getCostmap()->setConvexPolygonCost(clear_poly, costmap_2d::FREE_SPACE);
-
-    //clear the controller's costmap
-    controller_costmap_ros_->getRobotPose(global_pose);
-
-    clear_poly.clear();
-    x = global_pose.getOrigin().x();
-    y = global_pose.getOrigin().y();
-
-    pt.x = x - size_x / 2;
-    pt.y = y - size_y / 2;
-    clear_poly.push_back(pt);
-
-    pt.x = x + size_x / 2;
-    pt.y = y - size_y / 2;
-    clear_poly.push_back(pt);
-
-    pt.x = x + size_x / 2;
-    pt.y = y + size_y / 2;
-    clear_poly.push_back(pt);
-
-    pt.x = x - size_x / 2;
-    pt.y = y + size_y / 2;
-    clear_poly.push_back(pt);
-    controller_costmap_ros_->getCostmap()->setConvexPolygonCost(clear_poly, costmap_2d::FREE_SPACE);
-  }
-
+*******************************************************
+ */ 
+  // 把每一个层都 reset 一下
   bool GlobalNavi::clearCostmapsService(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp)
   {
     ROS_WARN("GlobalNavi::clearCostmapService");
-    //clear the costmaps
-    boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock_controller(*(controller_costmap_ros_->getCostmap()->getMutex()));
-    controller_costmap_ros_->resetLayers();
-
     boost::unique_lock<costmap_2d::Costmap2D::mutex_t> lock_planner(*(planner_costmap_ros_->getCostmap()->getMutex()));
     planner_costmap_ros_->resetLayers();
     return true;
   }
 
-  /*
-  >> move_base action server (请求一次全局规划的服务)
+/*
+  >> planService (请求一次全局规划的服务)
   1. 确保有一个 global costmap
   2. 确保能够的到机器人的位置
   3. clear机器人附近的costmap
@@ -319,7 +268,61 @@ namespace global_navi {
     return true;
   }
 
+
+/* ******************************************************* 
+  功能函数
+  - clearCostmapWindows   清除在costmap上机器人周围的的obstable
+
+*******************************************************
+ */ 
+
+  /*
+    >> 清除在costmap上机器人周围的的obstable
+    对 planner_costmap_ros_操作
+    1. 先得到机器人在costmap上的global pose (getRobotPose)
+    2. 然后以机器人位置中心圈一个矩形, 并清除 getCostmap()->setConvexPolygonCost
+    对 controller_costmap_ros_ 同样操作一遍
+  */
+  void GlobalNavi::clearCostmapWindows(double size_x, double size_y)
+  {
+
+    ROS_WARN("GlobalNavi::clearCostmapWindows");
+    tf::Stamped<tf::Pose> global_pose;
+
+    //clear the planner's costmap
+    planner_costmap_ros_->getRobotPose(global_pose);
+
+    std::vector<geometry_msgs::Point> clear_poly;
+    double x = global_pose.getOrigin().x();
+    double y = global_pose.getOrigin().y();
+    geometry_msgs::Point pt;
+
+    //上下左右的四个点
+    pt.x = x - size_x / 2;
+    pt.y = y - size_y / 2;
+    clear_poly.push_back(pt);
+
+    pt.x = x + size_x / 2;
+    pt.y = y - size_y / 2;
+    clear_poly.push_back(pt);
+
+    pt.x = x + size_x / 2;
+    pt.y = y + size_y / 2;
+    clear_poly.push_back(pt);
+
+    pt.x = x - size_x / 2;
+    pt.y = y + size_y / 2;
+    clear_poly.push_back(pt);
+
+    //清空这个矩形, 设定为free space
+    planner_costmap_ros_->getCostmap()->setConvexPolygonCost(clear_poly, costmap_2d::FREE_SPACE);
+  }
+
+
   
+
+
+  // 析构函数 释放costmap and  planThread
   GlobalNavi::~GlobalNavi()
   {
     
@@ -328,9 +331,6 @@ namespace global_navi {
 
     if(planner_costmap_ros_ != NULL)
       delete planner_costmap_ros_;
-
-    if(controller_costmap_ros_ != NULL)
-      delete controller_costmap_ros_;
 
     planner_thread_->interrupt();
     planner_thread_->join();
@@ -350,7 +350,6 @@ namespace global_navi {
   2. make sure planner costmap
   3. make sure  start pose 并转换到global pose
   4. make plan
-
  */
   bool GlobalNavi::makePlan(const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan){
 
@@ -381,10 +380,9 @@ namespace global_navi {
     //if the planner fails or returns a zero length plan, planning failed
     // 已知cost map & start and goal , planner的离散路径点放在plan中
     if(!planner_->makePlan(start, goal, plan) || plan.empty()){ //调用global_plan  make_plan
-      ROS_DEBUG_NAMED("move_base","Failed to find a  plan to point (%.2f, %.2f)", goal.pose.position.x, goal.pose.position.y);
+      ROS_WARN("Failed to find a  plan to point (%.2f, %.2f)", goal.pose.position.x, goal.pose.position.y);
       return false;
     }
-
     return true;
   }
 
@@ -504,7 +502,7 @@ namespace global_navi {
       //check if we should run the planner (the mutex is locked)
       while(wait_for_wake || !runPlanner_){
         //if we should not be running the planner then suspend this thread
-        ROS_DEBUG_NAMED("move_base_plan_thread","Planner thread is suspending");
+        ROS_DEBUG_NAMED("global_plan_thread","Planner thread is suspending");
         planner_cond_.wait(lock);
         wait_for_wake = false;
       }
@@ -521,7 +519,7 @@ namespace global_navi {
 
       if(gotPlan)
       {
-        ROS_DEBUG_NAMED("move_base_plan_thread","Got Plan with %zu points!", planner_plan_->size());
+        ROS_WARN("Got Plan with %zu points!", planner_plan_->size());
         //pointer swap the plans under mutex (the controller will pull from latest_plan_)
         std::vector<geometry_msgs::PoseStamped>* temp_plan = planner_plan_;
         lock.lock();
@@ -531,7 +529,10 @@ namespace global_navi {
         planning_retries_ = 0;
         new_global_plan_ = true;  //makePlan got global plan path
 
-        ROS_DEBUG_NAMED("move_base_plan_thread","Generated a plan from the base_global_planner");
+
+      // visiualization path waypoints
+    
+
 
         //make sure we only start the controller if we still haven't reached the goal
         if(runPlanner_)
@@ -575,7 +576,30 @@ namespace global_navi {
     }
   }
 
+  void GlobalNavi::visiualization_waypoints(const std::vector<geometry_msgs::PoseStamped>& waypoints)
+  {
+     visualization_msgs::Marker waypoints_marker;
+     waypoints_marker.header.frame_id = waypoints.front().header.frame_id;
+     waypoints_marker.header.stamp = ros::Time::now();
+     waypoints_marker.ns = global_frame_;
+     waypoints_marker.action = visualization_msgs::Marker::ADD;
 
+     waypoints_marker.id = 0;
+     waypoints_marker.type = visualization_msgs::Marker::LINE_LIST;
+     waypoints_marker.scale.x = 0.2;
+     waypoints_marker.scale.y = 0.2;
+     
+     waypoints_marker.color.b = 1.0f;
+     waypoints_marker.color.g = 1.0f;
+     for(int i=0; i< waypoints.size(); i++)
+     {
+       waypoints_marker.points.push_back(waypoints[i].pose.position);
+     }
+     path_waypoints_pub.publish(waypoints_marker);
+
+
+
+  }
 
   
   // 收到一个 GlobalNavi goal 点之后
@@ -672,40 +696,7 @@ namespace global_navi {
           return;
         }
       }
-
-      //we also want to check if we've changed global frames because we need to transform our goal pose
-      if(goal.header.frame_id != planner_costmap_ros_->getGlobalFrameID()){
-        goal = goalToGlobalFrame(goal);
-
-        //we want to go back to the planning state for the next execution cycle
-        state_ = PLANNING;
-
-        //we have a new goal so make sure the planner is awake
-        lock.lock();
-        planner_goal_ = goal;
-        runPlanner_ = true;
-        planner_cond_.notify_one();
-        lock.unlock();
-
-        //publish the goal point to the visualizer
-        ROS_DEBUG_NAMED("move_base","The global frame for move_base has changed, new frame: %s, new goal position x: %.2f, y: %.2f", goal.header.frame_id.c_str(), goal.pose.position.x, goal.pose.position.y);
-        current_goal_pub_.publish(goal);
-
-        //make sure to reset our timeouts and counters
-        last_valid_control_ = ros::Time::now();
-        last_valid_plan_ = ros::Time::now();
-        last_oscillation_reset_ = ros::Time::now();
-        planning_retries_ = 0;
-      }
-      //check if execution of the goal has completed in some way
-
     }
-
-    //wake up the planner thread so that it can exit cleanly
-    lock.lock();
-    runPlanner_ = true;
-    planner_cond_.notify_one();
-    lock.unlock();
 
     //if the node is killed then we'll abort and return
     as_->setAborted(move_base_msgs::MoveBaseResult(), "Aborting on the goal because the node has been killed");
@@ -785,7 +776,6 @@ namespace global_navi {
     if(shutdown_costmaps_){
       ROS_DEBUG_NAMED("move_base","Stopping costmaps");
       planner_costmap_ros_->stop();
-      controller_costmap_ros_->stop();
     }
   }
 

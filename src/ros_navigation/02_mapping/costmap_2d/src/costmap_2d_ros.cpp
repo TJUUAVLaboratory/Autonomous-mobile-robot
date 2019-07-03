@@ -153,9 +153,9 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener& tf) :
       std::string type = static_cast<std::string>(my_list[i]["type"]);
       ROS_WARN("Using plugin \"%s\"", (name + "/" + pname).c_str());
 
-      boost::shared_ptr<Layer> plugin = plugin_loader_.createInstance(type);
+      boost::shared_ptr<Layer> plugin = plugin_loader_.createInstance(type); //load every costmap layer
       layered_costmap_->addPlugin(plugin);
-      plugin->initialize(layered_costmap_, name + "/" + pname, &tf_); 
+      plugin->initialize(layered_costmap_, name + "/" + pname, &tf_);  //
     }
   }
 
@@ -301,6 +301,20 @@ void Costmap2DROS::resetOldParameters(ros::NodeHandle& nh)
   nh.setParam("plugins", super_array); //变成一个xmp_RPC类型的 param 
 }
 
+/* --------------------------------------
+
+   dynamic config
+    transform_tolerance_
+    map_update_frequency
+    map_publish_frequency
+    map_width_meters
+    map_height_meters
+    resolution
+    origin_x
+    origin_y
+    footprint_padding_
+    --------------------------------------
+*/
 void Costmap2DROS::reconfigureCB(costmap_2d::Costmap2DConfig &config, uint32_t level)
 {
   transform_tolerance_ = config.transform_tolerance;
@@ -447,7 +461,7 @@ void Costmap2DROS::mapUpdateLoop(double frequency)
       ros::Time now = ros::Time::now();
       if (last_publish_ + publish_cycle < now)
       {
-        publisher_->publishCostmap();
+        publisher_->publishCostmap(); // send costmap
         last_publish_ = now;
       }
     }
@@ -487,6 +501,7 @@ void Costmap2DROS::updateMap()
 // costmap start
 void Costmap2DROS::start()
 {
+  // costmap layer vector
   std::vector < boost::shared_ptr<Layer> > *plugins = layered_costmap_->getPlugins();
   // check if we're stopped or just paused
   if (stopped_)

@@ -65,9 +65,9 @@
 
 namespace global_navi 
 {
-  //typedefs to help us out with the action server so that we don't hace to type so much
+  // MoveBaseActionServer
   typedef actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction> MoveBaseActionServer;  
-  // movebase action server
+  
 
 /*
  >> MoveBaseState RecoveryTrigger 状态机
@@ -83,7 +83,6 @@ namespace global_navi
   tc_->computeVelocityCommands(cmd_vel)
   如果局部路径规划失败, 检测是否超时, 超时则state_ = CLEARING; recovery_trigger_ = CONTROLLING_R;
 */
-
   enum MoveBaseState {
     PLANNING,  //全局
     CONTROLLING, //局部
@@ -100,23 +99,13 @@ namespace global_navi
     public:
       /**
        * @brief  Constructor for the actions
-       * @param name The name of the action
        * @param tf A reference to a TransformListener
        */
-      GlobalNavi(tf::TransformListener& tf); //关键的函数
-
-      /**
-       * @brief  Destructor - Cleans up
-       */
+      GlobalNavi(tf::TransformListener& tf); 
       virtual ~GlobalNavi();
 
-      /**
-       * @brief  Performs a control cycle  
-       * @param goal A reference to the goal to pursue
-       * @param global_plan A reference to the global plan being used
-       * @return True if processing of the goal is done, false otherwise
-       */
-       //一轮控制的循环
+
+       // action server的 feedback 
       bool executeCycle(geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& global_plan);
 
     private:
@@ -125,8 +114,8 @@ namespace global_navi
        * @param req The service request 
        * @param resp The service response
        * @return True if the service call succeeds, false otherwise
+       * 清除Costmap上的 obstables的服务
        */
-       //清除Costmap上的 obstables的服务
       bool clearCostmapsService(std_srvs::Empty::Request &req, std_srvs::Empty::Response &resp);
 
       /**
@@ -162,12 +151,12 @@ namespace global_navi
        * @brief  Reset the state of the move_base action and send a zero velocity command to the base
        */
       void resetState();
-
+      // get a goal 
       void goalCB(const geometry_msgs::PoseStamped::ConstPtr& goal);
 
       void planThread();
 
-      // 
+      // extcute the goal and make plan
       void executeCb(const move_base_msgs::MoveBaseGoalConstPtr& move_base_goal);
 
       bool isQuaternionValid(const geometry_msgs::Quaternion& q);
@@ -187,24 +176,24 @@ namespace global_navi
         ******************************************************************************* */
         void velodyneDataCallBack(const sensor_msgs::PointCloud2ConstPtr&  velodyneData);
         void laserDataCallBack(const sensor_msgs::LaserScanConstPtr scan_msg);
+
+        void visiualization_waypoints(const std::vector<geometry_msgs::PoseStamped>& waypoints);
   
       tf::TransformListener& tf_;  //tf 坐标变换关系
 
       MoveBaseActionServer* as_; // Action server
 
       boost::shared_ptr<nav_core::BaseGlobalPlanner> planner_; //global planner实例化对象
-      costmap_2d::Costmap2DROS* planner_costmap_ros_, *controller_costmap_ros_; //维护costMap的类, 有global costMap和 local costMap
-
-      
+      costmap_2d::Costmap2DROS* planner_costmap_ros_; //维护costMap的类, 有global costMap和 local costMap      
       std::string robot_base_frame_, global_frame_;
 
 
       tf::Stamped<tf::Pose> global_pose_;  //定义一个全局坐标系
-      double planner_frequency_,  inscribed_radius_, circumscribed_radius_; //全局规划,局部规划的频率, 内切,外切半径的控制
-      double planner_patience_;  //全局规划 局部规划的 容耐值
+      double planner_frequency_; //全局规划,局部规划的频率, 内切,外切半径的控制
+      double planner_patience_;  //全局规划  patience ｔｉｍｅ
       int32_t max_planning_retries_;  //规划失败 重试的次数
       uint32_t planning_retries_;
-      double conservative_reset_dist_, clearing_radius_; 
+      double  clearing_radius_; 
       ros::Publisher current_goal_pub_, vel_pub_, action_goal_pub_;  //发布话题
       ros::Subscriber goal_sub_;        //订阅话题
       ros::ServiceServer make_plan_srv_, clear_costmaps_srv_; //定义两个服务
@@ -253,7 +242,8 @@ namespace global_navi
       // add subscriber of laser ******************
       ros::Subscriber laserScan_sub;
       ros::Subscriber velodyneData_sub;
-      ros::Publisher  obstableMsg_pub;           
+      ros::Publisher  obstableMsg_pub;   
+      ros::Publisher  path_waypoints_pub;        
   }; // end of class global_navi
 
 }; //end of namespace global_navi
