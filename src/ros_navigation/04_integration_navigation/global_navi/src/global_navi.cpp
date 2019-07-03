@@ -578,6 +578,7 @@ namespace global_navi {
 
   void GlobalNavi::visiualization_waypoints(const std::vector<geometry_msgs::PoseStamped>* waypoints)
   {
+     ROS_WARN("TEST1");
      visualization_msgs::Marker waypoints_marker;
      waypoints_marker.header.frame_id = waypoints->front().header.frame_id;
      waypoints_marker.header.stamp = ros::Time::now();
@@ -591,6 +592,7 @@ namespace global_navi {
      
      waypoints_marker.color.b = 1.0f;
      waypoints_marker.color.g = 1.0f;
+     ROS_WARN("TEST2");
      for(int i=0; i< waypoints->size(); i++)
      {
        geometry_msgs::Point point;
@@ -598,8 +600,9 @@ namespace global_navi {
        point.y = (*waypoints)[i].pose.position.y;
        point.z = (*waypoints)[i].pose.position.z;
        waypoints_marker.points.push_back(point);
+      ROS_WARN("TEST0");
      }
-
+    ROS_WARN("TEST3");
      path_waypoints_pub.publish(waypoints_marker);
 
 
