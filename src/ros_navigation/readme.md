@@ -51,7 +51,6 @@ void activate()
 
 #### 3.0. nav_core  planning_plugin 基类
 
-**3.0.1. base_global_planner [`global_planner基类`]**
 ```
 基类名称： nav_core::BaseGlobalPlanner
 方法：
@@ -61,8 +60,18 @@ virtual bool makePlan(const geometry_msgs::PoseStamped& start,
                             const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan,
                             double& cost)                            
 ```
+**3.0.1. base_global_planner [`global_planner类`]**
 
-**3.0.2. base_local_planner [`local_planner基类`]**
+
+```
+navfn           ==> navfn::NavfnROS                 global_planner plugin
+global_planner  ==> global_planner::GlobalPlanner   global_planner plugin
+
+
+```
+
+
+**3.0.2. base_local_planner [`local_planner类`]**
 ```
 基类名称： nav_core::BaseLocalPlanner
 virtual void initialize(std::string name, tf::TransformListener* tf, costmap_2d::Costmap2DROS* costmap_ros)

@@ -41,8 +41,10 @@ namespace global_navi {
     ros::NodeHandle nh;
 
     //get some parameters that will be global to the move base node
-    std::string global_planner;
-    private_nh.param("base_global_planner", global_planner, std::string("navfn/NavfnROS"));  // global_planner plugin  
+    std::string global_planner;  //global_planner::GlobalPlanner
+    private_nh.param("base_global_planner", global_planner, std::string("global_planner/GlobalPlanner"));  // global_planner plugin  
+    // private_nh.param("base_global_planner", global_planner, std::string("navfn/NavfnROS"));  // global_planner plugin
+
     private_nh.param("global_costmap/robot_base_frame", robot_base_frame_, std::string("base_link"));
     private_nh.param("global_costmap/global_frame", global_frame_, std::string("/map"));
     
