@@ -580,7 +580,7 @@ namespace global_navi {
   {
      ROS_WARN("TEST1");
      visualization_msgs::Marker waypoints_marker;
-     waypoints_marker.header.frame_id = (*waypoints)[0].header.frame_id;
+     waypoints_marker.header.frame_id = (*waypoints).at(0).header.frame_id;
      waypoints_marker.header.stamp = ros::Time::now();
      waypoints_marker.ns = global_frame_;
      waypoints_marker.action = visualization_msgs::Marker::ADD;
