@@ -177,7 +177,7 @@ namespace global_navi
         void velodyneDataCallBack(const sensor_msgs::PointCloud2ConstPtr&  velodyneData);
         void laserDataCallBack(const sensor_msgs::LaserScanConstPtr scan_msg);
 
-        void visiualization_waypoints(const std::vector<geometry_msgs::PoseStamped>* waypoints);
+        void visiualization_waypoints(std::vector<geometry_msgs::PoseStamped>* waypoints);
   
       tf::TransformListener& tf_;  //tf 坐标变换关系
 
