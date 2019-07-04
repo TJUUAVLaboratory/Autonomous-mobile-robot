@@ -1,0 +1,120 @@
+<launch>
+ <!-- ***************************** robot & world & sensors ************************************ -->
+    <!-- 设置launch文件的参数 -->
+    <arg name="world_name" value="$(find mrobot_gazebo)/worlds/cloister.world"/>
+    <arg name="paused" default="false"/>
+    <arg name="use_sim_time" default="true"/>
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false"/>
+    <arg name="debug" default="false"/>
+
+    <!-- 运行gazebo仿真环境 -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(arg world_name)" />
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+        <arg name="headless" value="$(arg headless)"/>
+    </include>
+
+    <!-- 加载机器人模型描述参数 -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find mrobot_gazebo)/urdf/mrobot_with_rplidar.urdf.xacro'" /> 
+
+    <!-- 运行joint_state_publisher节点，发布机器人的关节状态  -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node> 
+
+    <!-- 运行robot_state_publisher节点，发布tf  -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"  output="screen" >
+        <param name="publish_frequency" type="double" value="50.0" />
+    </node>
+
+    <!-- 在gazebo中加载机器人模型-->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="log"
+          args="-urdf -model mrobot -param robot_description"/> 
+
+
+<!-- ***************************** ROS Navigation ************************************ -->
+
+<!--map_server-->
+    <!-- 设置地图的配置文件 -->
+    <arg name="map" default="cloister_gmapping.yaml" />
+    <!--<arg name="map" default="gridmap/wandaf1.yaml" />-->
+    
+    <!-- 运行地图服务器，并且加载设置的地图-->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find aibee_robot)/maps/test_gazeboMap/$(arg map)">
+    <param name="map_topic" value="map"/>  
+    <!--map server-->
+    </node>
+
+
+<!--AMCL 定位-->
+<arg name="use_map_topic" default="false"/>
+    <arg name="scan_topic" default="scan"/>
+
+    <node pkg="amcl" type="amcl" name="amcl" clear_params="true">
+        <param name="use_map_topic" value="$(arg use_map_topic)"/>
+        <!-- Publish scans from best pose at a max of 10 Hz -->
+        <param name="odom_model_type" value="diff"/>
+        <param name="odom_alpha5" value="0.1"/>
+        <param name="gui_publish_rate" value="10.0"/>
+        <param name="laser_max_beams" value="60"/>
+        <param name="laser_max_range" value="12.0"/>
+        <param name="min_particles" value="500"/>
+        <param name="max_particles" value="2000"/>
+        <param name="kld_err" value="0.05"/>
+        <param name="kld_z" value="0.99"/>
+        <param name="odom_alpha1" value="0.2"/>
+        <param name="odom_alpha2" value="0.2"/>
+        <!-- translation std dev, m -->
+        <param name="odom_alpha3" value="0.2"/>
+        <param name="odom_alpha4" value="0.2"/>
+        <param name="laser_z_hit" value="0.5"/>
+        <param name="laser_z_short" value="0.05"/>
+        <param name="laser_z_max" value="0.05"/>
+        <param name="laser_z_rand" value="0.5"/>
+        <param name="laser_sigma_hit" value="0.2"/>
+        <param name="laser_lambda_short" value="0.1"/>
+        <param name="laser_model_type" value="likelihood_field"/>
+        <!-- <param name="laser_model_type" value="beam"/> -->
+        <param name="laser_likelihood_max_dist" value="2.0"/>
+        <param name="update_min_d" value="0.25"/>
+        <param name="update_min_a" value="0.2"/>
+        <param name="odom_frame_id" value="odom"/>
+        <param name="resample_interval" value="1"/>
+        <!-- Increase tolerance because the computer can get quite busy -->
+        <param name="transform_tolerance" value="1.0"/>
+        <param name="recovery_alpha_slow" value="0.0"/>
+        <param name="recovery_alpha_fast" value="0.0"/>
+        <remap from="scan" to="$(arg scan_topic)"/>
+    </node>
+
+<!-- move_base action
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+    <rosparam file="$(find aibee_robot)/config/mrobot/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find aibee_robot)/config/mrobot/base_local_planner_params.yaml" command="load" /> -->   
+  <!-- </node> -->
+
+<!--aibee_robot navigation action-->
+  <node pkg="aibee_robot" type="aibee_navi_node"  name="aibee_navi" output="screen" >
+    <param name="map_topic" value="map"/>  
+    <!-- global planner params -->
+    <rosparam file="$(find aibee_robot)/config/global_planner_params.yaml" command="load" />
+    <!-- local planner params -->
+    <rosparam file="$(find aibee_robot)/config/local_planner_params.yaml" command="load" />
+  </node>
+  
+
+    <!-- node function: 订阅ipad点位, 利用movebase 导航到对应位置
+    <node name="obstable_navigatoin" pkg="obstable_navigatoin" type="obstable_navigatoin_node" output="screen" >
+    </node> -->
+
+
+<!-- 运行rviz -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/gazebo_global_navi.rviz"/>
+
+</launch>
+

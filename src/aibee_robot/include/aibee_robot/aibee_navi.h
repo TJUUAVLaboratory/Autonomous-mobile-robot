@@ -99,7 +99,7 @@ namespace aibee_navi {
   首先检测 是否到达终点, 如果达到终点,resetState() 关闭planThread runPlanner = false
   如果震荡条件满足, state_ = CLEARING; recovery_trigger_ = OSCILLATION_R
 
-  tc_->computeVelocityCommands(cmd_vel)
+  local_planner_->computeVelocityCommands(cmd_vel)
   如果局部路径规划失败, 检测是否超时, 超时则state_ = CLEARING; recovery_trigger_ = CONTROLLING_R;
 */
 
@@ -224,11 +224,11 @@ namespace aibee_navi {
   
       tf::TransformListener& tf_;  //tf 坐标变换关系
 
-      MoveBaseActionServer* as_; // Action server
+      MoveBaseActionServer* actionServer_; // Action server
 
-      boost::shared_ptr<nav_core::BaseLocalPlanner> tc_;   //local_planner
-      boost::shared_ptr<nav_core::BaseGlobalPlanner> planner_; //global planner实例化对象
-      costmap_2d::Costmap2DROS* planner_costmap_ros_, *controller_costmap_ros_; //维护costMap的类, 有global costMap和 local costMap
+      boost::shared_ptr<nav_core::BaseLocalPlanner> local_planner_;   //local_planner
+      boost::shared_ptr<nav_core::BaseGlobalPlanner> global_planner_; //global planner实例化对象
+      costmap_2d::Costmap2DROS* global_costmap_ros_, *local_costmap_ros_; //维护costMap的类, 有global costMap和 local costMap
 
       
       std::string robot_base_frame_, global_frame_;
@@ -261,9 +261,9 @@ namespace aibee_navi {
       pluginlib::ClassLoader<nav_core::RecoveryBehavior> recovery_loader_;
 
       //set up plan triple buffer
-      std::vector<geometry_msgs::PoseStamped>* planner_plan_;
+      std::vector<geometry_msgs::PoseStamped>* global_planner_plan_;
       std::vector<geometry_msgs::PoseStamped>* latest_plan_;
-      std::vector<geometry_msgs::PoseStamped>* controller_plan_;
+      std::vector<geometry_msgs::PoseStamped>* local_planner_plan_;
 
       // set up the planner's thread
       // runPlanner_  planner_cond_ 通过这两个变量来控制planThread的运行

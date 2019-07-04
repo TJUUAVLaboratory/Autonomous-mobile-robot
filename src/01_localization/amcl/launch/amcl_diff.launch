@@ -1,0 +1,99 @@
+<launch>
+
+  <arg name="use_map_topic" default="false"/>
+  <arg name="scan_topic" default="scan"/>
+
+  <node pkg="amcl" type="amcl" name="amcl" output="screen" clear_params="true">
+    <param name="use_map_topic" value="$(arg use_map_topic)"/>
+    <!-- Publish scans from best pose at a max of 10 Hz -->
+    <param name="odom_model_type"           value="diff"/>
+    <param name="odom_alpha5"               value="0.1"/>
+    <param name="gui_publish_rate"          value="10.0"/>
+    <param name="laser_max_beams"             value="30"/>
+    <param name="laser_max_range"           value="30.0"/>
+    <param name="min_particles"             value="500"/>
+    <param name="max_particles"             value="2000"/>
+    <param name="kld_err"                   value="0.05"/>
+    <param name="kld_z"                     value="0.99"/>
+    <param name="odom_alpha1"               value="4.5"/>
+    <param name="odom_alpha2"               value="2.8"/>
+    <!-- translation std dev, m -->
+    <param name="odom_alpha3"               value="4.8"/>
+    <param name="odom_alpha4"               value="4.5"/>
+    <param name="laser_z_hit"               value="0.90"/>
+    <param name="laser_z_short"             value="0.05"/>
+    <param name="laser_z_max"               value="0.05"/>
+    <param name="laser_z_rand"              value="0.1"/>
+    <param name="laser_sigma_hit"           value="0.02"/>
+    <param name="laser_lambda_short"        value="0.1"/>
+    <param name="laser_model_type"          value="likelihood_field"/> 
+    <!-- <param name="laser_model_type" value="beam"/> -->
+    <param name="laser_likelihood_max_dist" value="1.0"/>  
+    <param name="update_min_d" value="0.05"/>
+    <param name="update_min_a" value="0.05"/>
+    <param name="odom_frame_id" value="odom"/>
+    <param name="resample_interval" value="1"/>
+    <!-- Increase tolerance because the computer can get quite busy -->
+    <param name="transform_tolerance"       value="0.5"/>
+    <param name="recovery_alpha_slow"       value="0.0"/>
+    <param name="recovery_alpha_fast"       value="0.0"/>
+
+// used to initialize filter with Gaussian distribution. 
+    <param name="initial_pose_x" value="0.0"/>   //Initial pose mean (x)
+    <param name="initial_pose_y" value="0.0"/>   //Initial pose mean (y)
+    <param name="initial_pose_a" value="0.0"/>   //Initial pose mean (yaw)
+
+    <param name="initial_cov_xx" value="0.25"/>   //Initial pose covariance (x*x)
+    <param name="initial_cov_yy" value="0.25"/>   //Initial pose covariance (y*y)
+    <param name="initial_cov_aa" value="0.068538917"/>   //Initial pose covariance (yaw*yaw)
+
+//    <param name="initial_cov_xx" value="1"/>   //Initial pose covariance (x*x)
+//    <param name="initial_cov_yy" value="1"/>   //Initial pose covariance (y*y)
+//    <param name="initial_cov_aa" value="0.5"/>   //Initial pose covariance (yaw*yaw)
+
+      <param name="beam_skip_distance" value="0.05"/>   
+
+      //----------  refine  ----------------------
+      <param name="max_iterations" value="10"/>
+      <param name="publish_pose_stamped" value="true"/>
+      <param name="map_frame" value="map"/>
+      <param name="laser_frame" value="laser_frame"/>
+      <!--param name="laser_frame" value="$(arg laser_frame) "/-->
+      <param name="laser_topic" value="/scan"/>
+      <!--param name="laser_topic" value="$(arg laser_topic) "/-->
+      <!--匹配关键帧范围-->
+      <param name="kf_delta_x" value="1.0"/>
+      <param name="kf_delta_y" value="1.0"/>
+      <param name="kf_delta_yaw" value="0.0"/>
+      <!--csm参数-->
+      <param name="max_angular_correction_deg" value="45.0"/>
+      <param name="max_linear_correction" value="0.50"/>
+      <param name="max_iterations" value="10"/>
+      <param name="epsilon_xy" value="0.000001"/>
+      <param name="epsilon_theta" value="0.000001"/>
+      <param name="max_correspondence_dist" value="1"/>
+      <param name="sigma" value="0.030"/>
+      <param name="use_corr_tricks" value="1"/>
+      <param name="restart" value="0"/>
+      <param name="restart_threshold_mean_error" value="0.01"/>
+      <param name="restart_dt" value="1.0"/>
+      <param name="restart_dtheta" value="0.1"/>
+      <param name="clustering_threshold" value="0.25"/>
+      <param name="orientation_neighbourhood" value="20"/>
+      <param name="use_point_to_line_distance" value="1"/>
+      <param name="do_alpha_test" value="0"/>
+      <param name="do_alpha_test_thresholdDeg" value="20.0"/>
+      <param name="outliers_maxPerc" value="0.90"/>
+      <param name="outliers_adaptive_order" value="0.7"/>
+      <param name="outliers_adaptive_mult" value="2.0"/>
+      <param name="do_visibility_test" value="0"/>
+      <param name="outliers_remove_doubles" value="1"/>
+      <param name="do_compute_covariance" value="1"/>
+      <param name="debug_verify_tricks" value="0"/>
+      <param name="use_ml_weights" value="0"/>
+      <param name="use_sigma_weights" value="0"/>
+
+
+    <remap from="scan" to="$(arg scan_topic)"/>
+  </node>
+</launch>

@@ -1,4 +1,11 @@
 ## global_costmap: static_layer obstacle_layer  inflation_layer
+
+# global_planner plugin
+base_global_planner: navfn/NavfnROS
+
+planner_frequency: 0.1
+planner_patience: 5.0 ##全局规划的最大时间
+
 global_costmap:
    global_frame: /map
    robot_base_frame: /base_link

@@ -1,0 +1,74 @@
+
+controller_frequency: 3.0  ## 局部规划周期
+controller_patience: 15.0  ## 局部规划处理的最大时间
+recovery_behavior_enabled: false
+clearing_rotation_allowed: false
+
+
+TrajectoryPlannerROS:
+   max_vel_x: 0.3
+   min_vel_x: 0.05
+   max_vel_y: 0.0  # zero for a differential drive robot
+   min_vel_y: 0.0
+   min_in_place_vel_theta: 0.3  ##
+   escape_vel: -0.1
+   acc_lim_x: 2.5  ##  2.5
+   acc_lim_y: 0.0 # zero for a differential drive robot
+   acc_lim_theta: 2.0  ## 3.2
+
+   holonomic_robot: false
+   yaw_goal_tolerance: 0.35 # about 6 degrees 10度 0.175  20度 0.35
+   xy_goal_tolerance: 0.3  # 30 cm  死区
+   latch_xy_goal_tolerance: false
+   pdist_scale: 0.9
+   gdist_scale: 0.6
+   meter_scoring: true
+
+   heading_lookahead: 0.325
+   heading_scoring: false
+   heading_scoring_timestep: 0.8
+   occdist_scale: 0.1
+   oscillation_reset_dist: 0.05
+   publish_cost_grid_pc: false
+   prune_plan: true
+
+   sim_time: 1.0
+   sim_granularity: 0.025
+   angular_sim_granularity: 0.025
+   vx_samples: 10  ## 默认8
+   vy_samples: 0 # zero for a differential drive robot
+   vtheta_samples: 10 ## 默认20
+   dwa: true
+   simple_attractor: false
+
+
+
+
+
+local_costmap:
+   global_frame: /map
+   robot_base_frame: /base_link
+   inscribed_radius: 0.3
+   circumscribed_radius: 0.4
+   update_frequency: 3.0
+   publish_frequency: 1.0
+   rolling_window: true
+   width: 6.0
+   height: 6.0
+   resolution: 0.05
+   transform_tolerance: 1.0
+   static_map: false ##  local_costmap don't have static layer
+
+### obstacle_layer
+   map_type: costmap  ## voxel another layer
+   max_obstacle_height: 2.0
+   min_obstacle_height: 0.2
+   raytrace_range: 3.0
+   obstacle_range: 2.5   ## local_costmap detect range
+  # track_unknown_space:
+   observation_sources: scan
+   scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true, expected_update_rate: 0}
+
+### inflation_layer
+    # cost_scaling_factor:
+   inflation_radius: 0.15
