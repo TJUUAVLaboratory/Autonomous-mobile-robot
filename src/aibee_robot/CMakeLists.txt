@@ -4,19 +4,31 @@ project(aibee_robot)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
-  move_base_msgs
-  roscpp
-  rospy
-  tf
-  visualization_msgs
-)
+set(CMAKE_CXX_FLAGS "-std=c++11")
+find_package(catkin REQUIRED
+    COMPONENTS
+        roscpp
+        rospy
+        tf
+        geometry_msgs
+        visualization_msgs
+        message_generation
+        pluginlib  ## load ros plugin
+        actionlib  ## move base action
+        move_base_msgs
+        nav_msgs
 
+        ## global navi
+        nav_core
+        navfn
+
+
+)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-
+find_package(Eigen3 REQUIRED)
+add_definitions(${EIGEN3_DEFINITIONS})
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -103,10 +115,11 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES mrobot_navigation
-#  CATKIN_DEPENDS geometry_msgs move_base_msgs roscpp rospy tf visualization_msgs
-#  DEPENDS system_lib
+    CATKIN_DEPENDS
+        geometry_msgs
+        sensor_msgs
+        nav_msgs
+        roscpp
 )
 
 ###########
@@ -117,13 +130,31 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(mrobot_navigation
 #   src/${PROJECT_NAME}/mrobot_navigation.cpp
 # )
+# move_base
+add_library(global_navi
+  src/global_navi.cpp
+)
+target_link_libraries(global_navi
+    ${Boost_LIBRARIES}
+    ${catkin_LIBRARIES}
+    )
+
+add_library(aibee_navi
+  src/aibee_navi.cpp
+  )
+  target_link_libraries(aibee_navi
+  ${Boost_LIBRARIES}
+  ${catkin_LIBRARIES}
+  )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -133,14 +164,30 @@ include_directories(
 ## Declare a C++ executable
 # add_executable(mrobot_navigation_node src/mrobot_navigation_node.cpp)
 
-## Add cmake target dependencies of the executable
-## same as for the library above
-# add_dependencies(mrobot_navigation_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(global_navi ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(global_navi_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# set_target_properties(global_navi_node PROPERTIES OUTPUT_NAME global_navi) #生成同名称的动态库和静态库
+# add_dependencies(aibee_navi_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# set_target_properties(aibee_navi_node PROPERTIES OUTPUT_NAME aibee_navi)
 
-## Specify libraries to link a library or executable target against
-# target_link_libraries(mrobot_navigation_node
-#   ${catkin_LIBRARIES}
-# )
+## 全局路径规划的节点
+add_executable(global_navi_node
+  src/global_navi_node.cpp
+)
+target_link_libraries(global_navi_node global_navi)
+
+
+## 升级版本　全局＋局部路径版本
+add_executable(aibee_navi_node 
+  src/aibee_navi_node
+  )
+
+target_link_libraries(aibee_navi_node
+    global_navi  
+)
+
+
+
 
 #############
 ## Install ##

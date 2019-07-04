@@ -28,7 +28,7 @@ global_costmap:
    scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true, expected_update_rate: 0}
 
 ### inflation_layer
-   inflation_radius: 0.15
+   inflation_radius: 0.3
     # cost_scaling_factor:
     
 
