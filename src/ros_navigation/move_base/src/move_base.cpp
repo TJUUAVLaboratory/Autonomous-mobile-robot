@@ -93,7 +93,7 @@ namespace move_base {
     //set up plan triple buffer
     planner_plan_ = new std::vector<geometry_msgs::PoseStamped>();
     latest_plan_  = new std::vector<geometry_msgs::PoseStamped>();
-    controller_plan_ = new std::vector<geometry_msgs::PoseStamped>();
+    controller_plan_ = new std::vector<geometry_msgs::PoseStamped>(); //control plan waypoints
 
     //set up the planner's thread  配置全局规划的线程
     planner_thread_ = new boost::thread(boost::bind(&MoveBase::planThread, this));    
