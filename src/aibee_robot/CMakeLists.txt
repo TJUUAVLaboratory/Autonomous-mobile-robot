@@ -179,7 +179,7 @@ target_link_libraries(global_navi_node global_navi)
 
 ## 升级版本　全局＋局部路径版本
 add_executable(aibee_navi_node 
-  src/aibee_navi_node
+  src/aibee_navi_node.cpp
   )
 
 target_link_libraries(aibee_navi_node
