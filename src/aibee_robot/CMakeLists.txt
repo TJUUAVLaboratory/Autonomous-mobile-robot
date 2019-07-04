@@ -181,10 +181,7 @@ target_link_libraries(global_navi_node global_navi)
 add_executable(aibee_navi_node 
   src/aibee_navi_node.cpp
   )
-
-target_link_libraries(aibee_navi_node
-    global_navi  
-)
+target_link_libraries(aibee_navi_node  aibee_navi)
 
 
 
