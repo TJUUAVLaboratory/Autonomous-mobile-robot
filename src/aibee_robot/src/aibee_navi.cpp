@@ -1075,7 +1075,7 @@ bool MoveBase::executeCycle(geometry_msgs::PoseStamped &goal, std::vector<geomet
           ******************************************************************************* */
         if (hasObstablePoints)
         {
-          publishZeroVelocity(); //
+          // publishZeroVelocity(); //
           ROS_WARN("before send cmd_vel, have detected Obstable Points");
         }
 
