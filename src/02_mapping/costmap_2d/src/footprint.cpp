@@ -224,6 +224,7 @@ std::vector<geometry_msgs::Point> makeFootprintFromParams(ros::NodeHandle& nh)
     {
       if (makeFootprintFromString(std::string(footprint_xmlrpc), points))
       {
+        ROS_WARN_STREAM("makeFootprintFromString ==> Robot_footprint: " << std::string(footprint_xmlrpc));
         writeFootprintToParam(nh, points);
         return points;
       }
@@ -242,6 +243,8 @@ std::vector<geometry_msgs::Point> makeFootprintFromParams(ros::NodeHandle& nh)
     nh.param(full_radius_param_name, robot_radius, 1.234);
     points = makeFootprintFromRadius(robot_radius);
     nh.setParam("robot_radius", robot_radius);
+    ROS_WARN("makeFootprintFromRadius ==> Robot_radius: %.5f", robot_radius);
+    
   }
   // Else neither param was found anywhere this knows about, so
   // defaults will come from dynamic_reconfigure stuff, set in

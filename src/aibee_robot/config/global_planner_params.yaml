@@ -11,7 +11,6 @@ global_costmap:
    robot_base_frame: /base_link
    update_frequency: 1.0
    publish_frequency: 0   
-   robot_radius:   0.3     ## robot footprint 300mm
    rolling_window: false
    resolution: 0.05  ## m/pixel
    transform_tolerance: 1.0
@@ -37,6 +36,8 @@ global_costmap:
 ### inflation_layer
    inflation_radius: 0.35
     # cost_scaling_factor:
+   robot_radius:   0.5     ## robot footprint 300mm
+   footprint: "[[-0.5, 0.0], [0.2, 0.4], [0.2, 0.0], [0.2, -0.4], [-0.5, 0.0]]"
     
 
   

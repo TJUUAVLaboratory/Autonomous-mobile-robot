@@ -944,8 +944,6 @@ double MoveBase::distance(const geometry_msgs::PoseStamped &p1, const geometry_m
   */
 bool MoveBase::executeCycle(geometry_msgs::PoseStamped &goal, std::vector<geometry_msgs::PoseStamped> &global_plan)
 {
-
-  ROS_WARN("MoveBase::executeCycle");
   boost::recursive_mutex::scoped_lock ecl(configuration_mutex_);
   //we need to be able to publish velocity commands
   geometry_msgs::Twist cmd_vel;

@@ -138,7 +138,7 @@ PLUGINLIB_EXPORT_CLASS(eband_local_planner::EBandPlannerROS, nav_core::BaseLocal
       else
         ROS_ERROR("Reconfigure CB called before eband planner initialization");
 
-      if (eband_trj_ctrl_)
+      if (eband_trj_ctrl_) // eband_trajectory_controller recofigure
         eband_trj_ctrl_->reconfigure(config);
       else
         ROS_ERROR("Reconfigure CB called before trajectory controller initialization!");

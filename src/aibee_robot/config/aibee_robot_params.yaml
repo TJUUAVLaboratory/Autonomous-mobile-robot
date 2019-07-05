@@ -1,0 +1,121 @@
+## global_costmap: static_layer obstacle_layer  inflation_layer
+
+# global_planner plugin
+# - 
+# - 
+# - 
+base_global_planner: navfn/NavfnROS
+
+
+
+## local planner plugin
+#
+# - base_local_planner/TrajectoryPlannerROS
+# - eband_local_planner/EBandPlannerROS
+base_local_planner: eband_local_planner/EBandPlannerROS
+
+## time params
+planner_frequency: 0.1     ## global_planner frequece
+controller_frequency: 20.0 ## locla planner frequece
+planner_patience: 5.0      ## 全局规划的最大时间
+controller_patience: 15.0  ## 局部规划控制的最大时间
+oscillation_timeout: 0.0
+oscillation_distance: 0.5
+
+max_planning_retries: 2
+footprint_topic: footprint
+
+global_costmap:
+   global_frame: /map
+   robot_base_frame: /base_link
+   rolling_window: false
+   always_send_full_costmap: false
+   track_unknown_space: false
+   resolution: 0.05  ## m/pixel
+   transform_tolerance: 1.0
+
+   ##global costmap layeres
+   static_map: true
+   obstacle_layer: true
+   map_type: grid ## or voxel  //obstacle layer的类型
+   inflation_layer: true 
+
+   ##每个层的参数
+   # static layer
+   map_topic: map
+   unknown_cost_value: -1
+   lethal_cost_threshold: 100
+   # grid obstacle layere
+   max_obstacle_height: 2.0
+   raytrace_range: 3.0
+   obstacle_range: 2.5  
+   observation_sources: scan
+   scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true, expected_update_rate: 0}
+
+   # voxel obstacle layere
+   # origin_z:
+   # z_resolution:
+   # z_voxels:
+   # mark_threshold:
+   # unknown_threshold:
+   publish_voxel_map: true ## publish /voxel_grid topic
+   # inflation layer
+   cost_scaling_factor: 10.0
+   inflation_radius: 0.5
+   robot_radius: 0.4
+   footprint_padding: 0.01
+   update_frequency: 1.0
+   publish_frequency: 0  
+
+local_costmap:
+   global_frame: /map
+   robot_base_frame: /base_link
+   rolling_window: false
+   always_send_full_costmap: false
+   track_unknown_space: false
+   resolution: 0.05  ## m/pixel
+   transform_tolerance: 1.0
+
+   ##global costmap layeres
+   static_map: false
+   obstacle_layer: true
+   map_type: grid ## or voxel  //obstacle layer的类型
+   inflation_layer: true 
+
+   ##每个层的参数
+   # static layer
+   map_topic: map
+   unknown_cost_value: -1
+   lethal_cost_threshold: 100
+   # grid obstacle layere
+   max_obstacle_height: 2.0
+   raytrace_range: 3.0
+   obstacle_range: 2.5  
+   observation_sources: scan
+   scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true, expected_update_rate: 0}
+   inflation_radius: 0.5
+   robot_radius: 0.4
+   footprint_padding: 0.01
+   footprint: "[[-0.325, -0.325], [-0.325, 0.325], [0.325, 0.325], [0.46, 0.0], [0.325, -0.325]]"
+   update_frequency: 1.0
+   publish_frequency: 0  
+
+   inscribed_radius: 0.4
+   circumscribed_radius: 0.5
+
+
+
+## distance params
+clearing_radius: 0.4  #清除机器人周围的障碍物
+conservative_reset_dist: 3.0
+
+
+shutdown_costmaps: false
+clearing_rotation_allowed: true
+recovery_behavior_enabled: true
+
+  
+
+  
+   
+  
