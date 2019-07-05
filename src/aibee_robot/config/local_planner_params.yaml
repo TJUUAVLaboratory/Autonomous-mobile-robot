@@ -4,6 +4,11 @@ controller_patience: 15.0  ## 局部规划处理的最大时间
 recovery_behavior_enabled: false
 clearing_rotation_allowed: false
 
+## local planner plugin
+#
+# - base_local_planner/TrajectoryPlannerROS
+# - eband_local_planner/EBandPlannerROS
+base_local_planner: eband_local_planner/EBandPlannerROS
 
 TrajectoryPlannerROS:
    max_vel_x: 0.3
@@ -71,4 +76,4 @@ local_costmap:
 
 ### inflation_layer
     # cost_scaling_factor:
-   inflation_radius: 0.15
+   inflation_radius: 0.35
