@@ -7,7 +7,6 @@
 base_global_planner: navfn/NavfnROS
 
 
-
 ## local planner plugin
 #
 # - base_local_planner/TrajectoryPlannerROS

@@ -8,7 +8,8 @@ clearing_rotation_allowed: false
 #
 # - base_local_planner/TrajectoryPlannerROS
 # - eband_local_planner/EBandPlannerROS
-base_local_planner: eband_local_planner/EBandPlannerROS
+# - teb_local_planner/TebLocalPlannerROS
+base_local_planner: teb_local_planner/TebLocalPlannerROS
 
 
 
@@ -55,7 +56,7 @@ TrajectoryPlannerROS:
    acc_lim_theta: 2.0  ## 3.2
 
    holonomic_robot: false
-   yaw_goal_tolerance: 0.35 # about 6 degrees 10度 0.175  20度 0.35
+   yaw_goal_tolerance: 0.175 # about 6 degrees 10度 0.175  20度 0.35
    xy_goal_tolerance: 0.3  # 30 cm  死区
    latch_xy_goal_tolerance: false
    pdist_scale: 0.9
@@ -80,6 +81,19 @@ TrajectoryPlannerROS:
    simple_attractor: false
 
 
+# EBandPlannerROS
+EBandPlannerROS:
+   max_vel_lin: 0.5
+   max_vel_th: 0.5
+   max_acceleration: 0.3
+   max_translaitonal_accleration: 0.3
+   mae_rotational_accleration: 0.3
+
+   xy_goal_tolerance: 0.2
+   yaw_goal_tolerance: 0.175
 
 
 
+# TebLocalPlannerROS
+# TebLocalPlannerROS:
+   

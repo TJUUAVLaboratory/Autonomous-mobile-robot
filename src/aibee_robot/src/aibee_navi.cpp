@@ -417,7 +417,7 @@ bool MoveBase::planService(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::R
   //尝试make global plan,
   if (!global_planner_->makePlan(start, req.goal, global_plan) || global_plan.empty())
   {
-    ROS_WARN("move_base", "Failed to find a plan to exact goal of (%.2f, %.2f), searching for a feasible goal within tolerance",
+    ROS_WARN("Failed to find a plan to exact goal of (%.2f, %.2f), searching for a feasible goal within tolerance",
                     req.goal.pose.position.x, req.goal.pose.position.y);
 
     // 如果没有规划成功

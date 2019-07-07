@@ -1,7 +1,11 @@
 ## global_costmap: static_layer obstacle_layer  inflation_layer
 
 # global_planner plugin
-base_global_planner: navfn/NavfnROS
+# 
+# - navfn/NavfnROS  A* or D*
+# - global_planner/GlobalPlanner
+# - carrot_planner/CarrotPlanner  test 从当前点到目标点的一条直线
+base_global_planner: global_planner/GlobalPlanner
 
 planner_frequency: 0.1
 planner_patience: 5.0 ##全局规划的最大时间
@@ -41,5 +45,11 @@ global_costmap:
     
 
   
-   
+## GlobalPlanner
+GlobalPlanner:
+    old_navfn_behavior: true
+   # use_quadratic: true
+   #  use_dijkstra: false  ## false use A*
+   # use_grid_path: true ## false use Gradient Path
+
   
