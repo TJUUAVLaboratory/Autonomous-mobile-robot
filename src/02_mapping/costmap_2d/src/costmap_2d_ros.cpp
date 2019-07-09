@@ -284,18 +284,20 @@ void Costmap2DROS::resetOldParameters(ros::NodeHandle &nh)
   move_parameter(nh, obstacles, "observation_sources");
 
   // inflation_layer
-  ROS_INFO("load inflation_layer costmap layer");
-  ros::NodeHandle inflation(nh, "inflation_layer");
-  move_parameter(nh, inflation, "cost_scaling_factor");
-  move_parameter(nh, inflation, "inflation_radius");
-  map["name"] = XmlRpc::XmlRpcValue("inflation_layer");
-  map["type"] = XmlRpc::XmlRpcValue("costmap_2d::InflationLayer");
-  super_map.setStruct(&map);
-  plugins.push_back(super_map); //add inflation_layer to xmp_RPC
-
-  super_array.setArray(&plugins);
-  nh.setParam("plugins", super_array); //变成一个xmp_RPC类型的 param
-}
+  if (nh.getParam("inflation_layer", flag) && flag)
+  {
+    ROS_INFO("load inflation_layer costmap layer");
+    ros::NodeHandle inflation(nh, "inflation_layer");
+    move_parameter(nh, inflation, "cost_scaling_factor");
+    move_parameter(nh, inflation, "inflation_radius");
+    map["name"] = XmlRpc::XmlRpcValue("inflation_layer");
+    map["type"] = XmlRpc::XmlRpcValue("costmap_2d::InflationLayer");
+    super_map.setStruct(&map);
+    plugins.push_back(super_map); //add inflation_layer to xmp_RPC
+    }
+    super_array.setArray(&plugins);
+    nh.setParam("plugins", super_array); //变成一个xmp_RPC类型的 param
+  }
 
 /* --------------------------------------
 

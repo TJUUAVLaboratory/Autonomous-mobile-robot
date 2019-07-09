@@ -216,6 +216,8 @@ public:
    * getUnpaddedRobotFootprint(). */
   void setUnpaddedRobotFootprintPolygon(const geometry_msgs::Polygon& footprint);
 
+  Costmap2DPublisher* publisher_;
+
 protected:
   LayeredCostmap* layered_costmap_;
   std::string name_;
@@ -244,7 +246,7 @@ private:
   ros::Duration publish_cycle;
   pluginlib::ClassLoader<Layer> plugin_loader_; //加载插件类
   tf::Stamped<tf::Pose> old_pose_;
-  Costmap2DPublisher* publisher_;
+  
   dynamic_reconfigure::Server<costmap_2d::Costmap2DConfig> *dsrv_; //动态参数配置server
 
   boost::recursive_mutex configuration_mutex_;

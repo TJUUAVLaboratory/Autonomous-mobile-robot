@@ -2,7 +2,7 @@
 ## ros navigation 重构
 
 
-### 2. mapping 
+### 2. mapping
 
 **2.0.1 map_server: load map**
 ```
@@ -23,7 +23,7 @@ boost::shared_ptr<Layer> plugin = plugin_loader_.createInstance(type);
 costmap_plugins.xml
 基类：costmap_2d::Layer
 
-plugin类： 
+plugin类：
 costmap_2d::InflationLayer
 costmap_2d::ObstacleLayer
 costmap_2d::StaticLayer

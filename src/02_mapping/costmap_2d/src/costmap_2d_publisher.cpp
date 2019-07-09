@@ -38,6 +38,8 @@
 #include <boost/bind.hpp>
 #include <costmap_2d/costmap_2d_publisher.h>
 #include <costmap_2d/cost_values.h>
+#include <std_msgs/String.h>
+#include <sstream>
 
 namespace costmap_2d
 {
@@ -85,6 +87,8 @@ void Costmap2DPublisher::onNewSubscription(const ros::SingleSubscriberPublisher&
   prepareGrid();
   pub.publish(grid_);
 }
+
+
 
 // prepare grid_ message for publication.
 void Costmap2DPublisher::prepareGrid()

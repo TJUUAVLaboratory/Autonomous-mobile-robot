@@ -72,3 +72,8 @@ target_link_libraries(click_move_to_goal
     ${OpenCV_LIBRARIES}
     ${catkin_LIBRARIES}  cjson
     )
+
+add_executable(temp_map src/temp_map.cpp)
+target_link_libraries(temp_map
+      ${catkin_LIBRARIES}  cjson
+   )

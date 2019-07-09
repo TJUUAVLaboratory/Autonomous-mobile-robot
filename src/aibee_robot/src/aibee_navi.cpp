@@ -100,6 +100,9 @@ MoveBase::MoveBase(tf::TransformListener &tf) : tf_(tf),
   private_nh.param("clearing_rotation_allowed", clearing_rotation_allowed_, true);
   private_nh.param("recovery_behavior_enabled", recovery_behavior_enabled_, true);
 
+  temp_costmap = new costmap_2d::Costmap2DROS("temp_costmap", tf_);
+  temp_costmap->start();
+
   // create global_costmap and global planner
   //create the ros wrapper for the planner's costmap... and initializer a pointer we'll use with the underlying map
   global_costmap_ros_ = new costmap_2d::Costmap2DROS("global_costmap", tf_);
@@ -1178,6 +1181,9 @@ bool MoveBase::executeCycle(geometry_msgs::PoseStamped &goal, std::vector<geomet
     actionServer_->setAborted(move_base_msgs::MoveBaseResult(), "Reached a case that should not be hit in move_base. This is a bug, please report it.");
     return true;
   }
+  // costmap_2d::Costmap2DPublisher temp_costmap;
+  // temp_costmap.tempCostmap_pub();
+  // temp_costmap->publisher_->tempCostmap_pub();
 
   //we aren't done yet
   return false;
