@@ -174,7 +174,8 @@ namespace eband_local_planner{
       return d-2*pi;
   }
 
-  bool EBandTrajectoryCtrl::getTwistDifferentialDrive(geometry_msgs::Twist& twist_cmd, bool& goal_reached) {
+  bool EBandTrajectoryCtrl::getTwistDifferentialDrive(geometry_msgs::Twist& twist_cmd, bool& goal_reached) 
+  {
     goal_reached = false;
 
     geometry_msgs::Twist robot_cmd, bubble_diff;

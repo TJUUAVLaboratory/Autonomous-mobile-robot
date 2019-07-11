@@ -114,6 +114,7 @@ void EBandPlanner::reconfigure(
   costmap_weight_ = config.costmap_weight;
 }
 
+//EBandVisualization 对象
 void EBandPlanner::setVisualization(boost::shared_ptr<EBandVisualization> eband_visual)
 {
   eband_visual_ = eband_visual;
@@ -831,6 +832,7 @@ bool EBandPlanner::modifyBandArtificialForce(std::vector<Bubble> &band)
   wrench.wrench.torque.x = 0.0;
   wrench.wrench.torque.y = 0.0;
   wrench.wrench.torque.z = 0.0;
+  
   internal_forces.assign(band.size(), wrench);
   external_forces = internal_forces;
   forces = internal_forces;

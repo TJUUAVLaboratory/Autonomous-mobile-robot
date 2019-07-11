@@ -83,8 +83,9 @@ int main( int argc, char** argv )
   // load ros parameters from node handle
   config.loadRosParamFromNodeHandle(n);
  
-  ros::Timer cycle_timer = n.createTimer(ros::Duration(0.025), CB_mainCycle);
-  ros::Timer publish_timer = n.createTimer(ros::Duration(0.1), CB_publishCycle);
+  //create timer 
+  ros::Timer cycle_timer = n.createTimer(ros::Duration(0.025), CB_mainCycle);// 定时器
+  ros::Timer publish_timer = n.createTimer(ros::Duration(0.1), CB_publishCycle);// 定时器
   
   // setup dynamic reconfigure
   dynamic_recfg = boost::make_shared< dynamic_reconfigure::Server<TebLocalPlannerReconfigureConfig> >(n);
@@ -151,10 +152,15 @@ int main( int argc, char** argv )
   
   // Setup planner (homotopy class planning or just the local teb planner)
   if (config.hcp.enable_homotopy_class_planning)
+  {
+    ROS_INFO("enable_homotopy_class_planning");
     planner = PlannerInterfacePtr(new HomotopyClassPlanner(config, &obst_vector, robot_model, visual, &via_points));
+  }
   else
+  {
+    ROS_INFO("disable_homotopy_class_planning");
     planner = PlannerInterfacePtr(new TebOptimalPlanner(config, &obst_vector, robot_model, visual, &via_points));
-  
+  }
 
   no_fixed_obstacles = obst_vector.size();
   ros::spin();
@@ -165,6 +171,7 @@ int main( int argc, char** argv )
 // Planning loop
 void CB_mainCycle(const ros::TimerEvent& e)
 {
+  ROS_INFO(" TEB Planning loop");
   planner->plan(PoseSE2(-4,0,0), PoseSE2(4,0,0)); // hardcoded start and goal for testing purposes
 }
 

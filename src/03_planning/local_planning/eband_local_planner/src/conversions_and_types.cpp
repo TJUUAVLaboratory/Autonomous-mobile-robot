@@ -207,7 +207,8 @@ namespace eband_local_planner{
 
     return true;
   }
-
+  
+  // according footprint points compute the CircumscribedRadius of robot 
   double getCircumscribedRadius(costmap_2d::Costmap2DROS& costmap) {
     std::vector<geometry_msgs::Point> footprint(costmap.getRobotFootprint());
     double max_distance_sqr = 0;

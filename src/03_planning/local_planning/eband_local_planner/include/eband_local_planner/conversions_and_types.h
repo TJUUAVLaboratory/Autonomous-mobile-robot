@@ -75,6 +75,7 @@ namespace eband_local_planner{
    * @brief Converts a frame of type Pose to type Pose2D (mainly -> conversion of orientation from quaternions to euler angles)
    * @param Pose which shall be converted
    * @param References to converted ROS Pose2D frmae
+   * * @ Pose (position orientation) ==> Pose2D(x , theta)
    */
   void PoseToPose2D(const geometry_msgs::Pose pose, geometry_msgs::Pose2D& pose2D);
 

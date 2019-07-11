@@ -105,8 +105,8 @@ EBandPlannerROS:
    max_vel_lin: 0.5
    max_vel_th: 0.5
    max_acceleration: 0.3
-   max_translaitonal_accleration: 0.3
-   mae_rotational_accleration: 0.3
+   max_translational_acceleration: 0.3
+   mae_rotational_acceleration: 0.3
 
    xy_goal_tolerance: 0.2
    yaw_goal_tolerance: 0.175
@@ -115,4 +115,5 @@ EBandPlannerROS:
 
 # TebLocalPlannerROS
 # TebLocalPlannerROS:
+
    
