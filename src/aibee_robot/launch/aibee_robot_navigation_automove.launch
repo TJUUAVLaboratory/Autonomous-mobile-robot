@@ -48,7 +48,7 @@
   </node> -->
 
 <node pkg="cmd_control" type="auto_move_node"  name="auto_move_node" output="screen" >
-  <param name="waypoints_num" value="5">
+  <param name="waypoints_num" value="5"/>
 </node>
 
  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>
