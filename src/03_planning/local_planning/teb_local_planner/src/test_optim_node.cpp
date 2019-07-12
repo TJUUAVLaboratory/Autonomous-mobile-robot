@@ -171,7 +171,7 @@ int main( int argc, char** argv )
 // Planning loop
 void CB_mainCycle(const ros::TimerEvent& e)
 {
-  ROS_INFO(" TEB Planning loop");
+  // ROS_INFO(" TEB Planning loop");
   planner->plan(PoseSE2(-4,0,0), PoseSE2(4,0,0)); // hardcoded start and goal for testing purposes
 }
 

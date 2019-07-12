@@ -72,6 +72,8 @@
   <build_export_depend>std_msgs</build_export_depend>
   <build_export_depend>pointcloud_msgs</build_export_depend>
   <build_export_depend>message_filters</build_export_depend>
+  <build_depend>move_base_msgs</build_depend>
+  <build_depend>actionlib</build_depend>
   <exec_depend>rosbag</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>pcl_conversions</exec_depend>
@@ -86,5 +88,7 @@
   <exec_depend>cv_brdige</exec_depend>
   <exec_depend>image_transport</exec_depend>
   <exec_depend>message_runtime</exec_depend>
+  <exec_depend>move_base_msgs</exec_depend>
+  <exec_depend>actionlib</exec_depend>
 
 </package>

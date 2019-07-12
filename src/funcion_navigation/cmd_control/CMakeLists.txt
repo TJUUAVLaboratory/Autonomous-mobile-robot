@@ -8,6 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   sensor_msgs
   message_generation
+  move_base_msgs
+  actionlib
   roscpp
   std_msgs
   message_filters
@@ -34,6 +36,7 @@ find_package(cmake_modules)
 
 catkin_package(
   CATKIN_DEPENDS geometry_msgs roscpp std_msgs message_runtime 
+  move_base_msgs  actionlib
 )
 
 include_directories(
@@ -49,4 +52,8 @@ target_link_libraries(cmd_control_node
 
   add_executable(cmd_control_pad src/cmd_control_pad.cpp)
   target_link_libraries(cmd_control_pad
+    ${catkin_LIBRARIES})
+
+    add_executable(auto_move_node src/auto_move_node.cpp)
+    target_link_libraries(auto_move_node
     ${catkin_LIBRARIES})
