@@ -31,8 +31,8 @@
 
 int main(int argc, char** argv){
   ros::init(argc, argv, "move_base_node");
-  ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
-  // ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
+  // ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
+  ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
   tf::TransformListener tf(ros::Duration(10));
 
   aibee_navi::MoveBase move_base( tf );
