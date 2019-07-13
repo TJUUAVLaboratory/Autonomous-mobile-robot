@@ -114,6 +114,9 @@ EBandPlannerROS:
 
 
 # TebLocalPlannerROS
-# TebLocalPlannerROS:
-
+TebLocalPlannerROS:
+   selection_prefer_initial_plan: 0.7
+   selectoin_obst_cost_scale: 80
+   acc_lim_x: 0.3
+   acc_lim_theta: 0.3
    
