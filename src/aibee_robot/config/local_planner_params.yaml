@@ -9,7 +9,7 @@ clearing_rotation_allowed: false
 # - base_local_planner/TrajectoryPlannerROS
 # - eband_local_planner/EBandPlannerROS
 # - teb_local_planner/TebLocalPlannerROS
-base_local_planner: eband_local_planner/EBandPlannerROS
+base_local_planner: teb_local_planner/TebLocalPlannerROS
 
 temp_costmap:
    global_frame: /map

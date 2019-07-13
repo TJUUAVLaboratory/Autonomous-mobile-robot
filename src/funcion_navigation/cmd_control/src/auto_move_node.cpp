@@ -86,7 +86,7 @@ void wayPointsCallback(const geometry_msgs::PointStampedPtr &point_msg)
 
     ROS_INFO_STREAM("select_point_size: " << waypoints_in.size());
 
-    if (waypoints_in.size() >= waypoints_num)
+    if(waypoints_in.size() >= waypoints_num)
         moveToGoal(waypoints_in);
 }
 

@@ -4,8 +4,9 @@
 # 
 # - navfn/NavfnROS  A* or D*
 # - global_planner/GlobalPlanner
+# - voronoi_planner/VoronoiPlanner
 # - carrot_planner/CarrotPlanner  test 从当前点到目标点的一条直线
-base_global_planner: global_planner/GlobalPlanner
+base_global_planner: voronoi_planner/VoronoiPlanner
 
 planner_frequency: 0.1
 planner_patience: 5.0 ##全局规划的最大时间
