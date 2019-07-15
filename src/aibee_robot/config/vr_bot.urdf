@@ -15,7 +15,7 @@
 -->
 
 <!-- robot -->
-<robot name="cartographer_backpack_3d">
+<robot name="aibee_robot">
   <material name="orange">
     <color rgba="1.0 0.5 0.2 1" />
   </material>
@@ -46,6 +46,7 @@
     </visual>
   </link>
 
+<!-- vertical_vlp16_link  -->
   <link name="vertical_vlp16_link">
     <visual>
       <origin xyz="0.0 0.0 0.0" />
@@ -55,6 +56,8 @@
       <material name="gray" />
     </visual>
   </link>
+
+<!-- odom_child
   <link name="odom_child">
     <visual>
       <origin xyz="0.0 0.0 0.0" />
@@ -63,30 +66,40 @@
       </geometry>
       <material name="orange" />
     </visual>
-  </link>
+  </link> -->
+
+  <!--base_link -->
   <link name="base_link" />
+
+<!-- the joint of every link -->
+
+<!-- base_link ==> imu -->
+
+<!-- imu ==> horizontal_vlp16_link -->
+<!-- imu ==> vertical_vlp16_link -->
 
   <joint name="imu_link_joint" type="fixed">
     <parent link="base_link" />
     <child link="imu_link" />
-    <origin xyz="0 0 0" rpy="0 0 0" />
+    <origin xyz="0.00493858 0.00 0.801653" rpy="-0.00584294 -0.00656523 -1.58415" />
   </joint>
 
   <joint name="horizontal_vlp16_link_joint" type="fixed">
-    <parent link="base_link" />
+    <parent link="imu_link" />
     <child link="horizontal_vlp16_link" />
     <origin xyz="0.0126509 0.0180983 0.172326" rpy="3.127 -3.1354 1.54265" />
   </joint>
 
   <joint name="vertical_vlp16_link_joint" type="fixed">
-    <parent link="base_link" />
+    <parent link="imu_link" />
     <child link="vertical_vlp16_link" />
 <origin xyz="0.0107642 0.17024 0.0459122" rpy="0.029518 1.31004 1.58561" />
   </joint>
-  <joint name="odom_child_joint" type="fixed">
+
+  <!-- <joint name="odom_child_joint" type="fixed">
     <parent link="base_link" />
     <child link="odom_child" />
 <origin xyz="-0.00493858 0.102603 -0.801653" rpy="0.00584294 0.00656523 1.58415" />
-  </joint>
+  </joint> -->
 
 </robot>
