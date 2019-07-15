@@ -46,19 +46,21 @@
 #include <string>
 #include <tf2_sensor_msgs/tf2_sensor_msgs.h>
 
-
 namespace pointcloud_to_laserscan
 {
 PointCloudToLaserScanNodelet::PointCloudToLaserScanNodelet()
 {
 }
 
+// onInit()
+// set Param
+//
 void PointCloudToLaserScanNodelet::onInit()
 {
   boost::mutex::scoped_lock lock(connect_mutex_);
   private_nh_ = getPrivateNodeHandle();
 
-  private_nh_.param<std::string>("target_frame", target_frame_, "");
+  private_nh_.param<std::string>("target_frame", target_frame_, ""); // 输出参考的frame_id
   private_nh_.param<double>("transform_tolerance", tolerance_, 0.01);
   private_nh_.param<double>("min_height", min_height_, std::numeric_limits<double>::min());
   private_nh_.param<double>("max_height", max_height_, std::numeric_limits<double>::max());
@@ -72,7 +74,7 @@ void PointCloudToLaserScanNodelet::onInit()
   private_nh_.param<double>("inf_epsilon", inf_epsilon_, 1.0);
 
   int concurrency_level;
-  private_nh_.param<int>("concurrency_level", concurrency_level, 1);
+  private_nh_.param<int>("concurrency_level", concurrency_level, 1); //ros mulitThread
   private_nh_.param<bool>("use_inf", use_inf_, true);
 
   // Check if explicitly single threaded, otherwise, let nodelet manager dictate thread pool size
@@ -96,22 +98,22 @@ void PointCloudToLaserScanNodelet::onInit()
   }
 
   // if pointcloud target frame specified, we need to filter by transform availability
-  // if (!target_frame_.empty())
-  // {
-  //   tf2_.reset(new tf2_ros::Buffer());
-  //   tf2_listener_.reset(new tf2_ros::TransformListener(*tf2_));
-  //   message_filter_.reset(new MessageFilter(sub_, *tf2_, target_frame_, input_queue_size_, nh_));
-  //   message_filter_->registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
-  //   message_filter_->registerFailureCallback(boost::bind(&PointCloudToLaserScanNodelet::failureCb, this, _1, _2));
-  // }
-  // else  // otherwise setup direct subscription
-  // {
-  //   sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
-  // }
-  sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
+  if (!target_frame_.empty())
+  {
+    tf2_.reset(new tf2_ros::Buffer());
+    tf2_listener_.reset(new tf2_ros::TransformListener(*tf2_));
+    message_filter_.reset(new MessageFilter(sub_, *tf2_, target_frame_, input_queue_size_, nh_));
+    message_filter_->registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
+    message_filter_->registerFailureCallback(boost::bind(&PointCloudToLaserScanNodelet::failureCb, this, _1, _2));
+  }
+  else // otherwise setup direct subscription
+  {
+    sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
+  }
+  // sub_.registerCallback(boost::bind(&PointCloudToLaserScanNodelet::cloudCb, this, _1));
   pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan", 10, boost::bind(&PointCloudToLaserScanNodelet::connectCb, this),
                                                boost::bind(&PointCloudToLaserScanNodelet::disconnectCb, this));
-}
+} // onInit end
 
 void PointCloudToLaserScanNodelet::connectCb()
 {
@@ -133,7 +135,7 @@ void PointCloudToLaserScanNodelet::disconnectCb()
   }
 }
 
-void PointCloudToLaserScanNodelet::failureCb(const sensor_msgs::PointCloud2ConstPtr& cloud_msg,
+void PointCloudToLaserScanNodelet::failureCb(const sensor_msgs::PointCloud2ConstPtr &cloud_msg,
                                              tf2_ros::filter_failure_reasons::FilterFailureReason reason)
 {
   NODELET_WARN_STREAM_THROTTLE(1.0, "Can't transform pointcloud from frame " << cloud_msg->header.frame_id << " to "
@@ -142,16 +144,19 @@ void PointCloudToLaserScanNodelet::failureCb(const sensor_msgs::PointCloud2Const
                                                                              << ", reason: " << reason);
 }
 
-void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
+// callback pointClude2
+void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPtr &cloud_msg)
 {
   // build laserscan output
-  
-  if(times==0){
+
+  if (times == 0)
+  {
     if (!target_frame_.empty())
     {
       output.header.frame_id = target_frame_;
     }
-    output.header = cloud_msg->header;
+    output.header.stamp = cloud_msg->header.stamp;
+    output.header.seq = cloud_msg->header.seq;
     output.angle_min = angle_min_;
     output.angle_max = angle_max_;
     output.angle_increment = angle_increment_;
@@ -173,27 +178,28 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
       output.ranges.assign(ranges_size, 0);
     }
   }
-  
 
   sensor_msgs::PointCloud2ConstPtr cloud_out;
   sensor_msgs::PointCloud2Ptr cloud;
 
   // Transform cloud if necessary
+  ROS_WARN_STREAM("input Pointcloud2 frame_id"<< cloud_msg->header.frame_id);
+  ROS_WARN_STREAM("output LaserScan  frame_id"<< output.header.frame_id);
   if (!(output.header.frame_id == cloud_msg->header.frame_id))
   {
     try
     {
       cloud.reset(new sensor_msgs::PointCloud2);
-      tf2_->transform(*cloud_msg, *cloud, target_frame_, ros::Duration(tolerance_));
+      tf2_->transform(*cloud_msg, *cloud, target_frame_, ros::Duration(tolerance_));//点的坐标变换
       cloud_out = cloud;
     }
-    catch (tf2::TransformException& ex)
+    catch (tf2::TransformException &ex)
     {
       NODELET_ERROR_STREAM("Transform failure: " << ex.what());
       return;
     }
   }
-  else
+  else // the same frame_id
   {
     cloud_out = cloud_msg;
   }
@@ -243,14 +249,14 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
       output.ranges[index] = range;
     }
   }
-  
+
   times++;
-  if (times == 40){
-     times=0;
-     pub_.publish(output);
+  if (times == 40)
+  {
+    times = 0;
+    pub_.publish(output);
   }
-  
-}
-}  // namespace pointcloud_to_laserscan
+} //end of scloudCb
+} // namespace pointcloud_to_laserscan
 
 PLUGINLIB_EXPORT_CLASS(pointcloud_to_laserscan::PointCloudToLaserScanNodelet, nodelet::Nodelet)
