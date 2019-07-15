@@ -40,15 +40,18 @@
 
 namespace global_planner {
 
+// yaw angle ==> pose orientation
 void set_angle(geometry_msgs::PoseStamped* pose, double angle)
 {
     pose->pose.orientation = tf::createQuaternionMsgFromYaw(angle); 
 }
 
+// pose orientation ==> yaw angle
 double getYaw(geometry_msgs::PoseStamped pose)
 {
     return tf::getYaw(pose.pose.orientation);
 }
+
 
 void OrientationFilter::processPath(const geometry_msgs::PoseStamped& start, 
                                     std::vector<geometry_msgs::PoseStamped>& path)
@@ -104,7 +107,8 @@ void OrientationFilter::processPath(const geometry_msgs::PoseStamped& start,
             break;           
     }
 }
-    
+
+//     
 void OrientationFilter::setAngleBasedOnPositionDerivative(std::vector<geometry_msgs::PoseStamped>& path, int index)
 {
   int index0 = std::max(0, index - window_size_);

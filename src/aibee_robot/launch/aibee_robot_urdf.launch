@@ -1,0 +1,13 @@
+<launch>
+<!-- 显示机器人的底盘 -->
+	<param name="robot_description" textfile="$(find aibee_robot)/config/vr_bot.urdf" />
+
+	<!-- 设置GUI参数，显示关节控制插件 -->
+	<param name="use_gui" value="true"/>
+	
+	<!-- 运行robot_state_publisher节点，发布tf  -->
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+	
+	<!-- 运行rviz可视化界面 -->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find aibee_robot)/rviz/gazebo_global_navi.rviz" required="true" />
+</launch>

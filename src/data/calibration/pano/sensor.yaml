@@ -1,0 +1,20 @@
+# General sensor definitions.
+sensor_type: camera
+comment: VI-Sensor panoman (CANON)
+
+# Sensor extrinsics wrt. the body-frame.
+T_BS:
+  cols: 4
+  rows: 4
+  data: [0.981480122, -0.0177714508, -0.190738648, 0.0151510173,
+  0.190335274, -0.022155473, 0.981468916, 0.0153334141,
+  -0.0216680467, -0.999596536, -0.0183626227, 0.681355596,
+  0, 0, 0, 1]
+
+# Camera specific definitions.
+rate_hz: 0
+resolution: [4160, 4160]
+camera_model: pinhole
+intrinsics: [1425.4556671971925, 1424.0639319951611, 2084.0176814305337, 2085.1000704040875]
+distortion_model: equidistant
+distortion_coefficients: [-0.050056235538485434, 0.0064848215024588653, -0.00031137594835744636, -0.00036751183052368932]

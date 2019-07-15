@@ -112,7 +112,7 @@
     <node name="obstable_navigatoin" pkg="obstable_navigatoin" type="obstable_navigatoin_node" output="screen" >
     </node> -->
 <node pkg="cmd_control" type="auto_move_node"  name="auto_move_node" output="screen" >
-  <param name="waypoints_num" value="5"/>
+  <param name="auto_move/waypoints_num" value="3"/>
 </node>
 
 <!-- 运行rviz -->

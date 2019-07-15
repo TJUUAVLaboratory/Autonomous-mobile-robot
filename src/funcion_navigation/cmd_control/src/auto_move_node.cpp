@@ -136,19 +136,20 @@ int main(int argc, char *argv[])
     ros::AsyncSpinner spinner(4);
     spinner.start();
 
+    bool  forward_flag = true;
+    std::deque<geometry_msgs::PointStamped>::iterator forward_goal = waypoints_in.begin();
     while (ros::ok())
     {
         if (!waypoints_in.empty())
         {   
-            
             ROS_INFO("the auto move thread");
             move_base_msgs::MoveBaseGoal goal;
 
-            goal.target_pose.header.frame_id = waypoints_in.front().header.frame_id;
+            goal.target_pose.header.frame_id = (*forward_goal).header.frame_id;
             goal.target_pose.header.stamp = ros::Time::now();
 
-            goal.target_pose.pose.position.x = waypoints_in.front().point.x;
-            goal.target_pose.pose.position.y = waypoints_in.front().point.y;
+            goal.target_pose.pose.position.x = (*forward_goal).point.x;
+            goal.target_pose.pose.position.y = (*forward_goal).point.y;
             goal.target_pose.pose.position.z = 0;
 
             goal.target_pose.pose.orientation.x = 0;
@@ -158,10 +159,20 @@ int main(int argc, char *argv[])
 
             // movebase_client.sendGoal(goal);
             movebase_client.sendGoalAndWait(goal, ros::Duration(20), ros::Duration(20));
-            //add to next list
-            waypoints_out.push_front(waypoints_in.front());
-            waypoints_in.pop_front();
-            ROS_INFO_STREAM("the remanent waywaypoints_in: " << waypoints_in.size());
+            
+            if(forward_flag)
+            {
+              forward_goal++;
+              if(forward_goal == waypoints_in.end())
+               forward_flag = false;
+            }
+            if(!forward_flag)
+            {
+              forward_goal--;
+              if(forward_goal == waypoints_in.begin())
+               forward_flag = true;
+            }
+            
             // bool finished_within_time = movebase_client.waitForResult(ros::Duration(60));
             // if (!finished_within_time)
             // {
@@ -175,11 +186,7 @@ int main(int argc, char *argv[])
             //     if(status == actionlib::SimpleClientGoalState::StateEnum::SUCCEEDED)
             //         continue;
             // }
-            if (waypoints_in.empty())
-            {
-                waypoints_in = waypoints_out;
-                waypoints_out.clear();
-            }
+
         }
 
         rate_loop.sleep();
