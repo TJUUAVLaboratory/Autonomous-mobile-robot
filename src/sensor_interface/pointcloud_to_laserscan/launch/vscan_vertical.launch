@@ -10,14 +10,14 @@
             # target_frame: rslidar # Leave disabled to output scan in pointcloud frame
             target_frame: base_link
             transform_tolerance: 0.01
-            min_height: -0.5
-            max_height: 2.0
+            min_height: 0.05
+            max_height: 1.5
 
             angle_min: -3.1415926 # -M_PI
             angle_max: 3.1415926 # M_PI
             angle_increment: 0.001 # 0.17degree
             scan_time: 0.1
-            range_min: 0.2
+            range_min: 0.30
             range_max: 100
             use_inf: false
             inf_epsilon: 1.0
