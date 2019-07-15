@@ -15,6 +15,9 @@
 
 <!-- ***************************** ROS Navigation ************************************ -->
 
+<!-- aibee_robot urdf -->
+<include file="$(find aibee_robot)/launch/aibee_robot_urdf.launch" />
+
 <!--map server 提供 /map -->
 <arg name="map" default="office_map/map_office.yaml" />
 <node name="map_server" pkg="map_server" type="map_server" args="$(find aibee_robot)/maps/$(arg map)">
