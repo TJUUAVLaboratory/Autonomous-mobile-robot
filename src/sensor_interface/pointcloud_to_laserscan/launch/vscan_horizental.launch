@@ -2,7 +2,7 @@
 
 <launch>
     <!-- run pointcloud_to_laserscan node -->
-    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan" output="screen">
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="laserscan_horizental" output="screen">
 
         <remap from="cloud_in" to="/static_velodyne/velodyne_points"/>
         
