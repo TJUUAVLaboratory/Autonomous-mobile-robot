@@ -9,5 +9,5 @@
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 	
 	<!-- 运行rviz可视化界面 -->
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find aibee_robot)/rviz/gazebo_global_navi.rviz" required="true" />
+	<!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find aibee_robot)/rviz/gazebo_global_navi.rviz" required="true" /> -->
 </launch>
