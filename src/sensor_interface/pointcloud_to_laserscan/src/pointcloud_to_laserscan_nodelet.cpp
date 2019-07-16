@@ -183,8 +183,8 @@ void PointCloudToLaserScanNodelet::cloudCb(const sensor_msgs::PointCloud2ConstPt
   sensor_msgs::PointCloud2Ptr cloud;
 
   // Transform cloud if necessary
-  ROS_WARN_STREAM("input Pointcloud2 frame_id"<< cloud_msg->header.frame_id);
-  ROS_WARN_STREAM("output LaserScan  frame_id"<< output.header.frame_id);
+  // ROS_WARN_STREAM("input Pointcloud2 frame_id"<< cloud_msg->header.frame_id);
+  // ROS_WARN_STREAM("output LaserScan  frame_id"<< output.header.frame_id);
   if (!(output.header.frame_id == cloud_msg->header.frame_id))
   {
     try

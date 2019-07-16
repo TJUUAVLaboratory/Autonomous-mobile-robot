@@ -31,7 +31,7 @@
 <include file="$(find wheel_speed_odo)/launch/odom_use_simtime.launch"/> 
 
 <!--pointCloud to Laserscan 提供/scan  vertical and horizental-->
-<!-- <include file="$(find pointcloud_to_laserscan)/launch/vscan_horizental.launch"/> -->
+<include file="$(find pointcloud_to_laserscan)/launch/vscan_horizental.launch"/>
 <include file="$(find pointcloud_to_laserscan)/launch/vscan_vertical.launch"/>
 
 <!--aibee_robot navigation action-->

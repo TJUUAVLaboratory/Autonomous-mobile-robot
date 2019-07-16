@@ -9,7 +9,7 @@ clearing_rotation_allowed: false
 # - base_local_planner/TrajectoryPlannerROS
 # - eband_local_planner/EBandPlannerROS
 # - teb_local_planner/TebLocalPlannerROS
-base_local_planner: teb_local_planner/TebLocalPlannerROS
+base_local_planner: eband_local_planner/EBandPlannerROS
 
 temp_costmap:
    global_frame: /map
@@ -102,10 +102,10 @@ TrajectoryPlannerROS:
 
 # EBandPlannerROS
 EBandPlannerROS:
-   max_vel_lin: 0.5
+   max_vel_lin: 0.45
    max_vel_th: 0.5
    max_acceleration: 0.3
-   max_translational_acceleration: 0.3
+   max_translational_acceleration: 0.25
    mae_rotational_acceleration: 0.3
 
    xy_goal_tolerance: 0.2
