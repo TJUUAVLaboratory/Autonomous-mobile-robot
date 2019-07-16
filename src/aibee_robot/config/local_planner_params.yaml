@@ -102,11 +102,11 @@ TrajectoryPlannerROS:
 
 # EBandPlannerROS
 EBandPlannerROS:
-   max_vel_lin: 0.45
-   max_vel_th: 0.5
-   max_acceleration: 0.3
-   max_translational_acceleration: 0.25
-   mae_rotational_acceleration: 0.3
+   max_vel_lin: 0.4
+   max_vel_th: 0.4
+   max_acceleration: 0.2
+   max_translational_acceleration: 0.2
+   mae_rotational_acceleration: 0.2
 
    xy_goal_tolerance: 0.2
    yaw_goal_tolerance: 0.175

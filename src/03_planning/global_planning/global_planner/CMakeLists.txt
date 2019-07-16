@@ -39,6 +39,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+## 生成global planner　lib
 add_library(${PROJECT_NAME}
   src/quadratic_calculator.cpp
   src/dijkstra.cpp
@@ -69,5 +70,6 @@ install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   PATTERN ".svn" EXCLUDE)
 
+## plugin
 install(FILES bgp_plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

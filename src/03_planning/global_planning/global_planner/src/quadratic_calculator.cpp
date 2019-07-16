@@ -29,13 +29,16 @@
 
 #include <global_planner/quadratic_calculator.h>
 
-namespace global_planner {
-float QuadraticCalculator::calculatePotential(float* potential, unsigned char cost, int n, float prev_potential) {
+namespace global_planner
+{
+// update poential[n] 附近的值
+float QuadraticCalculator::calculatePotential(float *potential, unsigned char cost, int n, float prev_potential)
+{
     // get neighbors
     float u, d, l, r;
     l = potential[n - 1];
     r = potential[n + 1];
-    u = potential[n - nx_];
+    u = potential[n - nx_];  //减去一行
     d = potential[n + nx_];
     //  ROS_INFO("[Update] c: %f  l: %f  r: %f  u: %f  d: %f\n",
     //     potential[n], l, r, u, d);
@@ -52,18 +55,18 @@ float QuadraticCalculator::calculatePotential(float* potential, unsigned char co
     else
         ta = d;
 
-    float hf = cost; // traversability factor
-    float dc = tc - ta;        // relative cost between ta,tc
+    float hf = cost;    // traversability factor
+    float dc = tc - ta; // relative cost between ta,tc
     if (dc < 0)         // tc is lowest
-            {
+    {
         dc = -dc;
         ta = tc;
     }
 
     // calculate new potential
-    if (dc >= hf)        // if too large, use ta-only update
+    if (dc >= hf) // if too large, use ta-only update
         return ta + hf;
-    else            // two-neighbor interpolation update
+    else // two-neighbor interpolation update
     {
         // use quadratic approximation
         // might speed this up through table lookup, but still have to
@@ -73,5 +76,4 @@ float QuadraticCalculator::calculatePotential(float* potential, unsigned char co
         return ta + hf * v;
     }
 }
-}
-
+} // namespace global_planner

@@ -53,10 +53,10 @@ global_costmap:
   
 ## GlobalPlanner
 GlobalPlanner:
-    old_navfn_behavior: true
-   # use_quadratic: true
-   #  use_dijkstra: false  ## false use A*
-   # use_grid_path: true ## false use Gradient Path
+    old_navfn_behavior: false
+   # use_quadratic: true   ## use Quadratic_Calculator or Potential_Calculator
+    use_dijkstra: true  ## use dijkstra or A*
+   # use_grid_path: true ## use GridPath or Gradient Path
 
 VoronoiPlanner:
    weight_data: 0.5

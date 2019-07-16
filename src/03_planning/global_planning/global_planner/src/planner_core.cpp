@@ -50,19 +50,20 @@
 //register this planner as a BaseGlobalPlanner plugin
 PLUGINLIB_EXPORT_CLASS(global_planner::GlobalPlanner, nav_core::BaseGlobalPlanner)
 
+//基于base_local_planner模板类的插件类
 namespace global_planner
 {
-
+// map边框
 void GlobalPlanner::outlineMap(unsigned char *costarr, int nx, int ny, unsigned char value)
 {
-    unsigned char *pc = costarr;
+    unsigned char *pc = costarr;//左上
     for (int i = 0; i < nx; i++)
         *pc++ = value;
-    pc = costarr + (ny - 1) * nx;
+    pc = costarr + (ny - 1) * nx;//左下
     for (int i = 0; i < nx; i++)
         *pc++ = value;
     pc = costarr;
-    for (int i = 0; i < ny; i++, pc += nx)
+    for (int i = 0; i < ny; i++, pc += nx)//第一列
         *pc = value;
     pc = costarr + nx - 1;
     for (int i = 0; i < ny; i++, pc += nx)
@@ -96,6 +97,13 @@ void GlobalPlanner::initialize(std::string name, costmap_2d::Costmap2DROS *costm
     initialize(name, costmap_ros->getCostmap(), costmap_ros->getGlobalFrameID());
 }
 
+/*
+-  p_calc_ = new QuadraticCalculator(cx, cy);         p_calc_ = new PotentialCalculator(cx, cy);
+-  planner = new DijkstraExpansion(p_calc_, cx, cy);  planner_ = new AStarExpansion(p_calc_, cx, cy);
+-  path_maker_ = new GridPath(p_calc_);               path_maker_ = new GradientPath(p_calc_);
+-  orientation_filter_ = new OrientationFilter();
+
+ */
 void GlobalPlanner::initialize(std::string name, costmap_2d::Costmap2D *costmap, std::string frame_id)
 {
     if (!initialized_)
@@ -150,7 +158,7 @@ void GlobalPlanner::initialize(std::string name, costmap_2d::Costmap2D *costmap,
 
         orientation_filter_ = new OrientationFilter();
 
-        plan_pub_ = private_nh.advertise<nav_msgs::Path>("plan", 1);
+        plan_pub_ = private_nh.advertise<nav_msgs::Path>("plan", 1); // ~/GlobalPlanner/plan
         potential_pub_ = private_nh.advertise<nav_msgs::OccupancyGrid>("potential", 1);
 
         private_nh.param("allow_unknown", allow_unknown_, true);
@@ -276,7 +284,7 @@ bool GlobalPlanner::makePlan(const geometry_msgs::PoseStamped &start, const geom
     double wy = start.pose.position.y;
 
     unsigned int start_x_i, start_y_i, goal_x_i, goal_y_i;
-    double start_x, start_y, goal_x, goal_y;
+    double start_x, start_y, goal_x, goal_y; // in the map position of start and goal
 
     if (!costmap_->worldToMap(wx, wy, start_x_i, start_y_i))
     {
@@ -315,7 +323,7 @@ bool GlobalPlanner::makePlan(const geometry_msgs::PoseStamped &start, const geom
 
     //clear the starting cell within the costmap because we know it can't be an obstacle
     tf::Stamped<tf::Pose> start_pose;
-    tf::poseStampedMsgToTF(start, start_pose);
+    tf::poseStampedMsgToTF(start, start_pose); 
     clearRobotCell(start_pose, start_x_i, start_y_i);
 
     int nx = costmap_->getSizeInCellsX(), ny = costmap_->getSizeInCellsY();
@@ -463,7 +471,7 @@ void GlobalPlanner::publishPotential(float *potential)
 
     grid.data.resize(nx * ny);
 
-    float max = 0.0;
+    float max = 0.0; //the max potential value
     for (unsigned int i = 0; i < grid.data.size(); i++)
     {
         float potential = potential_array_[i];
@@ -478,12 +486,13 @@ void GlobalPlanner::publishPotential(float *potential)
 
     for (unsigned int i = 0; i < grid.data.size(); i++)
     {
+        // unassigned points
         if (potential_array_[i] >= POT_HIGH)
         {
             grid.data[i] = -1;
         }
         else
-            grid.data[i] = potential_array_[i] * publish_scale_ / max;
+            grid.data[i] = potential_array_[i] * publish_scale_ / max; //publish_scale_=100
     }
     potential_pub_.publish(grid);
 }

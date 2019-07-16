@@ -54,6 +54,7 @@
 #include <global_planner/orientation_filter.h>
 #include <global_planner/GlobalPlannerConfig.h>
 
+
 namespace global_planner {
 
 class Expander;
