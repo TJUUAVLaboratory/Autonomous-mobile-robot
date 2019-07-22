@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="robot_namespace" default="/"/>
+  <arg name="laser_enabled" default="$(optenv HUSKY_LMS1XX_ENABLED true)"/>
+  <arg name="kinect_enabled" default="$(optenv HUSKY_KINECT_ENABLED true)"/>
+
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="verbose" default="false"/>
+  <arg name="world_name" default="$(find gazebo_robot)/world/empty_cube.world"/>
+
+  <!-- Start gazebo and load the world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" >
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="debug" value="$(arg debug)"/>
+    <arg name="verbose" value="$(arg verbose)"/>
+    <arg name="world_name" value="$(arg world_name)"/>
+  </include>
+
+  <!-- Spawn the example robot -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find gazebo_robot)/robot/test_husky_car.xacro'
+    robot_namespace:=$(arg robot_namespace)
+    laser_enabled:=$(arg laser_enabled)
+    kinect_enabled:=$(arg kinect_enabled)
+
+  " />
+
+    <!-- Load config-->
+  <!-- <rosparam command="load" file="$(find gazebo_robot)/sensors/husky/config/control.yaml" />
+  <rosparam command="load" file="$(find gazebo_robot)/sensors/husky/config/gazebo_interface.yaml" />
+  <node name="base_controller_spawner" pkg="controller_manager" type="spawner"
+        args="husky_joint_publisher husky_velocity_controller" >
+
+  </node> -->
+
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_model" args="-urdf -param /robot_description -model example"/>
+  
+  <!-- publish Lidar message -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="30.0" />
+  </node>
+
+  <!-- RViz -->
+  <arg name="rviz" default="true"/>
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="$(anon rviz)" respawn="false" output="screen" args="-d $(find gazebo_robot)/rviz/test_husky_car.rviz" />
+
+</launch>

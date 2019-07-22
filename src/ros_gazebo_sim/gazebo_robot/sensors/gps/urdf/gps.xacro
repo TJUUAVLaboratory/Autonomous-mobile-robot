@@ -1,0 +1,45 @@
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="gps">
+<xacro:macro name="gps" params=" robot_namespace:=/  ">
+
+  <link name="gps_link" >
+    <visual>
+      <geometry>
+        <box size="0.03 0.03 0.01" />
+        <material name="Red" />
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.03 0.03 0.01" />
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="3.0" ixy="0.0" ixz="0.0"
+               iyy="3.0" iyz="0.0"
+               izz="3.0" />
+    </inertial>
+  </link>
+
+ <gazebo reference="gps_link">
+  </gazebo>
+
+  <gazebo>
+    <plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+      <robotNamespace>$(arg robot_namespace)</robotNamespace>
+      <updateRate>40</updateRate>
+      <bodyName>base_link</bodyName>
+      <frameId>base_link</frameId>
+      <topicName>navsat/fix</topicName>
+      <velocityTopicName>navsat/vel</velocityTopicName>
+      <referenceLatitude>49.9</referenceLatitude>
+      <referenceLongitude>8.9</referenceLongitude>
+      <referenceHeading>0</referenceHeading>
+      <referenceAltitude>0</referenceAltitude>
+      <drift>0.0001 0.0001 0.0001</drift>
+    </plugin>
+  </gazebo>
+
+    </xacro:macro>
+</robot>

@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="robot_namespace" default="/"/>
+  <arg name="usb_camera_enabled" default="false"/>
+  <arg name="kinect_enabled" default="true"/>
+  <arg name="sick_lms1xx_enabled" default="false"/>
+  <arg name="velodyne16_enabled" default="true"/>
+  <arg name="velodyne32_enabled" default="false"/>
+  <arg name="imu_enabled" default="true"/>
+  <arg name="gps_enabled" default="true"/>
+
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+  <arg name="verbose" default="false"/>
+  <arg name="world_name" default="$(find gazebo_robot)/world/empty_cube.world"/>
+
+  <!-- Start gazebo and load the world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" >
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="debug" value="$(arg debug)"/>
+    <arg name="verbose" value="$(arg verbose)"/>
+    <arg name="world_name" value="$(arg world_name)"/>
+  </include>
+
+  <!-- Spawn the example robot -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find gazebo_robot)/robot/mrobot_with_sensors.xacro'
+      robot_namespace:=$(arg robot_namespace)
+      usb_camera_enabled:=$(arg usb_camera_enabled)
+      kinect_enabled:=$(arg kinect_enabled)
+      sick_lms1xx_enabled:=$(arg sick_lms1xx_enabled)
+      velodyne16_enabled:=$(arg velodyne16_enabled)
+      velodyne32_enabled:=$(arg velodyne32_enabled)
+      imu_enabled:=$(arg imu_enabled)
+      gps_enabled:=$(arg gps_enabled)
+  
+  " />
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_model" args="-urdf -param /robot_description -model example"/>
+  
+  <!-- publish  message -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="30.0" />
+  </node>
+
+  <!-- RViz -->
+  <arg name="rviz" default="true"/>
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="$(anon rviz)" respawn="false" output="screen" args="-d $(find gazebo_robot)/rviz/test_kinect_camera.rviz" />
+
+</launch>

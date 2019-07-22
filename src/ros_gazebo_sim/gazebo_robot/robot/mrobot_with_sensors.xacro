@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<robot name="mrobot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:arg name="usb_camera_enabled" default="false" />
+    <xacro:arg name="kinect_enabled" default="false" />
+    <xacro:arg name="sick_lms1xx_enabled" default="false" />
+    <xacro:arg name="velodyne_16" default="false" />
+    <xacro:arg name="velodyne_32" default="false" />
+    <xacro:arg name="imu_enabled" default="false" />
+    <xacro:arg name="gps_enabled" default="false" />
+
+
+    <xacro:property name="M_PI" value="3.14159"/>
+    <xacro:arg name="robot_namespace" default="/" />
+
+    <!-- mrobot body ============================================================================================= -->
+    <xacro:include filename="$(find gazebo_robot)/sensors/mrobot/urdf/mrobot_body.urdf.xacro" />
+    <mrobot_body/>
+
+     <!-- usb camera module ======================================================================================= -->
+    <xacro:if value="$(arg usb_camera_enabled)">
+        <xacro:include filename="$(find gazebo_robot)/sensors/usb_camera/urdf/usb_camera.xacro" />
+
+        <xacro:property name="camera_offset_x" value="0.1" />
+        <xacro:property name="camera_offset_y" value="0" />
+        <xacro:property name="camera_offset_z" value="0.02" />
+
+        <!-- Camera-joint -->
+        <joint name="camera_joint" type="fixed">
+            <origin xyz="${camera_offset_x} ${camera_offset_y} ${camera_offset_z}" rpy="0 0 0" />
+            <parent link="plate_2_link"/>
+            <child link="camera_link"/>
+        </joint>
+
+        <xacro:usb_camera prefix="camera"/>
+    </xacro:if> <!-- usb camera module -->
+
+     <!-- kinect camera module ====================================================================================== -->
+    <xacro:if value="$(arg kinect_enabled)">
+        <xacro:include filename="$(find gazebo_robot)/sensors/kinect_camera/urdf/kinect_camera.urdf.xacro" />
+        <xacro:kinect_camera prefix="camera" robot_namespace="$(arg robot_namespace)"/>
+
+        <xacro:property name="kinect_offset_x" value="0.1" />
+        <xacro:property name="kinect_offset_y" value="0" />
+        <xacro:property name="kinect_offset_z" value="0.02" />
+
+        <joint name="kinect_joint" type="fixed">
+            <origin xyz="${kinect_offset_x} ${kinect_offset_y} ${kinect_offset_z}" rpy="0 0 0" />
+            <parent link="plate_1_link"/>
+            <child link="camera_link"/>
+        </joint>
+    </xacro:if> <!-- kinect camera module -->
+
+     <!-- sick_lms1xx_enabled module  ============================================================================================= -->
+    <xacro:if value="$(arg sick_lms1xx_enabled)">
+        <xacro:include filename="$(find gazebo_robot)/sensors/sick_lms1xx/urdf/sick_lms1xx_mount.urdf.xacro"/>
+        <xacro:sick_lms1xx_mount prefix="base" />
+        <sick_lms1xx frame="base_laser" topic="scan" robot_namespace="$(arg robot_namespace)"/>
+
+        <xacro:property name="sick_offset_x" value="0.1" />
+        <xacro:property name="sick_offset_y" value="0" />
+        <xacro:property name="sick_offset_z" value="0.02" />
+
+        <!-- sick_lms1xx_enabled-joint -->
+        <joint name="sick_lms1xx_joint" type="fixed">
+            <origin xyz="${sick_offset_x} ${sick_offset_y} ${sick_offset_z}" rpy="0 0 0" />
+            <parent link="plate_2_link"/>
+            <child link="base_laser_mount"/>
+        </joint>
+    </xacro:if> <!-- sick_lms1xx_enabled -->
+
+    <!-- imu_enabled module  ============================================================================================= -->
+    <xacro:if value="$(arg imu_enabled)">
+        <xacro:include filename="$(find gazebo_robot)/sensors/imu/urdf/um6_imu.urdf.xacro"/>
+        <xacro:um6_imu  robot_namespace="$(arg robot_namespace)"/>
+
+        <xacro:property name="imu_offset_x" value="0" />
+        <xacro:property name="imu_offset_y" value="0" />
+        <xacro:property name="imu_offset_z" value="0.02" />
+
+        <!-- imu_link-joint -->
+        <joint name="imu_link_joint" type="fixed">
+            <origin xyz="${imu_offset_x} ${imu_offset_y} ${imu_offset_z}" rpy="0 0 0" />
+            <parent link="plate_1_link"/>
+            <child link="imu_link"/>
+        </joint>
+    </xacro:if> <!-- imu_enabled -->    
+
+    <!-- gps_enabled module  ============================================================================================= -->
+    <xacro:if value="$(arg gps_enabled)">
+        <xacro:include filename="$(find gazebo_robot)/sensors/gps/urdf/gps.xacro"/>
+        <xacro:gps  robot_namespace="$(arg robot_namespace)"/>
+
+        <xacro:property name="gps_offset_x" value="0.1" />
+        <xacro:property name="gps_offset_y" value="0.1" />
+        <xacro:property name="gps_offset_z" value="0.02" />
+
+        <!-- gps_link-joint -->
+        <joint name="gps_link_joint" type="fixed">
+            <origin xyz="${gps_offset_x} ${gps_offset_y} ${gps_offset_z}" rpy="0 0 0" />
+            <parent link="plate_1_link"/>
+            <child link="gps_link"/>
+        </joint>
+    </xacro:if> <!-- gps_enabled -->    
+
+    <!-- velodyne16_enabled module  ============================================================================================= -->
+    <xacro:if value="$(arg velodyne16_enabled)">
+        <xacro:arg name="gpu" default="false"/>
+        <xacro:property name="gpu" value="$(arg gpu)" />
+
+        <xacro:property name="velodyne_16_offset_x" value="0" />
+        <xacro:property name="velodyne_16_offset_y" value="0" />
+        <xacro:property name="velodyne_16_offset_z" value="0.02" />
+
+        <xacro:include filename="$(find gazebo_robot)/sensors/velodyne/urdf/VLP-16.urdf.xacro"/>
+        <VLP-16 parent="plate_2_link" name="velodyne" topic="/velodyne_points" hz="10" samples="440" gpu="${gpu}">
+        <origin xyz="${velodyne_16_offset_x} ${velodyne_16_offset_y} ${velodyne_16_offset_z}" rpy="0 0 0" />
+        </VLP-16>
+    </xacro:if> <!-- velodyne16_enabled -->    
+
+
+    <!-- velodyne32_enabled module  ============================================================================================= -->
+    <xacro:if value="$(arg velodyne32_enabled)">
+        <xacro:arg name="gpu" default="false"/>
+        <xacro:property name="gpu" value="$(arg gpu)" />
+
+        <xacro:property name="velodyne_32_offset_x" value="0" />
+        <xacro:property name="velodyne_32_offset_y" value="0" />
+        <xacro:property name="velodyne_32_offset_z" value="0.13" />
+
+        <xacro:include filename="$(find gazebo_robot)/sensors/velodyne/urdf/HDL-32E.urdf.xacro"/>
+        <HDL-32E parent="base_link" name="velodyne2" topic="/velodyne_points2" hz="10" samples="220" gpu="${gpu}">
+        <origin xyz="${velodyne_32_offset_x} ${velodyne_32_offset_y} ${velodyne_32_offset_z}" rpy="0 0 0" />
+        </HDL-32E>
+    </xacro:if> <!-- velodyne32_enabled -->    
+
+</robot>

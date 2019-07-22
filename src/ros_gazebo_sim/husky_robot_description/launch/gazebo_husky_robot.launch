@@ -1,0 +1,78 @@
+<launch>
+  <arg name="multimaster" default="true"/>
+    <!-- sensor enable -->
+  <arg name="robot_namespace" default="/"/>
+  <arg name="laser_enabled" default="$(optenv HUSKY_LMS1XX_ENABLED true)"/>
+  <arg name="kinect_enabled" default="$(optenv HUSKY_KINECT_ENABLED true)"/>
+  <arg name="urdf_extras" default="$(optenv HUSKY_URDF_EXTRAS)"/>
+  <!-- <arg name="multimaster" default="true" /> -->
+  
+  
+    <!-- <include file="$(find multimaster_launch)/launch/multimaster_robot.launch" if="$(arg multimaster)">
+    <arg name="gazebo_interface" value="$(find husky_robot_description)/config/gazebo_interface.yaml" />
+    <arg name="public_interface" value="$(find husky_robot_description)/config/public_interface.yaml" />
+    <arg name="robot_namespace" value="$(arg robot_namespace)"/>
+    <arg name="simulation" value="$(arg simulation)"/>
+  </include>
+ -->
+
+    <!-- 设置launch文件的参数 -->
+    <arg name="world_name" value="$(find husky_robot_description)/worlds/clearpath_playpen.world"/>
+    <arg name="paused" default="false"/>
+    <arg name="use_sim_time" default="true"/>
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false"/>
+    <arg name="debug" default="false"/>
+
+    <!-- 运行gazebo仿真环境 -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(arg world_name)" />
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+        <arg name="headless" value="$(arg headless)"/>
+    </include>
+
+    <!-- 加载机器人模型描述参数 -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find husky_robot_description)/urdf/husky.urdf.xacro'
+    --inorder
+    robot_namespace:=$(arg robot_namespace)
+    laser_enabled:=$(arg laser_enabled)
+    kinect_enabled:=$(arg kinect_enabled)
+    urdf_extras:=$(arg urdf_extras)
+    " />
+
+  <!-- Load controller configuration   差速轮控制　/cmd_vel  /odom-->
+  <rosparam command="load" file="$(find husky_robot_description)/config/control.yaml" />
+    <!-- Spawn controllers -->
+  <node name="base_controller_spawner" pkg="controller_manager" type="spawner"
+        args="husky_joint_publisher husky_velocity_controller" >
+
+  </node>
+
+  <!-- Start EKF for localization  状态估计　/odometry/filtered -->
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization">
+    <rosparam command="load" file="$(find husky_robot_description)/config/localization.yaml" />
+  </node>
+
+  <node pkg="interactive_marker_twist_server" type="marker_server" name="twist_marker_server" output="screen"/>
+
+  <node pkg="twist_mux" type="twist_mux" name="twist_mux">
+    <rosparam command="load" file="$(find husky_robot_description)/config/twist_mux.yaml" />
+    <remap from="cmd_vel_out" to="husky_velocity_controller/cmd_vel"/>
+  </node>
+
+    <!-- 运行joint_state_publisher节点，发布机器人的关节状态  -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ></node> 
+
+    <!-- 运行robot_state_publisher节点，发布tf  -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"  output="screen" >
+        <param name="publish_frequency" type="double" value="50.0" />
+    </node>
+
+    <!-- 在gazebo中加载机器人模型-->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+          args="-urdf -model mrobot -param robot_description"/> 
+
+</launch>
