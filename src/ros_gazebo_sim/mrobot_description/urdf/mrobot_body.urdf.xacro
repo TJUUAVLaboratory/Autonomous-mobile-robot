@@ -299,5 +299,10 @@
             </plugin>
         </gazebo> 
 
+
+    <!-- s1_front -->
+    <xacro:include filename="$(find gazebo_robot)/sensors/sonar/urdf/sonar.xacro"/>
+    <xacro:sonar parent="plate_2_link" pos="s1" xyz="0.12 0 0.02 " rpy="0 -3.1415 3.1415" />
+
     </xacro:macro>
 </robot>

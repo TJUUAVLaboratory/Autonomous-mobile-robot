@@ -20,11 +20,11 @@
       </collision>
     </link>
 
-    <!-- <joint name="${pos}_sonar_joint" type="fixed">
+    <joint name="${pos}_sonar_joint" type="fixed">
         <origin xyz="${xyz}" rpy="${rpy}"/>
         <parent link="${parent}"/>
         <child link="${pos}_sonar"/>
-    </joint> -->
+    </joint>
 
     <gazebo reference="${pos}_sonar">
       <sensor type="ray" name="sonar">

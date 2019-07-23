@@ -8,6 +8,7 @@
     <xacro:arg name="velodyne_32" default="false" />
     <xacro:arg name="imu_enabled" default="false" />
     <xacro:arg name="gps_enabled" default="false" />
+    <xacro:arg name="mulit_sonars_enabled" default="false" />    
 
 
     <xacro:property name="M_PI" value="3.14159"/>
@@ -57,9 +58,9 @@
         <xacro:sick_lms1xx_mount prefix="base" />
         <sick_lms1xx frame="base_laser" topic="scan" robot_namespace="$(arg robot_namespace)"/>
 
-        <xacro:property name="sick_offset_x" value="0.1" />
+        <xacro:property name="sick_offset_x" value="0" />
         <xacro:property name="sick_offset_y" value="0" />
-        <xacro:property name="sick_offset_z" value="0.02" />
+        <xacro:property name="sick_offset_z" value="0.001" />
 
         <!-- sick_lms1xx_enabled-joint -->
         <joint name="sick_lms1xx_joint" type="fixed">
@@ -76,7 +77,7 @@
 
         <xacro:property name="imu_offset_x" value="0" />
         <xacro:property name="imu_offset_y" value="0" />
-        <xacro:property name="imu_offset_z" value="0.02" />
+        <xacro:property name="imu_offset_z" value="0.001" />
 
         <!-- imu_link-joint -->
         <joint name="imu_link_joint" type="fixed">
@@ -91,14 +92,14 @@
         <xacro:include filename="$(find gazebo_robot)/sensors/gps/urdf/gps.xacro"/>
         <xacro:gps  robot_namespace="$(arg robot_namespace)"/>
 
-        <xacro:property name="gps_offset_x" value="0.1" />
-        <xacro:property name="gps_offset_y" value="0.1" />
-        <xacro:property name="gps_offset_z" value="0.02" />
+        <xacro:property name="gps_offset_x" value="0" />
+        <xacro:property name="gps_offset_y" value="0" />
+        <xacro:property name="gps_offset_z" value="0.001" />
 
         <!-- gps_link-joint -->
         <joint name="gps_link_joint" type="fixed">
             <origin xyz="${gps_offset_x} ${gps_offset_y} ${gps_offset_z}" rpy="0 0 0" />
-            <parent link="plate_1_link"/>
+            <parent link="base_link"/>
             <child link="gps_link"/>
         </joint>
     </xacro:if> <!-- gps_enabled -->    
@@ -133,5 +134,25 @@
         <origin xyz="${velodyne_32_offset_x} ${velodyne_32_offset_y} ${velodyne_32_offset_z}" rpy="0 0 0" />
         </HDL-32E>
     </xacro:if> <!-- velodyne32_enabled -->    
+
+    <!-- mulit_sonars_enabled module  ============================================================================================= -->
+    <xacro:if value="$(arg mulit_sonars_enabled)">
+
+    <!-- s1_front -->
+    <xacro:include filename="$(find gazebo_robot)/sensors/sonar/urdf/sonar.xacro"/>
+    <xacro:sonar parent="plate_2_link" pos="s1" xyz="0.12 0 0.02 " rpy="0 -3.1415 3.1415" />
+
+    <!-- s2_front left -->
+    <xacro:include filename="$(find gazebo_robot)/sensors/sonar/urdf/sonar.xacro"/>
+    <xacro:sonar parent="plate_2_link" pos="s2" xyz="0.12 0.04 0.02 " rpy="0 -3.1415 -2.094" />
+
+    <!-- s2_front right -->
+    <xacro:include filename="$(find gazebo_robot)/sensors/sonar/urdf/sonar.xacro"/>
+    <xacro:sonar parent="plate_2_link" pos="s3" xyz="0.12 -0.04 0.02 " rpy="0 -3.1415 2.094" />
+
+    <!-- back -->
+    <xacro:include filename="$(find gazebo_robot)/sensors/sonar/urdf/sonar.xacro"/>
+    <xacro:sonar parent="plate_2_link" pos="s4" xyz="-0.12 0 0.02 " rpy="0 -3.1415 0" />
+    </xacro:if> <!-- mulit-sonars_enabled  -->        
 
 </robot>

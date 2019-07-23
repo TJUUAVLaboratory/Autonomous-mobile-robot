@@ -1,6 +1,6 @@
 <launch>
 <!-- 显示机器人的底盘 -->
-	<param name="robot_description" textfile="$(find aibee_robot)/config/vr_bot.urdf" />
+	<param name="robot_description" textfile="$(find aibee_robot)/config/vr_bot.xacro" />
 
 	<!-- 设置GUI参数，显示关节控制插件 -->
 	<param name="use_gui" value="true"/>

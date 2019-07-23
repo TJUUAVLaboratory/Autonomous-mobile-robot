@@ -1,16 +1,15 @@
 <?xml version="1.0" ?>
 <launch>
+  <arg name="rviz" default="false"/>
   <arg name="robot_namespace" default="/"/>
   <arg name="usb_camera_enabled" default="false"/>
-  <arg name="kinect_enabled" default="true"/>
+  <arg name="kinect_enabled" default="false"/>
   <arg name="sick_lms1xx_enabled" default="false"/>
   <arg name="velodyne16_enabled" default="true"/>
   <arg name="velodyne32_enabled" default="false"/>
   <arg name="imu_enabled" default="true"/>
-  <arg name="gps_enabled" default="true"/>
+  <arg name="gps_enabled" default="false"/>
   <arg name="mulit_sonars_enabled" default="true"/>
-
-  
 
   <arg name="paused" default="false"/>
   <arg name="use_sim_time" default="true"/>
@@ -18,7 +17,7 @@
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
   <arg name="verbose" default="false"/>
-  <arg name="world_name" default="$(find gazebo_robot)/world/empty_cube.world"/>
+  <arg name="world_name" default="$(find gazebo_robot)/world/cloister.world"/>
 
   <!-- Start gazebo and load the world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch" >
@@ -52,7 +51,6 @@
   </node>
 
   <!-- RViz -->
-  <arg name="rviz" default="true"/>
-  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="$(anon rviz)" respawn="false" output="screen" args="-d $(find gazebo_robot)/rviz/mrobot_with_sensors.rviz" />
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="$(anon rviz)" respawn="false" output="screen" args="-d $(find gazebo_robot)/rviz/mrobot_with_sick_sonars.rviz" />
 
 </launch>

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<robot name="mrobot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<xacro:include filename="$(find mrobot_description)/urdf/mrobot_body.urdf.xacro" />
+	<xacro:include filename="$(find mrobot_description)/urdf/rplidar.xacro" />
+
+	<xacro:property name="rplidar_offset_x" value="0" />
+	<xacro:property name="rplidar_offset_y" value="0" />
+	<xacro:property name="rplidar_offset_z" value="0.028" />
+
+	<!-- MRobot机器人平台-->
+	<mrobot_body/>
+
+	<!-- rplidar -->
+	<joint name="rplidar_joint" type="fixed">
+		<origin xyz="${rplidar_offset_x} ${rplidar_offset_y} ${rplidar_offset_z}" rpy="0 0 0" />
+		<parent link="plate_2_link"/>
+		<child link="laser_link"/>
+	</joint>
+	<xacro:rplidar prefix="laser"/>
+
+
+    <!-- s1_front -->
+    <xacro:include filename="$(find gazebo_robot)/sensors/sonar/urdf/sonar.xacro"/>
+    <xacro:sonar parent="plate_2_link" pos="s1" xyz="0.12 0 0.02 " rpy="0 -3.1415 3.1415" />
+
+    <!-- s2_front left -->
+    <xacro:include filename="$(find gazebo_robot)/sensors/sonar/urdf/sonar.xacro"/>
+    <xacro:sonar parent="plate_2_link" pos="s2" xyz="0.12 0.04 0.02 " rpy="0 -3.1415 -2.094" />
+
+    <!-- s2_front right -->
+    <xacro:include filename="$(find gazebo_robot)/sensors/sonar/urdf/sonar.xacro"/>
+    <xacro:sonar parent="plate_2_link" pos="s3" xyz="0.12 -0.04 0.02 " rpy="0 -3.1415 2.094" />
+
+    <!-- back -->
+    <xacro:include filename="$(find gazebo_robot)/sensors/sonar/urdf/sonar.xacro"/>
+    <xacro:sonar parent="plate_2_link" pos="s4" xyz="-0.12 0 0.02 " rpy="0 -3.1415 0" />
+
+</robot>

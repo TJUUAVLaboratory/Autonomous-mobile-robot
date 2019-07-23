@@ -1,17 +1,5 @@
 <?xml version="1.0" ?>
 <launch>
-  <arg name="robot_namespace" default="/"/>
-  <arg name="usb_camera_enabled" default="false"/>
-  <arg name="kinect_enabled" default="true"/>
-  <arg name="sick_lms1xx_enabled" default="false"/>
-  <arg name="velodyne16_enabled" default="true"/>
-  <arg name="velodyne32_enabled" default="false"/>
-  <arg name="imu_enabled" default="true"/>
-  <arg name="gps_enabled" default="true"/>
-  <arg name="mulit_sonars_enabled" default="true"/>
-
-  
-
   <arg name="paused" default="false"/>
   <arg name="use_sim_time" default="true"/>
   <arg name="gui" default="true"/>
@@ -32,27 +20,16 @@
   </include>
 
   <!-- Spawn the example robot -->
-  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find gazebo_robot)/robot/mrobot_with_sensors.xacro'
-      robot_namespace:=$(arg robot_namespace)
-      usb_camera_enabled:=$(arg usb_camera_enabled)
-      kinect_enabled:=$(arg kinect_enabled)
-      sick_lms1xx_enabled:=$(arg sick_lms1xx_enabled)
-      velodyne16_enabled:=$(arg velodyne16_enabled)
-      velodyne32_enabled:=$(arg velodyne32_enabled)
-      imu_enabled:=$(arg imu_enabled)
-      gps_enabled:=$(arg gps_enabled)
-      mulit_sonars_enabled:=$(arg mulit_sonars_enabled)
-  
-  " />
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find gazebo_robot)/robot/test_rplidar.xacro'" />
   <node pkg="gazebo_ros" type="spawn_model" name="spawn_model" args="-urdf -param /robot_description -model example"/>
   
-  <!-- publish  message -->
+  <!-- publish Lidar message -->
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
     <param name="publish_frequency" type="double" value="30.0" />
   </node>
 
   <!-- RViz -->
   <arg name="rviz" default="true"/>
-  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="$(anon rviz)" respawn="false" output="screen" args="-d $(find gazebo_robot)/rviz/mrobot_with_sensors.rviz" />
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="$(anon rviz)" respawn="false" output="screen" args="-d $(find gazebo_robot)/rviz/test_sick_lms1xx.rviz" />
 
 </launch>

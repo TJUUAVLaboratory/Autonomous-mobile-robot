@@ -41,9 +41,9 @@
 
 PLUGINLIB_EXPORT_CLASS(costmap_2d::ObstacleLayer, costmap_2d::Layer)
 
-using costmap_2d::NO_INFORMATION;
-using costmap_2d::LETHAL_OBSTACLE;
-using costmap_2d::FREE_SPACE;
+using costmap_2d::NO_INFORMATION;//255
+using costmap_2d::LETHAL_OBSTACLE;//254
+using costmap_2d::FREE_SPACE;//0
 
 using costmap_2d::ObservationBuffer;
 using costmap_2d::Observation;
@@ -51,6 +51,7 @@ using costmap_2d::Observation;
 namespace costmap_2d
 {
 
+//init layer
 void ObstacleLayer::onInitialize()
 {
   ros::NodeHandle nh("~/" + name_), g_nh;
@@ -59,9 +60,9 @@ void ObstacleLayer::onInitialize()
   bool track_unknown_space;
   nh.param("track_unknown_space", track_unknown_space, layered_costmap_->isTrackingUnknown());
   if (track_unknown_space)
-    default_value_ = NO_INFORMATION;
+    default_value_ = NO_INFORMATION;//255
   else
-    default_value_ = FREE_SPACE;
+    default_value_ = FREE_SPACE;//0
 
   ObstacleLayer::matchSize();
   current_ = true;
@@ -430,7 +431,7 @@ void ObstacleLayer::updateFootprint(double robot_x, double robot_y, double robot
     }
 }
 
-//怎么更新map的cost value
+//怎么更新map的cost的
 void ObstacleLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
 {
   if (!enabled_)

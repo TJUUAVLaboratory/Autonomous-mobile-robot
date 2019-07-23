@@ -8,6 +8,7 @@
 	<xacro:property name="rplidar_offset_y" value="0" />
 	<xacro:property name="rplidar_offset_z" value="0.028" />
 
+
 	<!-- MRobot机器人平台-->
 	<mrobot_body/>
 
@@ -18,5 +19,7 @@
 		<child link="laser_link"/>
 	</joint>
 	<xacro:rplidar prefix="laser"/>
+
+
 
 </robot>

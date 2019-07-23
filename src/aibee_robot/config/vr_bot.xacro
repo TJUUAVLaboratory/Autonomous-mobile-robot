@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!--
   Copyright 2016 The Cartographer Authors
 
@@ -15,7 +16,8 @@
 -->
 
 <!-- robot -->
-<robot name="aibee_robot">
+<robot name="aibee_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+
   <material name="orange">
     <color rgba="1.0 0.5 0.2 1" />
   </material>
@@ -70,15 +72,6 @@
 
 
 
-    <link name="${pos}_sonar">
-      <visual>
-        <origin xyz="0 0 0" rpy="0 1.57 0"/>
-        <geometry>
-          <cylinder length="0.01" radius="0.01"/>
-        </geometry>
-      </visual>
-    </link>
-
 
 <!-- odom_child
   <link name="odom_child">
@@ -125,4 +118,5 @@
 <origin xyz="-0.00493858 0.102603 -0.801653" rpy="0.00584294 0.00656523 1.58415" />
   </joint> -->
 
+  </xacro:macro>
 </robot>

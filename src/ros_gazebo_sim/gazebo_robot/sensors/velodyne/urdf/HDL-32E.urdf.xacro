@@ -13,7 +13,7 @@
     <!-- HDL32E_base_link -->
     <link name="${name}_base_link">
       <inertial>
-        <mass value="1.0"/>
+        <mass value="0.010"/>
         <origin xyz="0 0 0.07212"/>
         <inertia ixx="${(1.0 * (3.0*0.04267*0.04267 + 0.14424*0.14424)) / 12.0}" ixy="0" ixz="0"
           iyy="${(1.0 * (3.0*0.04267*0.04267 + 0.14424*0.14424)) / 12.0}" iyz="0"
@@ -41,7 +41,7 @@
 
     <link name="${name}">
       <inertial>
-        <mass value="0.01"/>
+        <mass value="0.001"/>
         <origin xyz="0 0 0"/>
         <inertia ixx="1e-7" ixy="0" ixz="0" iyy="1e-7" iyz="0" izz="1e-7"/>
       </inertial>

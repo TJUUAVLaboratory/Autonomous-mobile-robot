@@ -293,8 +293,6 @@ namespace aibee_navi {
       ros::Subscriber laserScan_sub;
       ros::Subscriber velodyneData_sub;
       ros::Publisher  obstableMsg_pub;      
-
-      costmap_2d::Costmap2DROS*  temp_costmap;     
   };
 };
 #endif

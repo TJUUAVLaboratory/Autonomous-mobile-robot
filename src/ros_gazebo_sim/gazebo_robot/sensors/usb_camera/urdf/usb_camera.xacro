@@ -4,7 +4,7 @@
     <xacro:macro name="usb_camera" params="prefix:=camera">
         <link name="${prefix}_link">
             <inertial>
-                <mass value="0.1" />
+                <mass value="0.01" />
                 <origin xyz="0 0 0" />
                 <inertia ixx="0.01" ixy="0.0" ixz="0.0"
                          iyy="0.01" iyz="0.0"
