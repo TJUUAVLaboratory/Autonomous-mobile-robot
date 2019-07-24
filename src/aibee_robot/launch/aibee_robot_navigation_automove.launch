@@ -55,6 +55,6 @@
   <param name="waypoints_num" value="5"/>
 </node>
 
- <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/> -->
+ <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>
 
 </launch>
