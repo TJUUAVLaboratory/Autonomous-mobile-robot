@@ -59,17 +59,52 @@
     </visual>
   </link>
 
-<!-- vertical_vlp16_link  -->
-  <link name="vertical_vlp16_link">
-    <visual>
-      <origin xyz="0.0 0.0 0.0" />
-      <geometry>
-        <cylinder length="0.07" radius="0.05" />
-      </geometry>
-      <material name="gray" />
-    </visual>
-  </link>
 
+
+<!-- sonars sensor -->
+  <!-- UM6-IMU -->
+  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
+  <xacro:sonar parent="base_link" pos="m1" xyz="-0.3402  0.1611 0.0497 " rpy="0 1.57 0" />
+
+  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
+  <xacro:sonar parent="base_link" pos="m2" xyz="-0.1276 0.2838 0.0497 " rpy="0 1.57 0" />
+
+  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
+  <xacro:sonar parent="base_link" pos="m3" xyz="0.05 0.2693 0.0497 " rpy="0 1.57 0" />
+
+  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
+  <xacro:sonar parent="base_link" pos="m4" xyz="0.1514 0.1227 0.0497 " rpy="0 1.57 0" />
+
+  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
+  <xacro:sonar parent="base_link" pos="m5" xyz="0.1514 -0.1227 0.0497 " rpy="0 1.57 0" />
+
+  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
+  <xacro:sonar parent="base_link" pos="m6" xyz="0.05 -0.2693 0.0497 " rpy="0 1.57 0" />
+
+  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
+  <xacro:sonar parent="base_link" pos="m7" xyz="-0.1276 -0.2838 0.0497 " rpy="0 1.57 0" />
+
+  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
+  <xacro:sonar parent="base_link" pos="m8" xyz="-0.3402  -0.1611 0.0497" rpy="0 1.57 0" />
+
+  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
+  <xacro:sonar parent="base_link" pos="m9" xyz="0 0 0 " rpy="0 1.57 0" />
+
+<!-- rplidar sensor  -->
+    <link name="rplidar_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 1.57 0"/>
+        <geometry>
+          <cylinder length="0.05" radius="0.05"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="rplidar_link_joint" type="fixed">
+        <origin xyz="0.1127 0 0.013" rpy="0 1.57 0"/>
+        <parent link="base_link"/>
+        <child link="rplidar_link"/>
+    </joint>
 
 
 

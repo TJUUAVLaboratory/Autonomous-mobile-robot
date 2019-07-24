@@ -35,11 +35,6 @@
   </link>
 
 
-    <joint name="sonar_frame_joint" type="fixed">
-      <parent link="base_link"/>
-      <child link="m1_sonar"/>
-      <origin xyz="0 0 0.8" rpy="0 0 -3.14" />
-    </joint>
 
   <!-- UM6-IMU -->
   <xacro:include filename="$(find gazebo_robot)/sensors/sonar/urdf/sonar.xacro"/>
