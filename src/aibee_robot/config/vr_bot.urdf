@@ -145,7 +145,7 @@
     </link>
 
     <joint name="m2_sonar_joint" type="fixed">
-        <origin xyz="-0.1276 0.2838 0.0497 " rpy="0 0 0"/>
+        <origin xyz="-0.1276 0.2838 0.0497 " rpy="0 0 1.9933"/>
         <parent link="base_link"/>
         <child link="m2_sonar"/>
     </joint>
@@ -162,7 +162,7 @@
     </link>
 
     <joint name="m3_sonar_joint" type="fixed">
-        <origin xyz="0.05 0.2693 0.0497 " rpy="0 0 0"/>
+        <origin xyz="0.05 0.2693 0.0497 " rpy="0 0 -1.7544"/>
         <parent link="base_link"/>
         <child link="m3_sonar"/>
     </joint>
@@ -213,7 +213,7 @@
     </link>
 
     <joint name="m6_sonar_joint" type="fixed">
-        <origin xyz="0.05 -0.2693 0.0497 " rpy="0 0 0"/>
+        <origin xyz="0.05 -0.2693 0.0497 " rpy="0 0 -1.7544"/>
         <parent link="base_link"/>
         <child link="m6_sonar"/>
     </joint>
@@ -230,7 +230,7 @@
     </link>
 
     <joint name="m7_sonar_joint" type="fixed">
-        <origin xyz="-0.1276 -0.2838 0.0497 " rpy="0 1.57 0"/>
+        <origin xyz="-0.1276 -0.2838 0.0497 " rpy="0 0 -1.9933"/>
         <parent link="base_link"/>
         <child link="m7_sonar"/>
     </joint>    
@@ -247,12 +247,12 @@
     </link>
 
     <joint name="m8_sonar_joint" type="fixed">
-        <origin xyz="-0.3402  -0.1611 0.0497" rpy="0 0 2.699"/>
+        <origin xyz="-0.3402  -0.1611 0.0497" rpy="0 0 -2.699"/>
         <parent link="base_link"/>
         <child link="m8_sonar"/>
     </joint>
 
-<!-- m8 -->
+<!-- m9 -->
     <link name="m9_sonar">
       <visual>
         <origin xyz="0 0 0" rpy="0 1.57 0"/>
@@ -264,7 +264,7 @@
     </link>
 
     <joint name="m9_sonar_joint" type="fixed">
-        <origin xyz="0 0 0 " rpy="0 0 -3.1415" />
+        <origin xyz="-0.4165 0 0.0497 " rpy="0 0 -3.1415" />
         <parent link="base_link"/>
         <child link="m9_sonar"/>
     </joint>    
