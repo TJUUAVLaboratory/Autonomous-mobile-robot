@@ -51,11 +51,10 @@ local_costmap:
       observation_sources: scan
       scan: {data_type: LaserScan, topic: /singalScan0, marking: true, clearing: true, expected_update_rate: 0}
 
-    local_inflation_layer:
+   local_inflation_layer:
       inflation_radius: 0.35
       robot_radius:   0.5     ## robot footprint 300mm
       footprint: "[[-0.45, 0.0], [-0.4, 0.2], [-0.15,0.3], [0.10, 0.33],[0.20, 0.15], [0.20, -0.15], [0.10, -0.33], [-0.15, -0.3], [-0.4, -0.2]]"
-    
 
 
 ### inflation_layer
