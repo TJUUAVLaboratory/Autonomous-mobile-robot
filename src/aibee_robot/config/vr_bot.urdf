@@ -128,7 +128,7 @@
     </link>
 
     <joint name="m1_sonar_joint" type="fixed">
-        <origin xyz="-0.3402  0.1611 0.0497" rpy="0 0  -2.699"/>
+        <origin xyz="-0.3402  0.1611 0.0497" rpy="0 0  2.0131"/>
         <parent link="base_link"/>
         <child link="m1_sonar"/>
     </joint>
@@ -247,7 +247,7 @@
     </link>
 
     <joint name="m8_sonar_joint" type="fixed">
-        <origin xyz="-0.3402  -0.1611 0.0497" rpy="0 0 -2.699"/>
+        <origin xyz="-0.3402  -0.1611 0.0497" rpy="0 0 -2.0131"/>
         <parent link="base_link"/>
         <child link="m8_sonar"/>
     </joint>
