@@ -115,9 +115,58 @@
 
 
 <!-- sonars sensor -->
-  <!-- UM6-IMU -->
-  <include filename="$(find aibee_robot)/config/sonar.urdf"/>
-  <urdf:sonar parent="base_link" pos="m1" xyz="-0.3402  0.1611 0.0497 " rpy="0 1.57 0" />
+  <property name="sonar_radius" value="0.01"/>
+  <property name="sonar_height" value="0.01"/>
+<!-- m1 -->
+    <link name="m1_sonar">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 1.57 0"/>
+        <geometry>
+          <cylinder length="${sonar_height}" radius="${sonar_radius}"/>
+          <material name="yellow" />
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="m1_sonar_joint" type="fixed">
+        <origin xyz="-0.3402  0.1611 0.0497" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="m1_sonar"/>
+    </joint>
+
+<!-- m2 -->
+    <link name="m2_sonar">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 1.57 0"/>
+        <geometry>
+          <cylinder length="${sonar_height}" radius="${sonar_radius}"/>
+          <material name="yellow" />
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="m2_sonar_joint" type="fixed">
+        <origin xyz="-0.1276 0.2838 0.0497 " rpy="0 1.57 0"/>
+        <parent link="base_link"/>
+        <child link="m2_sonar"/>
+    </joint>
+
+<!-- m3 -->
+    <link name="m3_sonar">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 1.57 0"/>
+        <geometry>
+          <cylinder length="${sonar_height}" radius="${sonar_radius}"/>
+          <material name="yellow" />
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="m3_sonar_joint" type="fixed">
+        <origin xyz="0.05 0.2693 0.0497 " rpy="0 1.57 0"/>
+        <parent link="base_link"/>
+        <child link="m3_sonar"/>
+    </joint>
 
   <!-- <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
   <xacro:sonar parent="base_link" pos="m2" xyz="-0.1276 0.2838 0.0497 " rpy="0 1.57 0" />
