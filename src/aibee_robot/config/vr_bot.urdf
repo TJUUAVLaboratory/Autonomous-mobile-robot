@@ -100,7 +100,7 @@
 <!-- rplidar sensor  -->
     <link name="rplidar_link">
       <visual>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <origin xyz="0 0 0" rpy="0 1.57 0"/>
         <geometry>
           <cylinder length="0.05" radius="0.05"/>
         </geometry>
@@ -110,19 +110,18 @@
     <joint name="rplidar_link_joint" type="fixed">
         <parent link="base_link"/>
         <child link="rplidar_link"/>
-        <origin xyz="0.1127 0 0.013" rpy="0 1.57 0"/>
+        <origin xyz="0.1127 0 0.013" rpy="0 0 0"/>
     </joint>
 
 
 <!-- sonars sensor -->
-  <property name="sonar_radius" value="0.01"/>
-  <property name="sonar_height" value="0.01"/>
+
 <!-- m1 -->
     <link name="m1_sonar">
       <visual>
         <origin xyz="0 0 0" rpy="0 1.57 0"/>
         <geometry>
-          <cylinder length="${sonar_height}" radius="${sonar_radius}"/>
+          <cylinder length="0.01" radius="0.01"/>
           <material name="yellow" />
         </geometry>
       </visual>
@@ -139,7 +138,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 1.57 0"/>
         <geometry>
-          <cylinder length="${sonar_height}" radius="${sonar_radius}"/>
+          <cylinder length="0.01" radius="0.01"/>
           <material name="yellow" />
         </geometry>
       </visual>
@@ -156,7 +155,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 1.57 0"/>
         <geometry>
-          <cylinder length="${sonar_height}" radius="${sonar_radius}"/>
+          <cylinder length="0.01" radius="0.01"/>
           <material name="yellow" />
         </geometry>
       </visual>
