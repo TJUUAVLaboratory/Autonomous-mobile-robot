@@ -100,7 +100,7 @@
 <!-- rplidar sensor  -->
     <link name="rplidar_link">
       <visual>
-        <origin xyz="0 0 0" rpy="0 1.57 0"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
           <cylinder length="0.05" radius="0.05"/>
         </geometry>
@@ -116,10 +116,10 @@
 
 <!-- sonars sensor -->
   <!-- UM6-IMU -->
-  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
-  <xacro:sonar parent="base_link" pos="m1" xyz="-0.3402  0.1611 0.0497 " rpy="0 1.57 0" />
+  <include filename="$(find aibee_robot)/config/sonar.urdf"/>
+  <urdf:sonar parent="base_link" pos="m1" xyz="-0.3402  0.1611 0.0497 " rpy="0 1.57 0" />
 
-  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
+  <!-- <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
   <xacro:sonar parent="base_link" pos="m2" xyz="-0.1276 0.2838 0.0497 " rpy="0 1.57 0" />
 
   <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
@@ -141,14 +141,8 @@
   <xacro:sonar parent="base_link" pos="m8" xyz="-0.3402  -0.1611 0.0497" rpy="0 1.57 0" />
 
   <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
-  <xacro:sonar parent="base_link" pos="m9" xyz="0 0 0 " rpy="0 1.57 0" />
+  <xacro:sonar parent="base_link" pos="m9" xyz="0 0 0 " rpy="0 1.57 0" /> -->
 
 
-
-  <!-- <joint name="odom_child_joint" type="fixed">
-    <parent link="base_link" />
-    <child link="odom_child" />
-<origin xyz="-0.00493858 0.102603 -0.801653" rpy="0.00584294 0.00656523 1.58415" />
-  </joint> -->
 
 </robot>

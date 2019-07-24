@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
-<robot name="sonar" >
-  
-  
-  <xacro:macro name="sonar" params="parent pos xyz rpy">
+<robot name="sonar" >  
+  <urdf:macro name="sonar" params="parent pos xyz rpy">
 
     <link name="${pos}_sonar">
       <visual>
@@ -25,5 +23,5 @@
         <child link="${pos}_sonar"/>
     </joint>
 
-  </xacro:macro>
+  </urdf:macro>
 </robot>
