@@ -17,11 +17,13 @@
 
 <!-- robot -->
 <robot name="aibee_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+ 
+  <xacro:macro name="aibee_robot" >
 
   <material name="orange">
     <color rgba="1.0 0.5 0.2 1" />
-  </material>
-  <material name="gray">
+      </material>
+      <material name="gray">
     <color rgba="0.2 0.2 0.2 1" />
   </material>
 
@@ -60,6 +62,8 @@
   </link>
 
 
+  <!--base_link -->
+  <link name="base_link" />
 
 <!-- sonars sensor -->
   <!-- UM6-IMU -->
@@ -101,26 +105,12 @@
     </link>
 
     <joint name="rplidar_link_joint" type="fixed">
-        <origin xyz="0.1127 0 0.013" rpy="0 1.57 0"/>
         <parent link="base_link"/>
         <child link="rplidar_link"/>
+        <origin xyz="0.1127 0 0.013" rpy="0 1.57 0"/>
     </joint>
 
 
-
-<!-- odom_child
-  <link name="odom_child">
-    <visual>
-      <origin xyz="0.0 0.0 0.0" />
-      <geometry>
-        <box size="0.06 0.04 0.02" />
-      </geometry>
-      <material name="orange" />
-    </visual>
-  </link> -->
-
-  <!--base_link -->
-  <link name="base_link" />
 
 <!-- the joint of every link -->
 
@@ -144,14 +134,9 @@
   <joint name="vertical_vlp16_link_joint" type="fixed">
     <parent link="imu_link" />
     <child link="vertical_vlp16_link" />
-<origin xyz="0.0107642 0.17024 0.0459122" rpy="0.029518 1.31004 1.58561" />
+    <origin xyz="0.0107642 0.17024 0.0459122" rpy="0.029518 1.31004 1.58561" />
   </joint>
 
-  <!-- <joint name="odom_child_joint" type="fixed">
-    <parent link="base_link" />
-    <child link="odom_child" />
-<origin xyz="-0.00493858 0.102603 -0.801653" rpy="0.00584294 0.00656523 1.58415" />
-  </joint> -->
 
   </xacro:macro>
 </robot>

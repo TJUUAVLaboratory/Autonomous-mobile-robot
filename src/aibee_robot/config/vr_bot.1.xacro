@@ -14,8 +14,12 @@
   limitations under the License.
 -->
 
+<?xml version="1.0"?>
+<robot name="aibee_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+ 
+  <xacro:macro name="aibee_robot" >
+
 <!-- robot -->
-<robot name="aibee_robot">
   <material name="orange">
     <color rgba="1.0 0.5 0.2 1" />
   </material>
@@ -94,61 +98,13 @@
   <joint name="vertical_vlp16_link_joint" type="fixed">
     <parent link="imu_link" />
     <child link="vertical_vlp16_link" />
-    <origin xyz="0.0107642 0.17024 0.0459122" rpy="0.029518 1.31004 1.58561" />
+<origin xyz="0.0107642 0.17024 0.0459122" rpy="0.029518 1.31004 1.58561" />
   </joint>
-
-<!-- rplidar sensor  -->
-    <link name="rplidar_link">
-      <visual>
-        <origin xyz="0 0 0" rpy="0 1.57 0"/>
-        <geometry>
-          <cylinder length="0.05" radius="0.05"/>
-        </geometry>
-      </visual>
-    </link>
-
-    <joint name="rplidar_link_joint" type="fixed">
-        <parent link="base_link"/>
-        <child link="rplidar_link"/>
-        <origin xyz="0.1127 0 0.013" rpy="0 1.57 0"/>
-    </joint>
-
-
-<!-- sonars sensor -->
-  <!-- UM6-IMU -->
-  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
-  <xacro:sonar parent="base_link" pos="m1" xyz="-0.3402  0.1611 0.0497 " rpy="0 1.57 0" />
-
-  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
-  <xacro:sonar parent="base_link" pos="m2" xyz="-0.1276 0.2838 0.0497 " rpy="0 1.57 0" />
-
-  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
-  <xacro:sonar parent="base_link" pos="m3" xyz="0.05 0.2693 0.0497 " rpy="0 1.57 0" />
-
-  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
-  <xacro:sonar parent="base_link" pos="m4" xyz="0.1514 0.1227 0.0497 " rpy="0 1.57 0" />
-
-  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
-  <xacro:sonar parent="base_link" pos="m5" xyz="0.1514 -0.1227 0.0497 " rpy="0 1.57 0" />
-
-  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
-  <xacro:sonar parent="base_link" pos="m6" xyz="0.05 -0.2693 0.0497 " rpy="0 1.57 0" />
-
-  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
-  <xacro:sonar parent="base_link" pos="m7" xyz="-0.1276 -0.2838 0.0497 " rpy="0 1.57 0" />
-
-  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
-  <xacro:sonar parent="base_link" pos="m8" xyz="-0.3402  -0.1611 0.0497" rpy="0 1.57 0" />
-
-  <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>
-  <xacro:sonar parent="base_link" pos="m9" xyz="0 0 0 " rpy="0 1.57 0" />
-
-
 
   <!-- <joint name="odom_child_joint" type="fixed">
     <parent link="base_link" />
     <child link="odom_child" />
 <origin xyz="-0.00493858 0.102603 -0.801653" rpy="0.00584294 0.00656523 1.58415" />
   </joint> -->
-
+  </xacro:macro>
 </robot>
