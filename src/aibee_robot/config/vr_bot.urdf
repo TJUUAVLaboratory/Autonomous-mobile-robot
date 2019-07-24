@@ -58,16 +58,7 @@
   </link>
 
 
-<!-- odom_child
-  <link name="odom_child">
-    <visual>
-      <origin xyz="0.0 0.0 0.0" />
-      <geometry>
-        <box size="0.06 0.04 0.02" />
-      </geometry>
-      <material name="orange" />
-    </visual>
-  </link> -->
+
 
   <!--base_link -->
   <link name="base_link" />
@@ -110,7 +101,7 @@
     <joint name="rplidar_link_joint" type="fixed">
         <parent link="base_link"/>
         <child link="rplidar_link"/>
-        <origin xyz="0.1127 0 0.013" rpy="0 0 0"/>
+        <origin xyz="0.1127 0  0.013" rpy="0 0 0"/>
     </joint>
 
 

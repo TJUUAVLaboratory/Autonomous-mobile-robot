@@ -22,6 +22,7 @@ global_costmap:
    plugins:
       - {name: global_static_layer,    type: "costmap_2d::StaticLayer"   }
       - {name: global_obstacles_laser, type: "costmap_2d::ObstacleLayer" }
+      - {name: global_rplidar_laser, type: "costmap_2d::ObstacleLayer" }
       - {name: global_inflation_layer, type: "costmap_2d::InflationLayer"}
 
    global_static_layer:
@@ -41,11 +42,22 @@ global_costmap:
       observation_sources: scan
       scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true, expected_update_rate: 0}
 
+   global_rplidar_laser:
+      max_obstacle_height: 0.50
+      map_type: costmap  ## voxel
+      min_obstacle_height: -0.2
+      raytrace_range: 7.0
+      obstacle_range: 6   ## local_costmap
+      # track_unknown_space:
+      observation_sources: scan
+      scan: {data_type: LaserScan, topic: /singalScan0, marking: true, clearing: true, expected_update_rate: 0}
+
+
 
    global_inflation_layer:
       inflation_radius: 0.35
       robot_radius:   0.5     ## robot footprint 300mm
-      footprint: "[[-0.5, 0.0], [0.2, 0.4], [0.2, 0.0], [0.2, -0.4], [-0.5, 0.0]]"
+      footprint: "[[-0.45, 0.0], [-0.4, 0.2], [-0.15,0.3], [0.10, 0.33],[0.20, 0.15], [0.20, -0.15], [0.10, -0.33], [-0.15, -0.3], [-0.4, -0.2]]"
     
 
 ### static layer
