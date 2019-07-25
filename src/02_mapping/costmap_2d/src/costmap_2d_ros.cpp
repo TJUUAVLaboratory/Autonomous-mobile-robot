@@ -151,7 +151,7 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener &tf) : layere
 
       boost::shared_ptr<Layer> plugin = plugin_loader_.createInstance(type); //load every costmap layer
       layered_costmap_->addPlugin(plugin);
-      plugin->initialize(layered_costmap_, name + "/" + pname, &tf_); //
+      plugin->initialize(layered_costmap_, name + "/" + pname, &tf_); //加载并启动每一个layer
     }
   }
 
@@ -176,7 +176,7 @@ Costmap2DROS::Costmap2DROS(std::string name, tf::TransformListener &tf) : layere
   // read footprint robot_radius
   setUnpaddedRobotFootprint(makeFootprintFromParams(private_nh));
 
-  // 发布costmap
+  // 定义要发布　costmap
   publisher_ = new Costmap2DPublisher(&private_nh, layered_costmap_->getCostmap(), global_frame_, "costmap",
                                       always_send_full_costmap);
 
@@ -444,7 +444,7 @@ void Costmap2DROS::mapUpdateLoop(double frequency)
     start_t = start.tv_sec + double(start.tv_usec) / 1e6;
     end_t = end.tv_sec + double(end.tv_usec) / 1e6;
     t_diff = end_t - start_t;
-    ROS_DEBUG("Map update time: %.9f", t_diff);
+    ROS_WARN("Map update time: %.9f", t_diff);
     if (publish_cycle.toSec() > 0 && layered_costmap_->isInitialized())
     {
       unsigned int x0, y0, xn, yn;

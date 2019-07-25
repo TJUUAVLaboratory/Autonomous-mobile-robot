@@ -42,9 +42,9 @@
 
 PLUGINLIB_EXPORT_CLASS(costmap_2d::StaticLayer, costmap_2d::Layer)
 
-using costmap_2d::NO_INFORMATION;
-using costmap_2d::LETHAL_OBSTACLE;
 using costmap_2d::FREE_SPACE;
+using costmap_2d::LETHAL_OBSTACLE;
+using costmap_2d::NO_INFORMATION;
 
 namespace costmap_2d
 {
@@ -103,7 +103,6 @@ void StaticLayer::onInitialize()
     {
       ROS_INFO("Subscribing to updates");
       map_update_sub_ = g_nh.subscribe(map_topic + "_updates", 10, &StaticLayer::incomingUpdate, this);
-
     }
   }
   else
@@ -140,13 +139,20 @@ void StaticLayer::matchSize()
   //   unrelated to the size of the layered costmap
   if (!layered_costmap_->isRolling())
   {
-    Costmap2D* master = layered_costmap_->getCostmap();
+    Costmap2D *master = layered_costmap_->getCostmap();
     resizeMap(master->getSizeInCellsX(), master->getSizeInCellsY(), master->getResolution(),
               master->getOriginX(), master->getOriginY());
   }
 }
 
+/*
+occupancyGrid - costmap
+  -1              255     unknown space
+  0               0       free space
+  100             254     lethal 障碍物
 
+
+ */
 unsigned char StaticLayer::interpretValue(unsigned char value)
 {
   // check if the static value is above the unknown or lethal thresholds
@@ -159,25 +165,26 @@ unsigned char StaticLayer::interpretValue(unsigned char value)
   else if (trinary_costmap_)
     return FREE_SPACE;
 
-  double scale = (double) value / lethal_threshold_;
+  //中间值
+  double scale = (double)value / lethal_threshold_;
   return scale * LETHAL_OBSTACLE;
 }
 
 // 订阅 /map的 OccupancyGrid Map
-void StaticLayer::incomingMap(const nav_msgs::OccupancyGridConstPtr& new_map)
+void StaticLayer::incomingMap(const nav_msgs::OccupancyGridConstPtr &new_map)
 {
   unsigned int size_x = new_map->info.width, size_y = new_map->info.height;
 
   ROS_DEBUG("Received a %d X %d map at %f m/pix", size_x, size_y, new_map->info.resolution);
 
   // resize costmap if size, resolution or origin do not match
-  Costmap2D* master = layered_costmap_->getCostmap();
+  Costmap2D *master = layered_costmap_->getCostmap();
   if (!layered_costmap_->isRolling() && (master->getSizeInCellsX() != size_x ||
-      master->getSizeInCellsY() != size_y ||
-      master->getResolution() != new_map->info.resolution ||
-      master->getOriginX() != new_map->info.origin.position.x ||
-      master->getOriginY() != new_map->info.origin.position.y ||
-      !layered_costmap_->isSizeLocked()))
+                                         master->getSizeInCellsY() != size_y ||
+                                         master->getResolution() != new_map->info.resolution ||
+                                         master->getOriginX() != new_map->info.origin.position.x ||
+                                         master->getOriginY() != new_map->info.origin.position.y ||
+                                         !layered_costmap_->isSizeLocked()))
   {
     // Update the size of the layered costmap (and all layers, including this one)
     ROS_INFO("Resizing costmap to %d X %d at %f m/pix", size_x, size_y, new_map->info.resolution);
@@ -203,7 +210,9 @@ void StaticLayer::incomingMap(const nav_msgs::OccupancyGridConstPtr& new_map)
     for (unsigned int j = 0; j < size_x; ++j)
     {
       unsigned char value = new_map->data[index];
+      //更新cost　value
       costmap_[index] = interpretValue(value);
+      // ROS_INFO("index: %d occupancy value: %d static map value: %d", index,new_map->data[index] , costmap_[index] );
       ++index;
     }
   }
@@ -225,13 +234,13 @@ void StaticLayer::incomingMap(const nav_msgs::OccupancyGridConstPtr& new_map)
 }
 
 // subscribe /map_update Callback
-void StaticLayer::incomingUpdate(const map_msgs::OccupancyGridUpdateConstPtr& update)
+void StaticLayer::incomingUpdate(const map_msgs::OccupancyGridUpdateConstPtr &update)
 {
   unsigned int di = 0;
-  for (unsigned int y = 0; y < update->height ; y++)
+  for (unsigned int y = 0; y < update->height; y++)
   {
     unsigned int index_base = (update->y + y) * size_x_;
-    for (unsigned int x = 0; x < update->width ; x++)
+    for (unsigned int x = 0; x < update->width; x++)
     {
       unsigned int index = index_base + x + update->x;
       costmap_[index] = interpretValue(update->data[di++]);
@@ -268,11 +277,12 @@ void StaticLayer::reset()
   }
 }
 
-void StaticLayer::updateBounds(double robot_x, double robot_y, double robot_yaw, double* min_x, double* min_y,
-                               double* max_x, double* max_y)
+void StaticLayer::updateBounds(double robot_x, double robot_y, double robot_yaw, double *min_x, double *min_y,
+                               double *max_x, double *max_y)
 {
 
-  if( !layered_costmap_->isRolling() ){
+  if (!layered_costmap_->isRolling())
+  {
     if (!map_received_ || !(has_updated_data_ || has_extra_bounds_))
       return;
   }
@@ -292,7 +302,7 @@ void StaticLayer::updateBounds(double robot_x, double robot_y, double robot_yaw,
   has_updated_data_ = false;
 }
 
-void StaticLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
+void StaticLayer::updateCosts(costmap_2d::Costmap2D &master_grid, int min_i, int min_j, int max_i, int max_j)
 {
   if (!map_received_)
     return;
@@ -300,6 +310,7 @@ void StaticLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int
   if (!enabled_)
     return;
 
+  //
   if (!layered_costmap_->isRolling())
   {
     // if not rolling, the layered costmap (master_grid) has same coordinates as this layer
@@ -308,6 +319,7 @@ void StaticLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int
     else
       updateWithMax(master_grid, min_i, min_j, max_i, max_j);
   }
+  // rolling windows
   else
   {
     // If rolling window, the master_grid is unlikely to have same coordinates as this layer
@@ -347,4 +359,4 @@ void StaticLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int
   }
 }
 
-}  // namespace costmap_2d
+} // namespace costmap_2d

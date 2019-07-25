@@ -34,22 +34,29 @@
  *  根据多个 sonar　更新costmap layer
  *  
  *  
- * Author: Eitan Marder-Eppstein
- *         David V. Lu!!
+ * Author:　Hualong 2019/7
+ * - sub  9个sonar
+ * - 转换成　base_link下的点云　　m0-m8_snoar_link的点转化成一个base_link下的点云
+ * - 添加到 observation buffer
+ * - 
+ *  注意：数据封装为LaserScan　的data数组，
+ *  data[0] m0_sonar_link下探测的距离值　可参考的为 0.05-2m
  *********************************************************************/
-#ifndef COSTMAP_2D_OBSTACLE_LAYER_H_
-#define COSTMAP_2D_OBSTACLE_LAYER_H_
+#ifndef COSTMAP_2D__SONARS_OBSTACLE_LAYER_H_
+#define COSTMAP_2D__SONARS_OBSTACLE_LAYER_H_
 
 #include <ros/ros.h>
 #include <costmap_2d/costmap_layer.h>
-#include <costmap_2d/layered_costmap.h>//管理每个costmap layer
+#include <costmap_2d/observation_buffer.h> //pointCloud buffer
+#include <costmap_2d/layered_costmap.h>    //管理每个costmap layer
 #include <nav_msgs/OccupancyGrid.h>
-#include <sensor_msgs/Range.h>  //sonar msg
+// #include <sensor_msgs/Range.h>  //sonar msg
+#include <sensor_msgs/LaserScan.h> //９个sonar　封装在一起
 
 #include <tf/message_filter.h>
 #include <message_filters/subscriber.h>
 #include <dynamic_reconfigure/server.h>
-#include <costmap_2d/ObstaclePluginConfig.h>
+#include <costmap_2d/snoarObstaclePluginConfig.h>
 #include <costmap_2d/footprint.h>
 
 namespace costmap_2d
@@ -60,17 +67,17 @@ class SonarObstacleLayer : public CostmapLayer
 public:
   SonarObstacleLayer()
   {
-    costmap_ = NULL;  // this is the unsigned char* member of parent class Costmap2D.
+    costmap_ = NULL; // this is the unsigned char* member of parent class Costmap2D.
   }
 
   virtual ~SonarObstacleLayer();
 
   virtual void onInitialize();
   //更新costmap layer　size
-  virtual void updateBounds(double robot_x, double robot_y, double robot_yaw, double* min_x, double* min_y,
-                            double* max_x, double* max_y);
+  virtual void updateBounds(double robot_x, double robot_y, double robot_yaw, double *min_x, double *min_y,
+                            double *max_x, double *max_y);
   //更新costmap layer value
-  virtual void updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j);
+  virtual void updateCosts(costmap_2d::Costmap2D &master_grid, int min_i, int min_j, int max_i, int max_j);
 
   //enable or disable
   virtual void activate();
@@ -82,53 +89,29 @@ public:
    * @param message The message returned from a message notifier
    * @param buffer A pointer to the observation buffer to update
    */
-  void laserScanCallback(const sensor_msgs::LaserScanConstPtr& message,
-                         const boost::shared_ptr<costmap_2d::ObservationBuffer>& buffer);
-
-   /**
-    * @brief A callback to handle buffering LaserScan messages which need filtering to turn Inf values into range_max.
-    * @param message The message returned from a message notifier
-    * @param buffer A pointer to the observation buffer to update
-    */
-  void laserScanValidInfCallback(const sensor_msgs::LaserScanConstPtr& message,
-                                 const boost::shared_ptr<ObservationBuffer>& buffer);
-
-  /**
-   * @brief  A callback to handle buffering PointCloud messages
-   * @param message The message returned from a message notifier
-   * @param buffer A pointer to the observation buffer to update
-   */
-  void pointCloudCallback(const sensor_msgs::PointCloudConstPtr& message,
-                          const boost::shared_ptr<costmap_2d::ObservationBuffer>& buffer);
-
-  /**
-   * @brief  A callback to handle buffering PointCloud2 messages
-   * @param message The message returned from a message notifier
-   * @param buffer A pointer to the observation buffer to update
-   */
-  void pointCloud2Callback(const sensor_msgs::PointCloud2ConstPtr& message,
-                           const boost::shared_ptr<costmap_2d::ObservationBuffer>& buffer);
+  void sonarScanCallback(const sensor_msgs::LaserScanConstPtr &message,
+                          const boost::shared_ptr<costmap_2d::ObservationBuffer> &buffer);
 
   // for testing purposes
-  void addStaticObservation(costmap_2d::Observation& obs, bool marking, bool clearing);
+  void addStaticObservation(costmap_2d::Observation &obs, bool marking, bool clearing);
   void clearStaticObservations(bool marking, bool clearing);
 
 protected:
-  virtual void setupDynamicReconfigure(ros::NodeHandle& nh);
+  virtual void setupDynamicReconfigure(ros::NodeHandle &nh);
 
   /**
    * @brief  Get the observations used to mark space
    * @param marking_observations A reference to a vector that will be populated with the observations
    * @return True if all the observation buffers are current, false otherwise
    */
-  bool getMarkingObservations(std::vector<costmap_2d::Observation>& marking_observations) const;
+  bool getMarkingObservations(std::vector<costmap_2d::Observation> &marking_observations) const;
 
   /**
    * @brief  Get the observations used to clear space
    * @param clearing_observations A reference to a vector that will be populated with the observations
    * @return True if all the observation buffers are current, false otherwise
    */
-  bool getClearingObservations(std::vector<costmap_2d::Observation>& clearing_observations) const;
+  bool getClearingObservations(std::vector<costmap_2d::Observation> &clearing_observations) const;
 
   /**
    * @brief  Clear freespace based on one observation
@@ -138,40 +121,40 @@ protected:
    * @param max_x
    * @param max_y
    */
-  virtual void raytraceFreespace(const costmap_2d::Observation& clearing_observation, double* min_x, double* min_y,
-                                 double* max_x, double* max_y);
+  virtual void raytraceFreespace(const costmap_2d::Observation &clearing_observation, double *min_x, double *min_y,
+                                 double *max_x, double *max_y);
 
-  void updateRaytraceBounds(double ox, double oy, double wx, double wy, double range, double* min_x, double* min_y,
-                            double* max_x, double* max_y);
+  void updateRaytraceBounds(double ox, double oy, double wx, double wy, double range, double *min_x, double *min_y,
+                            double *max_x, double *max_y);
 
   std::vector<geometry_msgs::Point> transformed_footprint_;
   bool footprint_clearing_enabled_;
-  void updateFootprint(double robot_x, double robot_y, double robot_yaw, double* min_x, double* min_y, 
-                       double* max_x, double* max_y);
+  void updateFootprint(double robot_x, double robot_y, double robot_yaw, double *min_x, double *min_y,
+                       double *max_x, double *max_y);
 
-  std::string global_frame_;  ///< @brief The global frame for the costmap
-  double max_obstacle_height_;  ///< @brief Max Obstacle Height
+  std::string global_frame_;   ///< @brief The global frame for the costmap
+  std::string robot_frame_; // add robot_frame_id
+  double max_obstacle_range_; ///< @brief Max Obstacle range
+  double min_obstacle_range_;
 
-  laser_geometry::LaserProjection projector_;  ///< @brief Used to project laser scans into point clouds
-
-  std::vector<boost::shared_ptr<message_filters::SubscriberBase> > observation_subscribers_;  ///< @brief Used for the observation message filters
-  std::vector<boost::shared_ptr<tf::MessageFilterBase> > observation_notifiers_;  ///< @brief Used to make sure that transforms are available for each sensor
-  std::vector<boost::shared_ptr<costmap_2d::ObservationBuffer> > observation_buffers_;  ///< @brief Used to store observations from various sensors
-  std::vector<boost::shared_ptr<costmap_2d::ObservationBuffer> > marking_buffers_;  ///< @brief Used to store observation buffers used for marking obstacles
-  std::vector<boost::shared_ptr<costmap_2d::ObservationBuffer> > clearing_buffers_;  ///< @brief Used to store observation buffers used for clearing obstacles
+  std::vector<boost::shared_ptr<message_filters::SubscriberBase> > observation_subscribers_; ///< @brief Used for the observation message filters
+  std::vector<boost::shared_ptr<tf::MessageFilterBase> > observation_notifiers_;             ///< @brief Used to make sure that transforms are available for each sensor
+  std::vector<boost::shared_ptr<costmap_2d::ObservationBuffer> > observation_buffers_;       ///< @brief Used to store observations from various sensors
+  std::vector<boost::shared_ptr<costmap_2d::ObservationBuffer> > marking_buffers_;           ///< @brief Used to store observation buffers used for marking obstacles
+  std::vector<boost::shared_ptr<costmap_2d::ObservationBuffer> > clearing_buffers_;          ///< @brief Used to store observation buffers used for clearing obstacles
 
   // Used only for testing purposes
   std::vector<costmap_2d::Observation> static_clearing_observations_, static_marking_observations_;
 
   bool rolling_window_;
-  dynamic_reconfigure::Server<costmap_2d::ObstaclePluginConfig> *dsrv_;
+  dynamic_reconfigure::Server<costmap_2d::snoarObstaclePluginConfig> *dsrv_;
 
   int combination_method_;
 
 private:
-  void reconfigureCB(costmap_2d::ObstaclePluginConfig &config, uint32_t level);
+  void reconfigureCB(costmap_2d::snoarObstaclePluginConfig &config, uint32_t level);
 };
 
-}  // namespace costmap_2d
+} // namespace costmap_2d
 
-#endif  // COSTMAP_2D_OBSTACLE_LAYER_H_
+#endif // COSTMAP_2D__SONARS_OBSTACLE_LAYER_H_

@@ -128,6 +128,7 @@ void InflationLayer::matchSize()
   seen_ = new bool[seen_size_];
 }
 
+// updateBounds  考虑 inflation
 void InflationLayer::updateBounds(double robot_x, double robot_y, double robot_yaw, double* min_x,
                                            double* min_y, double* max_x, double* max_y)
 {
@@ -166,7 +167,7 @@ void InflationLayer::updateBounds(double robot_x, double robot_y, double robot_y
 void InflationLayer::onFootprintChanged()
 {
   inscribed_radius_ = layered_costmap_->getInscribedRadius();
-  cell_inflation_radius_ = cellDistance(inflation_radius_);
+  cell_inflation_radius_ = cellDistance(inflation_radius_);//把物理膨胀距离转换成map cell膨胀单位
   computeCaches();
   need_reinflation_ = true;
 
@@ -368,6 +369,7 @@ void InflationLayer::deleteKernels()
   }
 }
 
+// 动态更新机器人的　inflation paramter
 void InflationLayer::setInflationParameters(double inflation_radius, double cost_scaling_factor)
 {
   if (weight_ != cost_scaling_factor || inflation_radius_ != inflation_radius)

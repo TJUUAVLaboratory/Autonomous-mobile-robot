@@ -76,7 +76,7 @@ public:
   void resizeMap(unsigned int size_x, unsigned int size_y, double resolution, double origin_x, double origin_y,
                  bool size_locked = false);
 
-  // 围栏
+  
   void getUpdatedBounds(double& minx, double& miny, double& maxx, double& maxy)
   {
     minx = minx_;

@@ -108,6 +108,23 @@
 <!-- sonars sensor -->
 
 <!-- m1 -->
+    <link name="m0_sonar">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 1.57 0"/>
+        <geometry>
+          <cylinder length="0.01" radius="0.01"/>
+          <material name="yellow" />
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="m0_sonar_joint" type="fixed">
+        <origin xyz="-0.3402  0.1611 0.0497" rpy="0 0  2.2626"/>
+        <parent link="base_link"/>
+        <child link="m0_sonar"/>
+    </joint>
+
+<!-- m2 -->
     <link name="m1_sonar">
       <visual>
         <origin xyz="0 0 0" rpy="0 1.57 0"/>
@@ -119,12 +136,12 @@
     </link>
 
     <joint name="m1_sonar_joint" type="fixed">
-        <origin xyz="-0.3402  0.1611 0.0497" rpy="0 0  2.2626"/>
+        <origin xyz="-0.1276 0.2838 0.0497 " rpy="0 0 1.9268"/>
         <parent link="base_link"/>
         <child link="m1_sonar"/>
     </joint>
 
-<!-- m2 -->
+<!-- m3 -->
     <link name="m2_sonar">
       <visual>
         <origin xyz="0 0 0" rpy="0 1.57 0"/>
@@ -136,12 +153,12 @@
     </link>
 
     <joint name="m2_sonar_joint" type="fixed">
-        <origin xyz="-0.1276 0.2838 0.0497 " rpy="0 0 1.9268"/>
+        <origin xyz="0.05 0.2693 0.0497 " rpy="0 0 1.0472"/>
         <parent link="base_link"/>
         <child link="m2_sonar"/>
     </joint>
 
-<!-- m3 -->
+<!-- m4 -->
     <link name="m3_sonar">
       <visual>
         <origin xyz="0 0 0" rpy="0 1.57 0"/>
@@ -153,12 +170,12 @@
     </link>
 
     <joint name="m3_sonar_joint" type="fixed">
-        <origin xyz="0.05 0.2693 0.0497 " rpy="0 0 1.0472"/>
+        <origin xyz="0.1514 0.1227 0.0497 " rpy="0 0 0.1682"/>
         <parent link="base_link"/>
         <child link="m3_sonar"/>
     </joint>
 
-<!-- m4 -->
+<!-- m5 -->
     <link name="m4_sonar">
       <visual>
         <origin xyz="0 0 0" rpy="0 1.57 0"/>
@@ -170,12 +187,12 @@
     </link>
 
     <joint name="m4_sonar_joint" type="fixed">
-        <origin xyz="0.1514 0.1227 0.0497 " rpy="0 0 0.1682"/>
+        <origin xyz="0.1514 -0.1227 0.0497 " rpy="0 0 -0.1682"/>
         <parent link="base_link"/>
         <child link="m4_sonar"/>
     </joint>
 
-<!-- m5 -->
+<!-- m6 -->
     <link name="m5_sonar">
       <visual>
         <origin xyz="0 0 0" rpy="0 1.57 0"/>
@@ -187,12 +204,12 @@
     </link>
 
     <joint name="m5_sonar_joint" type="fixed">
-        <origin xyz="0.1514 -0.1227 0.0497 " rpy="0 0 -0.1682"/>
+        <origin xyz="0.05 -0.2693 0.0497 " rpy="0 0 -1.0472"/>
         <parent link="base_link"/>
         <child link="m5_sonar"/>
     </joint>
 
-<!-- m6 -->
+<!-- m7 -->
     <link name="m6_sonar">
       <visual>
         <origin xyz="0 0 0" rpy="0 1.57 0"/>
@@ -204,12 +221,12 @@
     </link>
 
     <joint name="m6_sonar_joint" type="fixed">
-        <origin xyz="0.05 -0.2693 0.0497 " rpy="0 0 -1.0472"/>
+        <origin xyz="-0.1276 -0.2838 0.0497 " rpy="0 0 -1.9268"/>
         <parent link="base_link"/>
         <child link="m6_sonar"/>
-    </joint>
+    </joint>    
 
-<!-- m7 -->
+<!-- m8 -->
     <link name="m7_sonar">
       <visual>
         <origin xyz="0 0 0" rpy="0 1.57 0"/>
@@ -221,12 +238,12 @@
     </link>
 
     <joint name="m7_sonar_joint" type="fixed">
-        <origin xyz="-0.1276 -0.2838 0.0497 " rpy="0 0 -1.9268"/>
+        <origin xyz="-0.3402  -0.1611 0.0497" rpy="0 0 -2.2626"/>
         <parent link="base_link"/>
         <child link="m7_sonar"/>
-    </joint>    
+    </joint>
 
-<!-- m8 -->
+<!-- m9 -->
     <link name="m8_sonar">
       <visual>
         <origin xyz="0 0 0" rpy="0 1.57 0"/>
@@ -238,26 +255,9 @@
     </link>
 
     <joint name="m8_sonar_joint" type="fixed">
-        <origin xyz="-0.3402  -0.1611 0.0497" rpy="0 0 -2.2626"/>
-        <parent link="base_link"/>
-        <child link="m8_sonar"/>
-    </joint>
-
-<!-- m9 -->
-    <link name="m9_sonar">
-      <visual>
-        <origin xyz="0 0 0" rpy="0 1.57 0"/>
-        <geometry>
-          <cylinder length="0.01" radius="0.01"/>
-          <material name="yellow" />
-        </geometry>
-      </visual>
-    </link>
-
-    <joint name="m9_sonar_joint" type="fixed">
         <origin xyz="-0.4165 0 0.0497 " rpy="0 0 -3.1415" />
         <parent link="base_link"/>
-        <child link="m9_sonar"/>
+        <child link="m8_sonar"/>
     </joint>    
 
   <!-- <xacro:include filename="$(find aibee_robot)/config/sonar.xacro"/>

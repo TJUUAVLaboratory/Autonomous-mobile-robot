@@ -45,8 +45,8 @@ local_costmap:
       max_obstacle_height: 0.50
       map_type: costmap  ## voxel
       min_obstacle_height: -0.2
-      raytrace_range: 6.0
-      obstacle_range: 6.0   ## local_costmap
+      raytrace_range: 5.0
+      obstacle_range: 4.0   ## local_costmap
       # track_unknown_space:
       observation_sources: scan
       scan: {data_type: LaserScan, topic: /singalScan0, marking: true, clearing: true, expected_update_rate: 0}

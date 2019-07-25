@@ -172,7 +172,7 @@ private:
 
   double inflation_radius_, inscribed_radius_, weight_;
   bool inflate_unknown_;
-  unsigned int cell_inflation_radius_;
+  unsigned int cell_inflation_radius_;////把物理膨胀距离转换成map cell膨胀单位
   unsigned int cached_cell_inflation_radius_;
   std::map<double, std::vector<CellData> > inflation_cells_;
 
