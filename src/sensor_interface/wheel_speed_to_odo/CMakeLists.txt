@@ -24,7 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_eigen
   message_filters
   eigen_conversions
-  robot_msgs
+  # robot_msgs
   tf
 )
 catkin_package(

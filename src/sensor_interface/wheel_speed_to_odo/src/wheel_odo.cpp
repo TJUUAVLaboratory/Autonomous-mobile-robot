@@ -11,7 +11,7 @@
 #include <array>
 #include "ros/ros.h"
 #include <nav_msgs/Odometry.h>
-#include "robot_msgs/wheelSpeed.h"
+#include "wheel_speed_odo/wheelSpeed.h"
 #include <tf/transform_broadcaster.h>
 double L_pub;
 double theta_pub;
@@ -155,7 +155,7 @@ public:
     ~Node() = default;
 
 private:
-    void HandleWheelSpeed(const robot_msgs::wheelSpeed::ConstPtr &msg);
+    void HandleWheelSpeed(const wheel_speed_odo::wheelSpeed::ConstPtr &msg);
 
 private:
     WheelSpeedIntergration wheel_intergrater;
@@ -177,7 +177,7 @@ Node::Node(WheelParameters &wheel_para, const std::string &topic)
 }
 
 // callback  /wheelSpeed
-void Node::HandleWheelSpeed(const robot_msgs::wheelSpeed::ConstPtr &msg)
+void Node::HandleWheelSpeed(const wheel_speed_odo::wheelSpeed::ConstPtr &msg)
 {
     int32_t timestamp = msg->timeStamp;
     long long timestamp_ = timestamp;
@@ -274,7 +274,7 @@ void Node::HandleWheelSpeed(const robot_msgs::wheelSpeed::ConstPtr &msg)
         }
     }
 }
-void HandleWheelSpeed_(const robot_msgs::wheelSpeed::ConstPtr &msg)
+void HandleWheelSpeed_(const wheel_speed_odo::wheelSpeed::ConstPtr &msg)
 {
     std::cout << "get!!!" << std::endl;
 }
