@@ -48,22 +48,63 @@
 #include <tf/transform_listener.h>
 #include <string>
 
-std::string global_frmae("map");
-std::string robot_frame("base_link");
-std::vector<std::string> sonars_frame{"m0_sonar", "m1_sonar", "m2_sonar", "m3_sonar", "m4_sonar", "m5_sonar", "m6_sonar", "m7_sonar", "m8_sonar"};
+class Sonar2PointCloud
+{
+public:
+  Sonar2PointCloud(ros::NodeHandle& nh, tf::TransformListener& tf) : nh_(nh), tf_(nh)
+  {
+    global_frame = "map";
+    robot_frame = "base_link";
+    sonars_frame = {"m0_sonar", "m1_sonar", "m2_sonar", "m3_sonar", "m4_sonar", "m5_sonar", "m6_sonar", "m7_sonar", "m8_sonar"};
 
-ros::Publisher sonarDataPub_0;
-ros::Publisher sonarDataPub_1;
-ros::Publisher sonarDataPub_2;
-ros::Publisher sonarDataPub_3;
-ros::Publisher sonarDataPub_4;
-ros::Publisher sonarDataPub_5;
-ros::Publisher sonarDataPub_6;
-ros::Publisher sonarDataPub_7;
-ros::Publisher sonarDataPub_8;
-ros::Publisher sonarPointcloudPub;
+    int concurrency_level = nh_.param("concurrency_level", 2);
+    ros::Subscriber sonarDataSub = nh_.subscribe("/ultrasonicScan", 10, &Sonar2PointCloud::sonarDataCallback, this);
+    sonarDataPub_0 = nh_.advertise<sensor_msgs::Range>("/sonar_m0", 10, true);
+    // sonarDataPub_1 = nh.advertise<sensor_msgs::Range>("/sonar_m1", 10, true);
+    // sonarDataPub_2 = nh.advertise<sensor_msgs::Range>("/sonar_m2", 10, true);
+    // sonarDataPub_3 = nh.advertise<sensor_msgs::Range>("/sonar_m3", 10, true);
+    // sonarDataPub_4 = nh.advertise<sensor_msgs::Range>("/sonar_m4", 10, true);
+    // sonarDataPub_5 = nh.advertise<sensor_msgs::Range>("/sonar_m5", 10, true);
+    // sonarDataPub_6 = nh.advertise<sensor_msgs::Range>("/sonar_m6", 10, true);
+    // sonarDataPub_7 = nh.advertise<sensor_msgs::Range>("/sonar_m7", 10, true);
+    // sonarDataPub_8 = nh.advertise<sensor_msgs::Range>("/sonar_m8", 10, true);
 
-void sonarDataCallback(const sensor_msgs::LaserScanConstPtr &message)
+    sonarPointcloudPub = nh_.advertise<sensor_msgs::PointCloud2>("/sonar_points", 5, true);
+
+    boost::shared_ptr<ros::MultiThreadedSpinner> spinner;
+    if (concurrency_level)
+    {
+      spinner.reset(new ros::MultiThreadedSpinner(static_cast<uint32_t>(concurrency_level)));
+    }
+    else
+    {
+      spinner.reset(new ros::MultiThreadedSpinner());
+    }
+    spinner->spin();
+  }
+
+  void sonarDataCallback(const sensor_msgs::LaserScanConstPtr &message);//callback
+
+private:
+  ros::NodeHandle nh_;
+  std::string global_frame;
+  std::string robot_frame;
+  std::vector<std::string> sonars_frame;
+  tf::TransformListener tf_;
+
+  ros::Publisher sonarDataPub_0;
+  ros::Publisher sonarDataPub_1;
+  ros::Publisher sonarDataPub_2;
+  ros::Publisher sonarDataPub_3;
+  ros::Publisher sonarDataPub_4;
+  ros::Publisher sonarDataPub_5;
+  ros::Publisher sonarDataPub_6;
+  ros::Publisher sonarDataPub_7;
+  ros::Publisher sonarDataPub_8;
+  ros::Publisher sonarPointcloudPub;
+};
+
+void Sonar2PointCloud::sonarDataCallback(const sensor_msgs::LaserScanConstPtr &message)
 {
   // project the laser into a point cloud
   sensor_msgs::PointCloud2 cloud;
@@ -82,8 +123,8 @@ void sonarDataCallback(const sensor_msgs::LaserScanConstPtr &message)
     sonarsValue[i].min_range = 0.1;
     sonarsValue[i].max_range = 1.0;
     sonarsValue[i].range = message->ranges[i];
-    
-    sonarDataPub_0.publish(sonarsValue[i]);// publish sonars  range date
+
+    sonarDataPub_0.publish(sonarsValue[i]); // publish sonars  range date
 
     sonarsPoints[i].header = message->header;
     sonarsPoints[i].header.frame_id = sonars_frame[i];
@@ -91,41 +132,17 @@ void sonarDataCallback(const sensor_msgs::LaserScanConstPtr &message)
     sonarsPoints[i].point.y = 0;
     sonarsPoints[i].point.z = 0;
   }
-    //再将一圈雷达数据组合成base_link下的点云
-    if(message->ranges.size() != sonarsPoints.size())
-      ROS_ERROR("don't receivec all the sonars data %d ",message->ranges.size());
-    
-    
+  //再将一圈雷达数据组合成base_link下的点云
+  if (message->ranges.size() != sonarsPoints.size())
+    ROS_ERROR("don't received all the sonars data %d ", message->ranges.size());
 }
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "sonar_to_pointcloud");
-  ros::NodeHandle private_nh("~"), nh;
-  int concurrency_level = private_nh.param("concurrency_level", 2);
+    ros::init(argc, argv, "sonar_to_pointcloud");
+    ros::NodeHandle  nh;
+    tf::TransformListener tf(ros::Duration(3));
+    Sonar2PointCloud sonar2pointclud(nh, tf);
 
-  ros::Subscriber zsonarDataSub = nh.subscribe("/ultrasonicScan", 10, sonarDataCallback);
-  sonarDataPub_0 = nh.advertise<sensor_msgs::Range>("/sonar_m0", 10, true);
-  // sonarDataPub_1 = nh.advertise<sensor_msgs::Range>("/sonar_m1", 10, true);
-  // sonarDataPub_2 = nh.advertise<sensor_msgs::Range>("/sonar_m2", 10, true);
-  // sonarDataPub_3 = nh.advertise<sensor_msgs::Range>("/sonar_m3", 10, true);
-  // sonarDataPub_4 = nh.advertise<sensor_msgs::Range>("/sonar_m4", 10, true);
-  // sonarDataPub_5 = nh.advertise<sensor_msgs::Range>("/sonar_m5", 10, true);
-  // sonarDataPub_6 = nh.advertise<sensor_msgs::Range>("/sonar_m6", 10, true);
-  // sonarDataPub_7 = nh.advertise<sensor_msgs::Range>("/sonar_m7", 10, true);
-  // sonarDataPub_8 = nh.advertise<sensor_msgs::Range>("/sonar_m8", 10, true);
-
-  sonarPointcloudPub = nh.advertise<sensor_msgs::PointCloud2>("/sonar_points", 5, true);
-
-  boost::shared_ptr<ros::MultiThreadedSpinner> spinner;
-  if (concurrency_level)
-  {
-    spinner.reset(new ros::MultiThreadedSpinner(static_cast<uint32_t>(concurrency_level)));
-  }
-  else
-  {
-    spinner.reset(new ros::MultiThreadedSpinner());
-  }
-  spinner->spin();
   return 0;
 }
