@@ -153,11 +153,27 @@ void SonarObstacleLayer::sonarScanCallback(const sensor_msgs::LaserScanConstPtr 
   // project the laser into a point cloud
   sensor_msgs::PointCloud2 cloud;
   cloud.header = message->header;
+  cloud.header.frame_id = robot_frame_;//将frame_id映射到 robot_frame base_link
+  std::vector<double> sonarsValue;
+  std::vector<geometry_msgs::PointStamped>  sonarsPoints;//各自雷达系坐标系下的点
+  std::vector<tf::Point>  sonarsPoints_baselink;//统一到baselink系下
+  for(int i=0; i<message->ranges.size(); i++)
+  {
+    sonarsValue.push_back(message->ranges[i]);
+
+    //把原来的消息封装成独立的每个sonar系下的pose
+    sonarsPoints[i].header = message->header;
+
+
+  }
+  //把每个点从各自的雷达系转换到base_link系
+  //  tf::Transform
+
 
   // project the scan into a point cloud
   // try
   // {
-  //   projector_.transformLaserScanToPointCloud(message->header.frame_id, *message, cloud, *tf_);
+    // projector_.transformLaserScanToPointCloud(message->header.frame_id, *message, cloud, *tf_);
   // }
   // catch (tf::TransformException &ex)
   // {
