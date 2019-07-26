@@ -7,7 +7,7 @@ find_package(catkin REQUIRED COMPONENTS message_generation std_msgs sensor_msgs)
 add_message_files(
   DIRECTORY msg
   FILES
-    wheelSpeed.msg
+  ## wheelSpeed.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs sensor_msgs)
@@ -24,7 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_eigen
   message_filters
   eigen_conversions
-  # robot_msgs
+  robot_msgs
   tf
 )
 catkin_package(

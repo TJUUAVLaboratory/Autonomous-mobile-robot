@@ -1,0 +1,9 @@
+uint32 dataOrder
+uint32 dataTimeStamp
+uint8 effective
+float32 temperature
+geometry_msgs/Vector3 acc
+geometry_msgs/Vector3 gyro
+geometry_msgs/Vector3 mag
+float32 airPressure
+uint8[4] status

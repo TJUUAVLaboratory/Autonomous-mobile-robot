@@ -92,6 +92,8 @@ void sonarDataCallback(const sensor_msgs::LaserScanConstPtr &message)
     sonarsPoints[i].point.z = 0;
   }
     //再将一圈雷达数据组合成base_link下的点云
+    if(message->ranges.size() != sonarsPoints.size())
+      ROS_ERROR("don't receivec all the sonars data %d ",message->ranges.size());
     
     
 }
