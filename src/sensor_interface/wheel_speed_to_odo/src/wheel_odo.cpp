@@ -11,7 +11,7 @@
 #include <array>
 #include "ros/ros.h"
 #include <nav_msgs/Odometry.h>
-#include "wheel_speed_odo/wheelSpeed.h"
+#include "robot_msgs/wheelSpeed.h"
 #include <tf/transform_broadcaster.h>
 double L_pub;
 double theta_pub;
@@ -155,7 +155,7 @@ public:
     ~Node() = default;
 
 private:
-    void HandleWheelSpeed(const wheel_speed_odo::wheelSpeed::ConstPtr &msg);
+    void HandleWheelSpeed(const robot_msgs::wheelSpeedConstPtr &msg);
 
 private:
     WheelSpeedIntergration wheel_intergrater;
@@ -177,8 +177,9 @@ Node::Node(WheelParameters &wheel_para, const std::string &topic)
 }
 
 // callback  /wheelSpeed
-void Node::HandleWheelSpeed(const wheel_speed_odo::wheelSpeed::ConstPtr &msg)
+void Node::HandleWheelSpeed(const robot_msgs::wheelSpeedConstPtr &msg)
 {
+    ROS_INFO("received wheelSpeed data");
     int32_t timestamp = msg->timeStamp;
     long long timestamp_ = timestamp;
     int16_t speed = msg->speed[0];
@@ -237,6 +238,7 @@ void Node::HandleWheelSpeed(const wheel_speed_odo::wheelSpeed::ConstPtr &msg)
 
                 //publish odom message
                 odom_publisher.publish(odom);
+                ROS_INFO("publish odom message");
                 left_rpms.erase(left_rpms.begin());
 
                 // broadcast odometry transform
@@ -274,16 +276,16 @@ void Node::HandleWheelSpeed(const wheel_speed_odo::wheelSpeed::ConstPtr &msg)
         }
     }
 }
-void HandleWheelSpeed_(const wheel_speed_odo::wheelSpeed::ConstPtr &msg)
+void HandleWheelSpeed_(const robot_msgs::wheelSpeedConstPtr &msg)
 {
     std::cout << "get!!!" << std::endl;
 }
 int main(int argc, char *argv[])
 {
-    ::ros::init(argc, argv, "cartographer_occupancy_grid_node");
-    ::ros::start();
+    ros::init(argc, argv, "wheel_odom_node");
+    ros::start();
     WheelParameters wheel_para(0.075, 0.075, 0.412);
     Node node(wheel_para, "/wheelSpeed");
-    ::ros::spin();
-    ::ros::shutdown();
+    ros::spin();
+    ros::shutdown();
 }
