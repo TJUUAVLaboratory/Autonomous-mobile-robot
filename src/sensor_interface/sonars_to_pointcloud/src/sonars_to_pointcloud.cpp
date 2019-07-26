@@ -69,7 +69,7 @@ public:
     // sonarDataPub_7 = nh.advertise<sensor_msgs::Range>("/sonar_m7", 10, true);
     // sonarDataPub_8 = nh.advertise<sensor_msgs::Range>("/sonar_m8", 10, true);
 
-    sonarPointcloudPub = nh_.advertise<sensor_msgs::PointCloud2>("/sonar_points", 5, true);
+    sonarPointcloudPub = nh_.advertise<sensor_msgs::PointCloud>("/sonar_points", 5, true);
 
     boost::shared_ptr<ros::MultiThreadedSpinner> spinner;
     if (concurrency_level)
@@ -106,12 +106,9 @@ private:
 
 void Sonar2PointCloud::sonarDataCallback(const sensor_msgs::LaserScanConstPtr &message)
 {
-  // project the laser into a point cloud
-  sensor_msgs::PointCloud2 cloud;
-  cloud.header = message->header;
+
   std::vector<sensor_msgs::Range> sonarsValue;
   std::vector<geometry_msgs::PointStamped> sonarsPoints; //各自雷达系坐标系下的点
-  std::vector<tf::Point> sonarsPoints_baselink;
   //统一到baselink系下
   for (int i = 0; i < message->ranges.size(); i++)
   {
@@ -135,7 +132,35 @@ void Sonar2PointCloud::sonarDataCallback(const sensor_msgs::LaserScanConstPtr &m
   //再将一圈雷达数据组合成base_link下的点云
   if (message->ranges.size() != sonarsPoints.size())
     ROS_ERROR("don't received all the sonars data %d ", message->ranges.size());
+
+  std::vector<geometry_msgs::PointStamped> sonarsPoints_baselink;
+      // project the laser into a point cloud
+  sensor_msgs::PointCloud cloud;
+  cloud.header = message->header;
+  cloud.header.frame_id = robot_frame;
+
+  for(std::size_t i=0; i< sonarsPoints.size(); i++)
+  {
+    sonarsPoints_baselink[i].header =  message->header;
+    sonarsPoints_baselink[i].header.frame_id = robot_frame;
+
+    //from mx_sonar to base_link
+    tf_.transformPoint(robot_frame, sonarsPoints[i], sonarsPoints_baselink[i]);
+    geometry_msgs::Point32  current_point;
+    current_point.x = sonarsPoints_baselink[i].point.x;
+    current_point.y = sonarsPoints_baselink[i].point.y;
+    current_point.z = sonarsPoints_baselink[i].point.z;
+    cloud.points.push_back(current_point);
+  }
+  
+  sonarPointcloudPub.publish(cloud);
+
+
+
 }
+
+
+
 
 int main(int argc, char **argv)
 {

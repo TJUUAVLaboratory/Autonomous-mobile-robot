@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-    <name>snoars_to_pointcloud</name>
+    <name>sonars_to_pointcloud</name>
     <version>1.4.0</version>
     <description>Converts a 3D Point Cloud into a 2D laser scan. This is useful for making devices like the Kinect appear like a laser scanner for 2D-based algorithms (e.g. laser-based SLAM).</description>
 

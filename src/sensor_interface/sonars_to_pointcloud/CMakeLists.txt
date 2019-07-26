@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(snoars_to_pointcloud)
+project(sonars_to_pointcloud)
 
 ## 编译选项
 set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall")
@@ -9,7 +9,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -DNDEBUG -Wno-reorder -O2" CACHE
 find_package(catkin REQUIRED COMPONENTS
   laser_geometry
   message_filters
-  nodelet
   roscpp
   sensor_msgs
   tf2
@@ -19,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   # INCLUDE_DIRS include
-  CATKIN_DEPENDS laser_geometry message_filters nodelet roscpp sensor_msgs tf2 tf2_ros tf2_sensor_msgs
+  CATKIN_DEPENDS laser_geometry message_filters  roscpp sensor_msgs tf2 tf2_ros tf2_sensor_msgs
 )
 
 include_directories(
@@ -27,7 +26,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(sonars_to_pointcloud src/sonars_to_pointcloud.cpp)
+add_executable(sonars_to_pointcloud src/sonars_to_pointcloud.cpp)
 target_link_libraries(sonars_to_pointcloud ${catkin_LIBRARIES})
 
 
