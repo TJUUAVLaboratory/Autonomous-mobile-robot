@@ -1,1 +1,5 @@
-rosbag  record /aibee_navi/EBandPlannerROS/global_plan /aibee_navi/EBandPlannerROS/local_plan /aibee_navi/GlobalPlanner/plan /aibee_navi/current_goal  /aibee_navi/global_costmap/costmap /aibee_navi/global_costmap/costmap_updates /aibee_navi/global_costmap/footprint /aibee_navi/local_costmap/costmap /aibee_navi/local_costmap/footprint /amcl_pose /auto_move_node/auto_move/goal_waypoints /cmd_vel /map /odom /particlecloud /scan /tf /tf /tf_static
+rosbag  record /slave_image_2 \
+		/scan \
+		/odom \
+		/imuRawData
+

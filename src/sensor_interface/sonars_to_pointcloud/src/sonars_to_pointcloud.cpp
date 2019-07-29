@@ -56,7 +56,7 @@ public:
     global_frame = "map";
     robot_frame = "base_link";
     sonars_frame = {"m0_sonar", "m1_sonar", "m2_sonar", "m3_sonar", "m4_sonar", "m5_sonar", "m6_sonar", "m7_sonar", "m8_sonar"};
-
+    ROS_INFO("init");
     int concurrency_level = nh_.param("concurrency_level", 2);
     ros::Subscriber sonarDataSub = nh_.subscribe("/ultrasonicScan", 10, &Sonar2PointCloud::sonarDataCallback, this);
     sonarDataPub_0 = nh_.advertise<sensor_msgs::Range>("/sonar_m0", 10, true);
@@ -70,17 +70,19 @@ public:
     // sonarDataPub_8 = nh.advertise<sensor_msgs::Range>("/sonar_m8", 10, true);
 
     sonarPointcloudPub = nh_.advertise<sensor_msgs::PointCloud>("/sonar_points", 5, true);
+    ROS_INFO("init finished");
+    ros::spin();
 
-    boost::shared_ptr<ros::MultiThreadedSpinner> spinner;
-    if (concurrency_level)
-    {
-      spinner.reset(new ros::MultiThreadedSpinner(static_cast<uint32_t>(concurrency_level)));
-    }
-    else
-    {
-      spinner.reset(new ros::MultiThreadedSpinner());
-    }
-    spinner->spin();
+    // boost::shared_ptr<ros::MultiThreadedSpinner> spinner;
+    // if (concurrency_level)
+    // {
+    //   spinner.reset(new ros::MultiThreadedSpinner(static_cast<uint32_t>(concurrency_level)));
+    // }
+    // else
+    // {
+    //   spinner.reset(new ros::MultiThreadedSpinner());
+    // }
+    // spinner->spin();
   }
 
   void sonarDataCallback(const sensor_msgs::LaserScanConstPtr &message);//callback
@@ -110,30 +112,36 @@ void Sonar2PointCloud::sonarDataCallback(const sensor_msgs::LaserScanConstPtr &m
   std::vector<sensor_msgs::Range> sonarsValue;
   std::vector<geometry_msgs::PointStamped> sonarsPoints; //各自雷达系坐标系下的点
   //统一到baselink系下
-  for (int i = 0; i < message->ranges.size(); i++)
+  std::vector<float> sonar_data = message->ranges;
+  for (std::size_t i = 0; i < sonar_data.size(); i++)
   {
+    sensor_msgs::Range sonarsValue_temp;
     //封装成sensor_msgs::Range
-    sonarsValue[i].header = message->header;
-    sonarsValue[i].header.frame_id = sonars_frame[i]; //重新修正sonar_frame_id;
-    sonarsValue[i].radiation_type = 0;
-    sonarsValue[i].field_of_view = 0.5;
-    sonarsValue[i].min_range = 0.1;
-    sonarsValue[i].max_range = 1.0;
-    sonarsValue[i].range = message->ranges[i];
+    sonarsValue_temp.header = message->header;
+    sonarsValue_temp.header.frame_id = sonars_frame[i]; //重新修正sonar_frame_id;
+    sonarsValue_temp.radiation_type = 0;
+    sonarsValue_temp.field_of_view = 0.5;
+    sonarsValue_temp.min_range = 0.1;
+    sonarsValue_temp.max_range = 1.0;
+    sonarsValue_temp.range = sonar_data[i];
+    sonarsValue.push_back(sonarsValue_temp);
+    sonarDataPub_0.publish(sonarsValue_temp); // publish sonars  range date
 
-    sonarDataPub_0.publish(sonarsValue[i]); // publish sonars  range date
 
-    sonarsPoints[i].header = message->header;
-    sonarsPoints[i].header.frame_id = sonars_frame[i];
-    sonarsPoints[i].point.x = message->ranges[i];
-    sonarsPoints[i].point.y = 0;
-    sonarsPoints[i].point.z = 0;
+    geometry_msgs::PointStamped sonarsPoints_temp;
+    sonarsPoints_temp.header = message->header;
+    sonarsPoints_temp.header.frame_id = sonars_frame[i];
+    sonarsPoints_temp.point.x = message->ranges[i];
+    sonarsPoints_temp.point.y = 0;
+    sonarsPoints_temp.point.z = 0;
+    sonarsPoints.push_back(sonarsPoints_temp);
+
   }
   //再将一圈雷达数据组合成base_link下的点云
   if (message->ranges.size() != sonarsPoints.size())
-    ROS_ERROR("don't received all the sonars data %d ", message->ranges.size());
+    ROS_ERROR_STREAM("don't received all the sonars data " << message->ranges.size());
 
-  std::vector<geometry_msgs::PointStamped> sonarsPoints_baselink;
+  std::vector<geometry_msgs::PointStamped> sonarsPoints_baselink(sonarsPoints.size());
       // project the laser into a point cloud
   sensor_msgs::PointCloud cloud;
   cloud.header = message->header;
@@ -155,8 +163,6 @@ void Sonar2PointCloud::sonarDataCallback(const sensor_msgs::LaserScanConstPtr &m
   
   sonarPointcloudPub.publish(cloud);
 
-
-
 }
 
 
@@ -167,6 +173,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "sonar_to_pointcloud");
     ros::NodeHandle  nh;
     tf::TransformListener tf(ros::Duration(3));
+    ROS_INFO("sonar to pointcloud  running");
     Sonar2PointCloud sonar2pointclud(nh, tf);
 
   return 0;

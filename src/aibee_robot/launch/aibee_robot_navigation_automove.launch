@@ -36,26 +36,26 @@
 <include file="$(find pointcloud_to_laserscan)/launch/vscan_horizental.launch"/>
 <!-- <include file="$(find pointcloud_to_laserscan)/launch/vscan_vertical.launch"/> -->
 
-<!-- aibee_robot navigation action
+<!-- aibee_robot navigation action -->
   <node pkg="aibee_robot" type="aibee_navi_node"  name="aibee_navi" output="screen" >
     <param name="map_topic" value="map"/>  
   
     <rosparam file="$(find aibee_robot)/config/global_planner_params.yaml" command="load" />
   
     <rosparam file="$(find aibee_robot)/config/local_planner_params.yaml" command="load" />
-  </node> -->
+  </node>
   
 
 <!-- cmd or ipad control change-->
-<!-- <node pkg="cmd_control" type="cmd_control_node"  name="cmd_control_node" output="screen"/> -->
+<node pkg="cmd_control" type="cmd_control_node"  name="cmd_control_node" output="screen"/>
 
   <!-- node function: 订阅ipad点位, 利用movebase 导航到对应位置-->
   <!-- <node name="obstable_navigatoin" pkg="obstable_navigatoin" type="obstable_navigatoin_node" output="screen" >
   </node> -->
 
-<!-- <node pkg="cmd_control" type="auto_move_node"  name="auto_move_node" output="screen" >
+<node pkg="cmd_control" type="auto_move_node"  name="auto_move_node" output="screen" >
   <param name="waypoints_num" value="5"/>
-</node> -->
+</node>
 
  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>
 
