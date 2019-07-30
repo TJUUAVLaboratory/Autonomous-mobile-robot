@@ -444,7 +444,7 @@ void Costmap2DROS::mapUpdateLoop(double frequency)
     start_t = start.tv_sec + double(start.tv_usec) / 1e6;
     end_t = end.tv_sec + double(end.tv_usec) / 1e6;
     t_diff = end_t - start_t;
-    ROS_WARN("Map update time: %.9f", t_diff);
+    //ROS_WARN("Map update time: %.9f", t_diff);
     if (publish_cycle.toSec() > 0 && layered_costmap_->isInitialized())
     {
       unsigned int x0, y0, xn, yn;

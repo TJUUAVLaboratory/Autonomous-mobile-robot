@@ -19,10 +19,11 @@ global_costmap:
    rolling_window: false   ##全局地图不需要rolling windows
    resolution: 0.05  ## m/pixel
    transform_tolerance: 1.0
+   footprint: "[[-0.42, 0.0], [-0.35, 0.17], [-0.13,0.29], [0.06, 0.275],[0.16, 0.13], [0.16, -0.13], [0.06, -0.275], [-0.13, -0.29], [-0.35, -0.17]]"
    plugins:
       - {name: global_static_layer,    type: "costmap_2d::StaticLayer"   }
       - {name: global_obstacles_laser, type: "costmap_2d::ObstacleLayer" }
-      - {name: global_rplidar_laser, type: "costmap_2d::ObstacleLayer" }
+      ##- {name: global_rplidar_laser, type: "costmap_2d::ObstacleLayer" }
       - {name: global_inflation_layer, type: "costmap_2d::InflationLayer"}
 
    global_static_layer:
@@ -49,8 +50,8 @@ global_costmap:
       max_obstacle_height: 0.50
       map_type: costmap  ## voxel
       min_obstacle_height: -0.2
-      raytrace_range: 5.0
-      obstacle_range: 4.0   ## local_costmap
+      raytrace_range: 3.0
+      obstacle_range: 3.0   ## local_costmap
       # track_unknown_space:
       observation_sources: scan
       scan: {data_type: LaserScan, topic: /singalScan0, marking: true, clearing: true, expected_update_rate: 0}
@@ -58,10 +59,9 @@ global_costmap:
 
 
    global_inflation_layer:
-      inflation_radius: 0.35
+      inflation_radius: 0.2
       # robot_radius:   0.5     ## robot footprint 300mm
-      footprint: "[[-0.45, 0.0], [-0.4, 0.2], [-0.15,0.3], [0.10, 0.33],[0.20, 0.15], [0.20, -0.15], [0.10, -0.33], [-0.15, -0.3], [-0.4, -0.2]]"
-    
+      
 
 # ### static layer
 #    static_map: true

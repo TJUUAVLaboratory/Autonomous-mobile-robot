@@ -34,7 +34,11 @@
 
 <!--pointCloud to Laserscan 提供/scan  vertical and horizental-->
 <include file="$(find pointcloud_to_laserscan)/launch/vscan_horizental.launch"/>
-<!-- <include file="$(find pointcloud_to_laserscan)/launch/vscan_vertical.launch"/> -->
+<include file="$(find pointcloud_to_laserscan)/launch/vscan_vertical.launch"/> 
+
+<!-- sonars to poincloud node  -->
+<node name="sonars_to_pointcloud_node" pkg="sonars_to_pointcloud" type="sonars_to_pointcloud" output="screen">
+</node>
 
 <!-- aibee_robot navigation action -->
   <node pkg="aibee_robot" type="aibee_navi_node"  name="aibee_navi" output="screen" >
@@ -50,13 +54,13 @@
 <node pkg="cmd_control" type="cmd_control_node"  name="cmd_control_node" output="screen"/>
 
   <!-- node function: 订阅ipad点位, 利用movebase 导航到对应位置-->
-  <!-- <node name="obstable_navigatoin" pkg="obstable_navigatoin" type="obstable_navigatoin_node" output="screen" >
-  </node> -->
+  <node name="obstable_navigatoin" pkg="obstable_navigatoin" type="obstable_navigatoin_node" output="screen" >
+  </node> 
 
 <node pkg="cmd_control" type="auto_move_node"  name="auto_move_node" output="screen" >
   <param name="waypoints_num" value="5"/>
 </node>
 
- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/>
+ <!-- node pkg="rviz" type="rviz" name="rviz" args="-d $(find aibee_robot)/rviz/obstable.rviz"/ -->
 
 </launch>
