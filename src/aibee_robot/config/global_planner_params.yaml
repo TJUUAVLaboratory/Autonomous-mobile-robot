@@ -59,7 +59,7 @@ global_costmap:
 
 
    global_inflation_layer:
-      inflation_radius: 0.2
+      inflation_radius: 0.1
       # robot_radius:   0.5     ## robot footprint 300mm
       
 

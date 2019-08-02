@@ -57,3 +57,10 @@ target_link_libraries(cmd_control_node
     add_executable(auto_move_node src/auto_move_node.cpp)
     target_link_libraries(auto_move_node
     ${catkin_LIBRARIES})
+
+
+    add_executable(data_record_node src/data_record_node.cpp)
+    target_link_libraries(data_record_node
+    ${catkin_LIBRARIES})
+
+
