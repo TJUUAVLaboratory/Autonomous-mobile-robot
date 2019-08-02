@@ -19,7 +19,7 @@ std::vector<geometry_msgs::PoseStamped> waypoints_in;
 std::vector<geometry_msgs::PoseStamped> waypoints_out;
 bool move_flag = false;
 ros::Publisher marker_pub;
-int window_size = 5;
+int window_size = 1;
 
 std::string waypoints_file;
 std::ofstream save_points;
@@ -89,21 +89,20 @@ void wayPointsCallback(const geometry_msgs::PointStampedPtr &point_msg)
     if (waypoint_id >= waypoints_num)
     {
         save_points.open(waypoints_file);
-        if(save_points.fail())
-            ROS_ERROR_STREAM("can not open the file of waypoints" << waypoints_file );
+        if (save_points.fail())
+            ROS_ERROR_STREAM("can not open the file of waypoints" << waypoints_file);
         //waypoints_in = waypoints_in;
         for (std::size_t i = 0; i < waypoints_in.size(); i++)
         {
             setAngleBasedOnPositionDerivative(waypoints_in, i); //修改航向
             save_points << waypoints_in[i].pose.position.x << " "
-                        << waypoints_in[i].pose.position.x << " "
-                        << waypoints_in[i].pose.position.x << " "
+                        << waypoints_in[i].pose.position.y << " "
+                        << waypoints_in[i].pose.position.z << " "
                         << waypoints_in[i].pose.orientation.x << " "
-                        << waypoints_in[i].pose.orientation.x << " "
-                        << waypoints_in[i].pose.orientation.x << " "
-                        << waypoints_in[i].pose.orientation.x << " "
+                        << waypoints_in[i].pose.orientation.y << " "
+                        << waypoints_in[i].pose.orientation.z << " "
+                        << waypoints_in[i].pose.orientation.w << " "
                         << std::endl;
-        
         }
         save_points.close();
         ROS_INFO("save the waypoints");
@@ -115,7 +114,7 @@ int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "data_record_node");
     ros::NodeHandle nh("~");
-    nh.param("waypoints_num", waypoints_num, 20); // the number of waypoints
+    nh.param("waypoints_num", waypoints_num, 5); // the number of waypoints
     nh.param("waypoints_file", waypoints_file, std::string("waypoints.txt"));
 
     marker_pub = nh.advertise<visualization_msgs::Marker>("goal_waypoints", 10);
@@ -131,23 +130,25 @@ int main(int argc, char *argv[])
     spinner.start();
 
     std::vector<geometry_msgs::PoseStamped>::iterator forward_goal = waypoints_in.begin();
+    int point_id = 0;
     while (ros::ok())
     {
-        if ((!waypoints_out.empty()) && move_flag == true)
+
+        if ((!waypoints_in.empty()) && move_flag == true)
         {
             ROS_INFO("the auto move thread");
             move_base_msgs::MoveBaseGoal goal;
 
-            goal.target_pose.header.frame_id = (*forward_goal).header.frame_id;
+            goal.target_pose.header.frame_id = waypoints_in[point_id].header.frame_id;
             goal.target_pose.header.stamp = ros::Time::now();
 
-            goal.target_pose.pose.position.x = (*forward_goal).pose.position.x;
-            goal.target_pose.pose.position.y = (*forward_goal).pose.position.y;
+            goal.target_pose.pose.position.x = waypoints_in[point_id].pose.position.x;
+            goal.target_pose.pose.position.y = waypoints_in[point_id].pose.position.y;
 
-            goal.target_pose.pose.orientation.x = (*forward_goal).pose.orientation.x;
-            goal.target_pose.pose.orientation.y = (*forward_goal).pose.orientation.y;
-            goal.target_pose.pose.orientation.z = (*forward_goal).pose.orientation.z;
-            goal.target_pose.pose.orientation.w = (*forward_goal).pose.orientation.w;
+            goal.target_pose.pose.orientation.x = waypoints_in[point_id].pose.orientation.x;
+            goal.target_pose.pose.orientation.y = waypoints_in[point_id].pose.orientation.y;
+            goal.target_pose.pose.orientation.z = waypoints_in[point_id].pose.orientation.z;
+            goal.target_pose.pose.orientation.w = waypoints_in[point_id].pose.orientation.w;
             movebase_client.sendGoal(goal);
             //movebase_client.sendGoalAndWait(goal, ros::Duration(20), ros::Duration(20));
             bool finished_within_time = movebase_client.waitForResult(ros::Duration(30));
@@ -156,14 +157,9 @@ int main(int argc, char *argv[])
                 movebase_client.cancelGoal();
                 continue;
             }
-            else
-            {
-                actionlib::SimpleClientGoalState status = movebase_client.getState();
-                if (status == actionlib::SimpleClientGoalState::StateEnum::SUCCEEDED)
-                    continue;
-            }
 
             forward_goal++;
+            point_id++;
             if (forward_goal == waypoints_in.end())
             {
                 move_flag = false;
