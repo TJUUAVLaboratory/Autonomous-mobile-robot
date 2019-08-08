@@ -1,9 +1,0 @@
-devel/*
-
-build/*
-
-logs/*
-
-.catkin_tools/*
-
-src/cartographer_ros/cartographer_ros/map/*
