@@ -1,0 +1,6 @@
+uint32 timestamp
+---
+uint8 code
+string message
+float64[3] position
+float64[4] rotation
