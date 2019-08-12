@@ -1,0 +1,6 @@
+build
+install
+bazel-*
+cmake-build-debug
+cmake-build-relwithdebinfo
+
