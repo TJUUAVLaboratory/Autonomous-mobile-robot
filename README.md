@@ -56,6 +56,18 @@
 ============================================================================================
 ##  3. <a name='function_navigation'></a>function_navigation 根据需求定义机器人自主功能
 
+- use cartographer mapping
+ roslaunch cartographer_ros vr_robot_mapping.launch
+
+- finished and save map
+ rosservice call /finish_trajectory "trajectory_id: 0"
+ rosservice call /write_state "/home/aibee/ros-navigation_workspace/map_data/test.pbstream"
+
+- convert pbstream to ros_grid_map
+rosrun cartographer_ros cartographer_pbstream_to_ros_map -map_filestem=/home/aibee/ros-navigation_workspace/map_data/test -pbstream_filename="/home/aibee/ros-navigation_workspace/map_data/test.pbstream" -resolution=0.05
+
+- localization
+ roslaunch cartographer_ros online_vr_bot_localization2.launch
 
 
 

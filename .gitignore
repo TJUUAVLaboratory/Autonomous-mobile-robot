@@ -15,3 +15,5 @@
 
 /install_isolated/*
 /build_isolated/*
+
+/map_data
