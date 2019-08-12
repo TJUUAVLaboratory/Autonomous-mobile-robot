@@ -1,0 +1,6 @@
+string message
+string map_path
+---
+uint8 code
+string message
+float64[4] parameters

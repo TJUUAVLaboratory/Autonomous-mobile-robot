@@ -1,0 +1,5 @@
+string message
+uint16 total_points
+float64[450] points
+---
+uint8 code
