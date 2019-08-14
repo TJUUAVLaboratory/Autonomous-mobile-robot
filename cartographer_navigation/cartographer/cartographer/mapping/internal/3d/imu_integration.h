@@ -61,8 +61,6 @@ IntegrateImuResult<T> IntegrateImu(
       next_imu_data = std::next(*it)->time;
     }
     common::Time next_time = std::min(next_imu_data, end_time);
-    //common::Time delta = next_time - current_time;
-
     const T delta_t(common::ToSeconds(next_time - current_time));
 
     const Eigen::Matrix<T, 3, 1> delta_angle =

@@ -53,7 +53,6 @@ class LocalTrajectoryBuilder2D {
     sensor::RangeData range_data_in_local;
     // 'nullptr' if dropped by the motion filter.
     std::unique_ptr<const InsertionResult> insertion_result;
-    std::shared_ptr<Submap2D> local_current_submap_;
   };
 
   explicit LocalTrajectoryBuilder2D(

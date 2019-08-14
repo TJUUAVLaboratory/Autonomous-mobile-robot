@@ -16,19 +16,14 @@
 <!-- ***************************** ROS Navigation ************************************ -->
 <param name="/use_sim_time" value="true" />
 <!-- aibee_robot urdf -->
-<include file="$(find aibee_robot)/launch/aibee_robot_urdf.launch" />
+<!-- cartographer localization -->
+<!-- map server load map-->
+ 
 
-<!--map server 提供 /map -->
-<arg name="map" default="office_map/map_office.yaml" />
-<node name="map_server" pkg="map_server" type="map_server" args="$(find aibee_robot)/maps/$(arg map)">
-<param name="map_topic" value="map"/> 
-</node>
+<include file="$(find aibee_robot)/launch/aibee_robot_urdf.launch" />
 
 <!--wheel speed  提供/odom-->
 <include file="$(find wheel_speed_odo)/launch/odom_use_simtime.launch"/> 
-
-<!-- amcl -->
-<!-- include file="$(find amcl)/launch/amcl_diff.launch"/ --> 
 
 
 
@@ -39,6 +34,10 @@
 <!-- sonars to poincloud node  -->
 <node name="sonars_to_pointcloud_node" pkg="sonars_to_pointcloud" type="sonars_to_pointcloud" output="screen">
 </node>
+
+
+<include file="$(find cartographer_ros)/launch/online_vr_bot_localization2.launch" /> 
+
 
 <!-- aibee_robot navigation action -->
   <node pkg="aibee_robot" type="aibee_navi_node"  name="aibee_navi" output="screen" >

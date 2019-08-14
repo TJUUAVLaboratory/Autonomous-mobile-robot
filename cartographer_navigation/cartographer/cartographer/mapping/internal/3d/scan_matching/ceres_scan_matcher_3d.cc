@@ -19,7 +19,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <iostream>
+
 #include "cartographer/common/ceres_solver_options.h"
 #include "cartographer/common/make_unique.h"
 #include "cartographer/mapping/internal/3d/rotation_parameterization.h"
@@ -102,9 +102,6 @@ void CeresScanMatcher3D::Match(
         ceres_pose.rotation());
   }
   CHECK_GT(options_.translation_weight(), 0.);
-  //std::cout<<"\n\n\n options_.translation_weight():"<<options_.translation_weight()
-  //<<"\n options_.rotation_weight(): "<<options_.rotation_weight()
-  //<<"\n\n\n\n";
   problem.AddResidualBlock(
       TranslationDeltaCostFunctor3D::CreateAutoDiffCostFunction(
           options_.translation_weight(), target_translation),

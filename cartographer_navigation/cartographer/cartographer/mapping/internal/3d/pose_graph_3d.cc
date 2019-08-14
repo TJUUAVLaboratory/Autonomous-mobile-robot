@@ -152,7 +152,6 @@ void PoseGraph3D::AddTrajectoryIfNeeded(const int trajectory_id) {
 
 void PoseGraph3D::AddImuData(const int trajectory_id,
                              const sensor::ImuData& imu_data) {
-    //std::cout<<"time: "<<imu_data.time<<std::endl;
   common::MutexLocker locker(&mutex_);
   AddWorkItem([=]() REQUIRES(mutex_) {
     optimization_problem_->AddImuData(trajectory_id, imu_data);
@@ -236,7 +235,6 @@ void PoseGraph3D::ComputeConstraint(const NodeId& node_id,
     // arbitrary. Finding the correct yaw component will be handled by the
     // matching procedure in the FastCorrelativeScanMatcher, and the given yaw
     // is essentially ignored.
-    // add by galyean, find loop-closure here
     constraint_builder_.MaybeAddGlobalConstraint(
         submap_id, submap_data_.at(submap_id).submap.get(), node_id,
         trajectory_nodes_.at(node_id).constant_data.get(), submap_nodes,
@@ -346,8 +344,6 @@ void PoseGraph3D::UpdateTrajectoryConnectivity(const Constraint& constraint) {
 
 void PoseGraph3D::HandleWorkQueue(
     const constraints::ConstraintBuilder3D::Result& result) {
-  // graph optimization is done here!
-  // added by galyean
   {
     common::MutexLocker locker(&mutex_);
     constraints_.insert(constraints_.end(), result.begin(), result.end());
@@ -470,7 +466,6 @@ bool PoseGraph3D::IsTrajectoryFrozen(const int trajectory_id) const {
 void PoseGraph3D::AddSubmapFromProto(
     const transform::Rigid3d& global_submap_pose, const proto::Submap& submap) {
   if (!submap.has_submap_3d()) {
-    std::cerr<<submap.submap_id().submap_index()<<"  doesn't contain any submap3d\n";
     return;
   }
 
@@ -610,7 +605,6 @@ void PoseGraph3D::LogResidualHistograms() const {
       translational_residual.Add(residual.translation().norm());
     }
   }
-  LOG(INFO) << "Translational residuals histogram:\n";
   LOG(INFO) << "Translational residuals histogram:\n"
             << translational_residual.ToString(10);
   LOG(INFO) << "Rotational residuals histogram:\n"
@@ -626,9 +620,6 @@ void PoseGraph3D::RunOptimization() {
   // frozen_trajectories_ and landmark_nodes_ when executing the Solve. Solve is
   // time consuming, so not taking the mutex before Solve to avoid blocking
   // foreground processing.
-  
-  // log added by galyean, to test how frequently the pose-graph is done
-  //std::cout<<" run pose graph optimization once \n";
   optimization_problem_->Solve(constraints_, frozen_trajectories_,
                                landmark_nodes_);
   common::MutexLocker locker(&mutex_);
@@ -797,19 +788,11 @@ PoseGraph3D::GetAllSubmapData() const {
   common::MutexLocker locker(&mutex_);
   return GetSubmapDataUnderLock();
 }
-void PoseGraph3D::SetLocalCurrentSubmap(PoseGraphInterface::SubmapData current_submap_){
-  local_current_submap_ = current_submap_;
-}
-
-PoseGraphInterface::SubmapData PoseGraph3D::GetLocalCurrentSubmap() const {
-  return local_current_submap_;
-}
 
 MapById<SubmapId, PoseGraphInterface::SubmapPose>
 PoseGraph3D::GetAllSubmapPoses() const {
   common::MutexLocker locker(&mutex_);
   MapById<SubmapId, SubmapPose> submap_poses;
-  //std::cout<<"\n\n submap_data_ size: "<<submap_data_.size()<<"\n\n";
   for (const auto& submap_id_data : submap_data_) {
     auto submap_data = GetSubmapDataUnderLock(submap_id_data.id);
     submap_poses.Insert(

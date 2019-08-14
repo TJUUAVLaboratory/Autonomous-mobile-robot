@@ -52,7 +52,6 @@ class LocalTrajectoryBuilder3D {
     sensor::RangeData range_data_in_local;
     // 'nullptr' if dropped by the motion filter.
     std::unique_ptr<const InsertionResult> insertion_result;
-    std::shared_ptr<const Submap3D> local_current_submap_;
   };
 
   explicit LocalTrajectoryBuilder3D(
@@ -103,8 +102,6 @@ class LocalTrajectoryBuilder3D {
   std::chrono::steady_clock::time_point accumulation_started_;
 
   RangeDataCollator range_data_collator_;
-
-
 };
 
 }  // namespace mapping

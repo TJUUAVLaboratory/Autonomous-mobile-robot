@@ -23,7 +23,7 @@ global_costmap:
    plugins:
       - {name: global_static_layer,    type: "costmap_2d::StaticLayer"   }
       - {name: global_obstacles_laser, type: "costmap_2d::ObstacleLayer" }
-      ##- {name: global_rplidar_laser, type: "costmap_2d::ObstacleLayer" }
+     # - {name: global_rplidar_laser,   type: "costmap_2d::ObstacleLayer" }
       - {name: global_inflation_layer, type: "costmap_2d::InflationLayer"}
 
    global_static_layer:
@@ -43,7 +43,7 @@ global_costmap:
       obstacle_range: 2.5   ## local_costmap
       transform_tolerance: 0.2
       observation_sources: scan
-      scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true, expected_update_rate: 0}
+      scan: {data_type: LaserScan, topic: /scan, sensor_frame: base_link, marking: true, clearing: true, expected_update_rate: 0}
       # track_unknown_space: 
 
    global_rplidar_laser:
@@ -54,12 +54,12 @@ global_costmap:
       obstacle_range: 3.0   ## local_costmap
       # track_unknown_space:
       observation_sources: scan
-      scan: {data_type: LaserScan, topic: /singalScan0, marking: true, clearing: true, expected_update_rate: 0}
+      scan: {data_type: LaserScan, topic: /rplidar_point, marking: true, clearing: true, expected_update_rate: 0}
 
 
 
    global_inflation_layer:
-      inflation_radius: 0.1
+      inflation_radius: 0.2
       # robot_radius:   0.5     ## robot footprint 300mm
       
 

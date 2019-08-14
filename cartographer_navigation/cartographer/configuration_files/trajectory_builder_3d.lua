@@ -12,7 +12,7 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-MAX_3D_RANGE = 80.
+MAX_3D_RANGE = 60.
 
 TRAJECTORY_BUILDER_3D = {
   min_range = 1.,
@@ -22,8 +22,8 @@ TRAJECTORY_BUILDER_3D = {
 
   high_resolution_adaptive_voxel_filter = {
     max_length = 2.,
-    min_num_points = 200,
-    max_range = 25.,
+    min_num_points = 150,
+    max_range = 15.,
   },
 
   low_resolution_adaptive_voxel_filter = {
@@ -55,8 +55,8 @@ TRAJECTORY_BUILDER_3D = {
 
   motion_filter = {
     max_time_seconds = 0.5,
-    max_distance_meters = 0.06,
-    max_angle_radians = 0.02,
+    max_distance_meters = 0.1,
+    max_angle_radians = 0.004,
   },
 
   imu_gravity_time_constant = 10.,
@@ -68,9 +68,9 @@ TRAJECTORY_BUILDER_3D = {
     low_resolution = 0.45,
     num_range_data = 160,
     range_data_inserter = {
-      hit_probability = 0.6,
-      miss_probability = 0.2,
-      num_free_space_voxels = 3,
+      hit_probability = 0.55,
+      miss_probability = 0.49,
+      num_free_space_voxels = 2,
     },
   },
 }

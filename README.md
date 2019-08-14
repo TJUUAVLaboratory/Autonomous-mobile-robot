@@ -71,6 +71,14 @@ rosrun cartographer_ros cartographer_pbstream_to_ros_map -map_filestem=/home/aib
 
 
 
+// cartographer  
+tracking_frmae = imu_link
+
+vscan_horizontal.launch target_link imu_link
+vscan_vertical.launch   target_link imu_link
+
+
+
 ============================================================================================
 ##  4. <a name='ROS_Navigation'></a>ROS_Navigation 机器人的定位/导航功能包
 

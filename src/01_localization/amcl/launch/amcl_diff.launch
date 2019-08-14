@@ -47,9 +47,9 @@
     <param name="initial_cov_yy" value="0.25"/>   //Initial pose covariance (y*y)
     <param name="initial_cov_aa" value="0.068538917"/>   //Initial pose covariance (yaw*yaw)
 
-//    <param name="initial_cov_xx" value="1"/>   //Initial pose covariance (x*x)
-//    <param name="initial_cov_yy" value="1"/>   //Initial pose covariance (y*y)
-//    <param name="initial_cov_aa" value="0.5"/>   //Initial pose covariance (yaw*yaw)
+  //  <param name="initial_cov_xx" value="1"/>   //Initial pose covariance (x*x)
+  //  <param name="initial_cov_yy" value="1"/>   //Initial pose covariance (y*y)
+  //  <param name="initial_cov_aa" value="0.5"/>   //Initial pose covariance (yaw*yaw)
 
       <param name="beam_skip_distance" value="0.05"/>   
 

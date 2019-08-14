@@ -53,8 +53,6 @@ class PointsProcessorPipelineBuilder {
 
   std::vector<std::unique_ptr<PointsProcessor>> CreatePipeline(
       common::LuaParameterDictionary* dictionary) const;
-  std::vector<std::unique_ptr<PointsProcessor>> CreatePipeline(
-      common::LuaParameterDictionary* dictionary,std::vector<Eigen::Vector3f> &human_points) const;
 
  private:
   std::unordered_map<std::string, FactoryFunction> factories_;

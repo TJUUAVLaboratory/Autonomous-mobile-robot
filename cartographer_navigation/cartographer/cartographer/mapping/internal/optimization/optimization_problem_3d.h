@@ -116,12 +116,6 @@ class OptimizationProblem3D
   }
 
  private:
-    void compute_acc_residual(double* middle_rotation,double*start_position,double*middle_position,
-                                         double* end_position,double gravity_constant,double*imu_calibration,
-                                         const Eigen::Vector3d&delta_velocity_imu_frame_,double first_delta_time_seconds_,
-                                         double second_delta_time_seconds_);
-    void compute_gyro_residual(double*start_rotation,double*end_rotation,
-                               double*imu_calibration,const Eigen::Quaterniond &delta_rotation_imu_frame_);
   // Computes the relative pose between two nodes based on odometry data.
   std::unique_ptr<transform::Rigid3d> CalculateOdometryBetweenNodes(
       int trajectory_id, const NodeSpec3D& first_node_data,

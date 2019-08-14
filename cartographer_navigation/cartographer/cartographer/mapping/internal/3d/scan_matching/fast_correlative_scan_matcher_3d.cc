@@ -202,11 +202,9 @@ FastCorrelativeScanMatcher3D::MatchWithSearchParameters(
   const std::vector<Candidate3D> lowest_resolution_candidates =
       ComputeLowestResolutionCandidates(search_parameters, discrete_scans);
 
-  //std::printf("\nlowest_resolution_candidates size: %d\n",lowest_resolution_candidates.size());
   const Candidate3D best_candidate = BranchAndBound(
       search_parameters, discrete_scans, lowest_resolution_candidates,
       precomputation_grid_stack_->max_depth(), min_score);
-
   if (best_candidate.score > min_score) {
     return common::make_unique<Result>(Result{
         best_candidate.score,
@@ -272,7 +270,6 @@ std::vector<DiscreteScan3D> FastCorrelativeScanMatcher3D::GenerateDiscreteScans(
   std::vector<DiscreteScan3D> result;
   // We set this value to something on the order of resolution to make sure that
   // the std::acos() below is defined.
-  //printf("\nresolution:%f",resolution_);
   float max_scan_range = 3.f * resolution_;
   for (const Eigen::Vector3f& point : point_cloud) {
     const float range = point.norm();
@@ -369,7 +366,6 @@ void FastCorrelativeScanMatcher3D::ScoreCandidates(
     candidate.score = PrecomputationGrid3D::ToProbability(
         sum /
         static_cast<float>(discrete_scan.cell_indices_per_depth[depth].size()));
-    //printf("\ncandidate_score:%f",candidate.score);
   }
   std::sort(candidates->begin(), candidates->end(),
             std::greater<Candidate3D>());
@@ -456,7 +452,6 @@ Candidate3D FastCorrelativeScanMatcher3D::BranchAndBound(
         BranchAndBound(search_parameters, discrete_scans,
                        higher_resolution_candidates, candidate_depth - 1,
                        best_high_resolution_candidate.score));
-      //std::printf("\nhigher_resolution_score: %f and min_score is:%f\n",best_high_resolution_candidate.score,min_score);
   }
   return best_high_resolution_candidate;
 }

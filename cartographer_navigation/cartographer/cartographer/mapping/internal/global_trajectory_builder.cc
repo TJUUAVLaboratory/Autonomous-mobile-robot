@@ -61,12 +61,6 @@ class GlobalTrajectoryBuilder : public mapping::TrajectoryBuilderInterface {
       // The range data has not been fully accumulated yet.
       return;
     }
-    // add by galyean, to send current local submap to pose_graph
-    PoseGraphInterface::SubmapData submap_data{
-      matching_result->local_current_submap_,
-      matching_result->local_current_submap_->local_pose()};
-    pose_graph_->SetLocalCurrentSubmap(submap_data);
-
     kLocalSlamMatchingResults->Increment();
     std::unique_ptr<InsertionResult> insertion_result;
     if (matching_result->insertion_result != nullptr) {
@@ -91,14 +85,10 @@ class GlobalTrajectoryBuilder : public mapping::TrajectoryBuilderInterface {
 
   void AddSensorData(const std::string& sensor_id,
                      const sensor::ImuData& imu_data) override {
-    sensor::ImuData temp_imu =  imu_data;
-
-    temp_imu.angular_velocity = temp_imu.angular_velocity;
-    temp_imu.linear_acceleration = temp_imu.linear_acceleration;
     if (local_trajectory_builder_) {
-      local_trajectory_builder_->AddImuData(temp_imu);
+      local_trajectory_builder_->AddImuData(imu_data);
     }
-    pose_graph_->AddImuData(trajectory_id_, temp_imu);
+    pose_graph_->AddImuData(trajectory_id_, imu_data);
   }
 
   void AddSensorData(const std::string& sensor_id,

@@ -50,17 +50,20 @@ target_link_libraries(cmd_control_node
     ${catkin_LIBRARIES}
     )
 
-  add_executable(cmd_control_pad src/cmd_control_pad.cpp)
-  target_link_libraries(cmd_control_pad
+add_executable(cmd_control_pad src/cmd_control_pad.cpp)
+target_link_libraries(cmd_control_pad
     ${catkin_LIBRARIES})
 
-    add_executable(auto_move_node src/auto_move_node.cpp)
-    target_link_libraries(auto_move_node
-    ${catkin_LIBRARIES})
-
-
-    add_executable(data_record_node src/data_record_node.cpp)
-    target_link_libraries(data_record_node
+add_executable(auto_move_node src/auto_move_node.cpp)
+target_link_libraries(auto_move_node
     ${catkin_LIBRARIES})
 
 
+add_executable(data_record_node src/data_record_node.cpp)
+target_link_libraries(data_record_node
+    ${catkin_LIBRARIES})
+
+
+add_executable(waypoints_with_load src/waypoints_with_loadPoints.cpp)
+target_link_libraries(waypoints_with_load
+    ${catkin_LIBRARIES})

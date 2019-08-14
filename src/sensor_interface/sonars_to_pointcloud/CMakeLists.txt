@@ -30,3 +30,5 @@ add_executable(sonars_to_pointcloud src/sonars_to_pointcloud.cpp)
 target_link_libraries(sonars_to_pointcloud ${catkin_LIBRARIES})
 
 
+add_executable(rplidar_to_pointcloud src/rplidar_to_pointcloud.cpp)
+target_link_libraries(rplidar_to_pointcloud ${catkin_LIBRARIES})

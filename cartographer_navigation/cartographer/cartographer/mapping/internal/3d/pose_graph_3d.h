@@ -143,9 +143,7 @@ class PoseGraph3D : public PoseGraph {
       PoseGraphInterface::GlobalSlamOptimizationCallback callback) override;
   transform::Rigid3d GetInterpolatedGlobalTrajectoryPose(
       int trajectory_id, const common::Time time) const REQUIRES(mutex_);
-  // add by galyean
-  void SetLocalCurrentSubmap(SubmapData current_submap_) EXCLUDES(mutex_) override;
-  SubmapData GetLocalCurrentSubmap() const EXCLUDES(mutex_) override;
+
  protected:
   // Waits until we caught up (i.e. nothing is waiting to be scheduled), and
   // all computations have finished.
@@ -155,7 +153,6 @@ class PoseGraph3D : public PoseGraph {
   // The current state of the submap in the background threads. When this
   // transitions to kFinished, all nodes are tried to match against this submap.
   // Likewise, all new nodes are matched against submaps which are finished.
-  SubmapData local_current_submap_;
   enum class SubmapState { kActive, kFinished };
   struct InternalSubmapData {
     std::shared_ptr<const Submap3D> submap;

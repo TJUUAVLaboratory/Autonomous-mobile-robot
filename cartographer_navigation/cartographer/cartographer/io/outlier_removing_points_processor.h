@@ -45,6 +45,7 @@ class OutlierRemovingPointsProcessor : public PointsProcessor {
 
   void Process(std::unique_ptr<PointsBatch> batch) override;
   FlushResult Flush() override;
+
  private:
   // To reduce memory consumption by not having to keep all rays in memory, we
   // filter outliers in three phases each going over all data: First we compute
@@ -60,7 +61,7 @@ class OutlierRemovingPointsProcessor : public PointsProcessor {
     kPhase2,
     kPhase3,
   };
-  void MarkHumanPoints();
+
   // First phase counts the number of hits per voxel.
   void ProcessInPhaseOne(const PointsBatch& batch);
 
@@ -73,7 +74,7 @@ class OutlierRemovingPointsProcessor : public PointsProcessor {
   // hit an inlier if it is inside a voxel that has a sufficiently high
   // hit-to-ray ratio.
   void ProcessInPhaseThree(std::unique_ptr<PointsBatch> batch);
-  
+
   const double voxel_size_;
   PointsProcessor* const next_;
   State state_;

@@ -20,7 +20,7 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 #include "ceres/ceres.h"
-#include <iostream>
+
 namespace cartographer {
 namespace mapping {
 
@@ -30,7 +30,6 @@ class RotationCostFunction3D {
   static ceres::CostFunction* CreateAutoDiffCostFunction(
       const double scaling_factor,
       const Eigen::Quaterniond& delta_rotation_imu_frame) {
-
     return new ceres::AutoDiffCostFunction<
         RotationCostFunction3D, 3 /* residuals */, 4 /* rotation variables */,
         4 /* rotation variables */, 4 /* rotation variables */

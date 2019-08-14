@@ -20,7 +20,7 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 #include "ceres/ceres.h"
-#include <iostream>
+
 namespace cartographer {
 namespace mapping {
 
@@ -96,7 +96,6 @@ class AccelerationCostFunction3D {
   const Eigen::Vector3d delta_velocity_imu_frame_;
   const double first_delta_time_seconds_;
   const double second_delta_time_seconds_;
-
 };
 
 }  // namespace mapping

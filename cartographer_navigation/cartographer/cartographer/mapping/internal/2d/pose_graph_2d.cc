@@ -746,14 +746,6 @@ std::vector<std::vector<int>> PoseGraph2D::GetConnectedTrajectories() const {
   return trajectory_connectivity_state_.Components();
 }
 
-void PoseGraph2D::SetLocalCurrentSubmap(SubmapData current_submap){
-
-}
-PoseGraphInterface::SubmapData PoseGraph2D::GetLocalCurrentSubmap() const{
-    PoseGraphInterface::SubmapData a;
-  return a;
-}
-
 PoseGraphInterface::SubmapData PoseGraph2D::GetSubmapData(
     const SubmapId& submap_id) const {
   common::MutexLocker locker(&mutex_);

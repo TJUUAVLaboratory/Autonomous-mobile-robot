@@ -33,7 +33,7 @@ class ImuTracker {
 
   // Advances to the given 'time' and updates the orientation to reflect this.
   void Advance(common::Time time);
-    void UpdatePose(const common::Time time,const Eigen::Quaterniond& rotation);
+
   // Updates from an IMU reading (in the IMU frame).
   void AddImuLinearAccelerationObservation(
       const Eigen::Vector3d& imu_linear_acceleration);

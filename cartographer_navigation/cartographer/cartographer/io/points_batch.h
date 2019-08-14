@@ -53,8 +53,7 @@ struct PointsBatch {
 
   // Geometry of the points in the map frame.
   std::vector<Eigen::Vector3f> points;
-  // add by galyean, we use normals to store origins
-  std::vector<Eigen::Vector3f> normals;
+
   // Intensities are optional and may be unspecified. The meaning of these
   // intensity values varies by device. For example, the VLP16 provides values
   // in the range [0, 100] for non-specular return values and values up to 255

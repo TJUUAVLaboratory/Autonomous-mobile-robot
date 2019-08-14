@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <fstream>
+
 #include "cartographer/common/lua_parameter_dictionary.h"
 #include "cartographer/io/file_writer.h"
 #include "cartographer/io/points_processor.h"
@@ -42,11 +42,9 @@ class PlyWritingPointsProcessor : public PointsProcessor {
   FlushResult Flush() override;
 
  private:
-  std::string base_dir_name_;
   PointsProcessor* const next_;
-  int batch_id;
+
   int64 num_points_;
-  bool has_normals_;
   bool has_colors_;
   bool has_intensities_;
   std::unique_ptr<FileWriter> file_;

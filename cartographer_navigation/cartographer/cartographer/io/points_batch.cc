@@ -22,7 +22,6 @@ namespace io {
 void RemovePoints(std::unordered_set<int> to_remove, PointsBatch* batch) {
   const int new_num_points = batch->points.size() - to_remove.size();
   std::vector<Eigen::Vector3f> points;
-  std::vector<Eigen::Vector3f> normals;
   points.reserve(new_num_points);
   std::vector<float> intensities;
   if (!batch->intensities.empty()) {
@@ -32,9 +31,7 @@ void RemovePoints(std::unordered_set<int> to_remove, PointsBatch* batch) {
   if (!batch->colors.empty()) {
     colors.reserve(new_num_points);
   }
-  if(!batch->normals.empty()){
-    normals.reserve(new_num_points);
-  }
+
   for (size_t i = 0; i < batch->points.size(); ++i) {
     if (to_remove.count(i) == 1) {
       continue;
@@ -43,9 +40,6 @@ void RemovePoints(std::unordered_set<int> to_remove, PointsBatch* batch) {
     if (!batch->colors.empty()) {
       colors.push_back(batch->colors[i]);
     }
-    if(!batch->normals.empty()){
-      normals.push_back(batch->normals[i]);
-    }
     if (!batch->intensities.empty()) {
       intensities.push_back(batch->intensities[i]);
     }
@@ -53,7 +47,6 @@ void RemovePoints(std::unordered_set<int> to_remove, PointsBatch* batch) {
   batch->points = std::move(points);
   batch->intensities = std::move(intensities);
   batch->colors = std::move(colors);
-  batch->normals = std::move(normals);
 }
 
 }  // namespace io

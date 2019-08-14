@@ -86,7 +86,6 @@ PaintSubmapSlicesResult PaintSubmapSlices(
   const Eigen::Array2i size(
       std::ceil(bounding_box.sizes().x()) + 2 * kPaddingPixel,
       std::ceil(bounding_box.sizes().y()) + 2 * kPaddingPixel);
-  //std::cerr<<"bounding_box.min().x() "<<bounding_box.min().x()<<"  bounding_box.min().y()"<<bounding_box.min().y()<<std::endl;
   const Eigen::Array2f origin(-bounding_box.min().x() + kPaddingPixel,
                               -bounding_box.min().y() + kPaddingPixel);
 
@@ -115,7 +114,6 @@ void FillSubmapSlice(
   ::cartographer::mapping::proto::SubmapQuery::Response response;
   ::cartographer::transform::Rigid3d local_pose;
   if (proto.has_submap_3d()) {
-    std::cout<<"FillSubmapSlice!"<<std::endl;
     mapping::Submap3D submap(proto.submap_3d());
     local_pose = submap.local_pose();
     submap.ToResponseProto(global_submap_pose, &response);
@@ -174,7 +172,6 @@ UniqueCairoSurfacePtr DrawTexture(const std::vector<char>& intensity,
     const uint8_t alpha_value = alpha.at(i);
     const uint8_t observed =
         (intensity_value == 0 && alpha_value == 0) ? 0 : 255;
-
     cairo_data->push_back((alpha_value << 24) | (intensity_value << 16) |
                           (observed << 8) | 0);
   }

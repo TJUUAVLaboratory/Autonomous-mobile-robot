@@ -99,10 +99,7 @@ class ActiveSubmaps3D {
                        const Eigen::Quaterniond& gravity_alignment);
 
   std::vector<std::shared_ptr<Submap3D>> submaps() const;
-  void CreatCurrentLocalSubmap(
-            const sensor::RangeData& range_data,
-            const transform::Rigid3d& global_submap_pose);
-  std::shared_ptr<Submap3D> CurrentSubmap() const;
+
  private:
   void AddSubmap(const transform::Rigid3d& local_submap_pose);
 
@@ -110,11 +107,9 @@ class ActiveSubmaps3D {
   int matching_submap_index_ = 0;
   std::vector<std::shared_ptr<Submap3D>> submaps_;
   RangeDataInserter3D range_data_inserter_;
-  std::shared_ptr<Submap3D> local_current_submap_;
 };
 
 }  // namespace mapping
 }  // namespace cartographer
-//++aibee_zzx
-extern int aibee_map_saver_type;
+
 #endif  // CARTOGRAPHER_MAPPING_3D_SUBMAP_3D_H_

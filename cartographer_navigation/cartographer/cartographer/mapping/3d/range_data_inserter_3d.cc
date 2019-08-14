@@ -40,52 +40,17 @@ void InsertMissesIntoGrid(const std::vector<uint16>& miss_table,
     // line between 'origin' and 'hit'. (including a fractional part for sub-
     // voxels) It is chosen so that between two samples we change from one voxel
     // to the next on the fastest changing dimension.
+    //
     // Only the last 'num_free_space_voxels' are updated for performance.
-    //+++aibee_zzx
-
-    if(hybrid_grid->resolution()>=0.03){
-      int num = 0.8/hybrid_grid->resolution();
-      for (int position = 0;
-        position < num_samples - 5; ++position) {
-        Eigen::Array3i miss_cell =
-        origin_cell + delta * position / num_samples;
-        //0.1分辨率 高度限制
-        // if(abs(miss_cell[2])<5){
-        //   for(int x=-1;x<2;x++){
-        //     for(int y=-1;y<2;y++){
-        //       //for(int z=-1;z<1;z++){
-        //         Eigen::Array3i ifhit;
-        //         ifhit[0]=miss_cell[0]+x;
-        //         ifhit[1]=miss_cell[1]+y;
-        //         //ifhit[2]=miss_cell[2]+z;
-        //         float pro=hybrid_grid->GetProbability(ifhit);
-        //         if(pro>0.3){
-        //            std::cout<<"set!!!"<<std::endl;
-        //            hybrid_grid->ApplyLookupTable(ifhit, miss_table);
-        //            ifhit[2]+=1;
-        //            hybrid_grid->ApplyLookupTable(ifhit, miss_table);
-        //            ifhit[2]-=2;
-        //            hybrid_grid->ApplyLookupTable(ifhit, miss_table);
-        //         }
-
-        //       // }
-        //     }
-        //   //}
-        // }
-          if(abs(miss_cell[2])<=num){
-              float pro=hybrid_grid->GetProbability(miss_cell);
-              if(pro>0.6){
-                  hybrid_grid->ApplyLookupTable(miss_cell, miss_table);
-                  // miss_cell[2]+=1;
-                  // hybrid_grid->ApplyLookupTable(miss_cell, miss_table);
-                  // miss_cell[2]-=2;
-                  // hybrid_grid->ApplyLookupTable(miss_cell, miss_table);
-              }
-            }
-      }
+    for (int position = std::max(0, num_samples - num_free_space_voxels);
+         position < num_samples; ++position) {
+      const Eigen::Array3i miss_cell =
+          origin_cell + delta * position / num_samples;
+      hybrid_grid->ApplyLookupTable(miss_cell, miss_table);
     }
   }
 }
+
 }  // namespace
 
 proto::RangeDataInserterOptions3D CreateRangeDataInserterOptions3D(
@@ -122,7 +87,7 @@ void RangeDataInserter3D::Insert(const sensor::RangeData& range_data,
   // By not starting a new update after hits are inserted, we give hits priority
   // (i.e. no hits will be ignored because of a miss in the same cell).
   InsertMissesIntoGrid(miss_table_, range_data.origin, range_data.returns,
-                        hybrid_grid, options_.num_free_space_voxels());
+                       hybrid_grid, options_.num_free_space_voxels());
   hybrid_grid->FinishUpdate();
 }
 

@@ -19,8 +19,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
-#include <sys/types.h>
-#include <sys/stat.h>
+
 #include "cartographer/common/lua_parameter_dictionary.h"
 #include "cartographer/common/make_unique.h"
 #include "cartographer/io/points_batch.h"
@@ -34,17 +33,12 @@ namespace {
 // Writes the PLY header claiming 'num_points' will follow it into
 // 'output_file'.
 void WriteBinaryPlyHeader(const bool has_color, const bool has_intensities,
-                          const bool has_normal,
                           const int64 num_points,
                           FileWriter* const file_writer) {
   const std::string color_header = !has_color ? ""
                                               : "property uchar red\n"
                                                 "property uchar green\n"
                                                 "property uchar blue\n";
-  const std::string normal_header = !has_normal ? ""
-                                              : "property float nx\n"
-                                                "property float ny\n"
-                                                "property float nz\n";
   const std::string intensity_header =
       !has_intensities ? "" : "property float intensity\n";
   std::ostringstream stream;
@@ -56,7 +50,7 @@ void WriteBinaryPlyHeader(const bool has_color, const bool has_intensities,
          << "property float x\n"
          << "property float y\n"
          << "property float z\n"
-         << color_header << normal_header << intensity_header << "end_header\n";
+         << color_header << intensity_header << "end_header\n";
   const std::string out = stream.str();
   CHECK(file_writer->WriteHeader(out.data(), out.size()));
 }
@@ -70,15 +64,7 @@ void WriteBinaryPlyPointCoordinate(const Eigen::Vector3f& point,
   memcpy(buffer + 8, &point[2], sizeof(float));
   CHECK(file_writer->Write(buffer, 12));
 }
-void WriteBinaryPlyPointNormal(const Eigen::Vector3f& normal,
-                                   FileWriter* const file_writer) {
-  // TODO(sirver): This ignores endianness.
-  char buffer[12];
-  memcpy(buffer, &normal[0], sizeof(float));
-  memcpy(buffer + 4, &normal[1], sizeof(float));
-  memcpy(buffer + 8, &normal[2], sizeof(float));
-  CHECK(file_writer->Write(buffer, 12));
-}
+
 void WriteBinaryIntensity(const float intensity,
                           FileWriter* const file_writer) {
   // TODO(sirver): This ignores endianness.
@@ -106,26 +92,12 @@ PlyWritingPointsProcessor::FromDictionary(
 PlyWritingPointsProcessor::PlyWritingPointsProcessor(
     std::unique_ptr<FileWriter> file_writer, PointsProcessor* const next)
     : next_(next),
-      batch_id(0),
       num_points_(0),
-      has_normals_(false),
       has_colors_(false),
-      file_(std::move(file_writer)) {
-        // add by galyean, to set base dir_name
-        std::string file_name = file_->GetFilename();
-        auto p = file_name.find_last_of("/");
-        if(p==std::string::npos){
-          LOG(ERROR)<<"set wrong file path: file_name\n";
-          exit(1);
-        }
-        base_dir_name_ = file_name.substr(0,p)+"/ply_folder/";
-        std::string system_command = "mkdir -p "+base_dir_name_;
-        system(system_command.data());
-      }
+      file_(std::move(file_writer)) {}
 
 PointsProcessor::FlushResult PlyWritingPointsProcessor::Flush() {
-  WriteBinaryPlyHeader(has_colors_, has_intensities_,has_normals_, num_points_, file_.get());
-
+  WriteBinaryPlyHeader(has_colors_, has_intensities_, num_points_, file_.get());
   CHECK(file_->Close()) << "Closing PLY file_writer failed.";
 
   switch (next_->Flush()) {
@@ -144,32 +116,15 @@ void PlyWritingPointsProcessor::Process(std::unique_ptr<PointsBatch> batch) {
     next_->Process(std::move(batch));
     return;
   }
-  if(num_points_>2e6){
-    WriteBinaryPlyHeader(has_colors_, has_intensities_, has_normals_,num_points_, file_.get());
-    file_->Close();
-    num_points_=0;
-    batch_id++;
-  }
-  if(num_points_ == 0){
-    std::string file_name = base_dir_name_+std::to_string(batch_id)+".ply";
 
-    FileWriterFactory file_writer_factory;
-    file_ = common::make_unique<io::StreamFileWriter>(file_name);
+  if (num_points_ == 0) {
     has_colors_ = !batch->colors.empty();
     has_intensities_ = !batch->intensities.empty();
-    has_normals_ = !batch->normals.empty();
-    WriteBinaryPlyHeader(has_colors_, has_intensities_,has_normals_, 0, file_.get());
+    WriteBinaryPlyHeader(has_colors_, has_intensities_, 0, file_.get());
   }
-
   if (has_colors_) {
     CHECK_EQ(batch->points.size(), batch->colors.size())
         << "First PointsBatch had colors, but encountered one without. "
-           "frame_id: "
-        << batch->frame_id;
-  }
-  if(has_normals_) {
-    CHECK_EQ(batch->points.size(), batch->normals.size())
-        << "First PointsBatch had normals, but encountered one without. "
            "frame_id: "
         << batch->frame_id;
   }
@@ -185,15 +140,11 @@ void PlyWritingPointsProcessor::Process(std::unique_ptr<PointsBatch> batch) {
     if (has_colors_) {
       WriteBinaryPlyPointColor(ToUint8Color(batch->colors[i]), file_.get());
     }
-    if (has_normals_) {
-      WriteBinaryPlyPointNormal(batch->normals[i],file_.get());
-    }
     if (has_intensities_) {
       WriteBinaryIntensity(batch->intensities[i], file_.get());
     }
     ++num_points_;
   }
-  
   next_->Process(std::move(batch));
 }
 

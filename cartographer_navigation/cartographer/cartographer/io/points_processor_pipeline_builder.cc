@@ -134,33 +134,6 @@ PointsProcessorPipelineBuilder::CreatePipeline(
   }
   return pipeline;
 }
-std::vector<std::unique_ptr<PointsProcessor>>
-PointsProcessorPipelineBuilder::CreatePipeline(
-    common::LuaParameterDictionary* const dictionary,
-    std::vector<Eigen::Vector3f> &human_points) const {
-  std::vector<std::unique_ptr<PointsProcessor>> pipeline;
-  // The last consumer in the pipeline must exist, so that the one created after
-  // it (and being before it in the pipeline) has a valid 'next' to point to.
-  // The last consumer will just drop all points.
-  pipeline.emplace_back(common::make_unique<NullPointsProcessor>());
 
-  std::vector<std::unique_ptr<common::LuaParameterDictionary>> configurations =
-      dictionary->GetArrayValuesAsDictionaries();
-
-  // We construct the pipeline starting at the back.
-  for (auto it = configurations.rbegin(); it != configurations.rend(); it++) {
-    const std::string action = (*it)->GetString("action");
-    //std::cout<<"action: "<<action<<std::endl;
-    auto factory_it = factories_.find(action);
-    CHECK(factory_it != factories_.end())
-        << "Unknown action '" << action
-        << "'. Did you register the correspoinding PointsProcessor?";
-    pipeline.push_back(factory_it->second(it->get(), pipeline.back().get()));
-    //if(action.compare("voxel_filter_and_remove_moving_objects")==0){
-        pipeline.back()->human_points_ = human_points;
-    //}
-  }
-  return pipeline;
-}
 }  // namespace io
 }  // namespace cartographer

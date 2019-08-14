@@ -15,27 +15,24 @@
  */
 
 #include "cartographer/mapping/3d/submap_3d.h"
+
 #include <cmath>
 #include <limits>
+
 #include "cartographer/common/math.h"
 #include "cartographer/sensor/range_data.h"
 #include "glog/logging.h"
 
-int aibee_map_saver_type=0;
 namespace cartographer {
 namespace mapping {
 namespace {
 
 struct PixelData {
-    int in_range_count =0;
-    bool z_impassable = false;
   int min_z = INT_MAX;
   int max_z = INT_MIN;
   int count = 0;
   float probability_sum = 0.f;
   float max_probability = 0.5f;
-  //++aibee_zzx
-  int ifacc=0;
 };
 
 // Filters 'range_data', retaining only the returns that have no more than
@@ -53,7 +50,6 @@ sensor::RangeData FilterRangeDataByMaxRange(const sensor::RangeData& range_data,
 }
 
 std::vector<PixelData> AccumulatePixelData(
-        const float resolution,
     const int width, const int height, const Eigen::Array2i& min_index,
     const Eigen::Array2i& max_index,
     const std::vector<Eigen::Array4i>& voxel_indices_and_probabilities) {
@@ -63,35 +59,19 @@ std::vector<PixelData> AccumulatePixelData(
     const Eigen::Array2i pixel_index = voxel_index_and_probability.head<2>();
     if ((pixel_index < min_index).any() || (pixel_index > max_index).any()) {
       // Out of bounds. This could happen because of floating point inaccuracy.
-       continue;
+      continue;
     }
     const int x = max_index.x() - pixel_index[0];
     const int y = max_index.y() - pixel_index[1];
     PixelData& pixel = accumulated_pixel_data[x * width + y];
-    //++aibee_zzx
-    if(voxel_index_and_probability[3]==-1){
-      pixel.min_z = 0;
-      pixel.max_z = 0;
-      pixel.z_impassable = true;
-      if (pixel.ifacc==0){
-        pixel.ifacc = -1;
-      }
-    }
-    else
-    {
-      pixel.count++;
-      pixel.min_z = std::min(pixel.min_z, voxel_index_and_probability[2]);
-      pixel.max_z = std::max(pixel.max_z, voxel_index_and_probability[2]);
-      pixel.ifacc = 1;
-      pixel.z_impassable = true;
-      pixel.in_range_count++;
-      const float probability =
-          ValueToProbability(voxel_index_and_probability[3]);
-      pixel.probability_sum = pixel.probability_sum + probability;
-      pixel.max_probability = std::max(pixel.max_probability, probability);
-    }    
+    ++pixel.count;
+    pixel.min_z = std::min(pixel.min_z, voxel_index_and_probability[2]);
+    pixel.max_z = std::max(pixel.max_z, voxel_index_and_probability[2]);
+    const float probability =
+        ValueToProbability(voxel_index_and_probability[3]);
+    pixel.probability_sum += probability;
+    pixel.max_probability = std::max(pixel.max_probability, probability);
   }
-  // add by galyean
   return accumulated_pixel_data;
 }
 
@@ -103,39 +83,29 @@ std::vector<Eigen::Array4i> ExtractVoxelData(
     Eigen::Array2i* min_index, Eigen::Array2i* max_index) {
   std::vector<Eigen::Array4i> voxel_indices_and_probabilities;
   const float resolution_inverse = 1.f / hybrid_grid.resolution();
-  constexpr float kXrayObstructedCellProbabilityLimit = 0.7;
+
+  constexpr float kXrayObstructedCellProbabilityLimit = 0.501f;
   for (auto it = HybridGrid::Iterator(hybrid_grid); !it.Done(); it.Next()) {
-    uint16 probability_value = it.GetValue();
+    const uint16 probability_value = it.GetValue();
     const float probability = ValueToProbability(probability_value);
+    if (probability < kXrayObstructedCellProbabilityLimit) {
+      // We ignore non-obstructed cells.
+      continue;
+    }
+
     const Eigen::Vector3f cell_center_submap =
         hybrid_grid.GetCenterOfCell(it.GetCellIndex());
-
     const Eigen::Vector3f cell_center_global = transform * cell_center_submap;
-    //++aibee_zzx
-    if (cell_center_global.z()> 0.8 || cell_center_global.z()< -0.8) {
-        const Eigen::Array4i voxel_index_and_probability(
-        common::RoundToInt(cell_center_global.x() * resolution_inverse),
-        common::RoundToInt(cell_center_global.y() * resolution_inverse),
-        0,
-        -1);
-        voxel_indices_and_probabilities.push_back(voxel_index_and_probability);
-        const Eigen::Array2i pixel_index = voxel_index_and_probability.head<2>();
-        *min_index = min_index->cwiseMin(pixel_index);
-        *max_index = max_index->cwiseMax(pixel_index);
-    }
-    if (cell_center_global.z()< 0.5 && cell_center_global.z()> -0.5&&probability > kXrayObstructedCellProbabilityLimit)
-    {
-        const Eigen::Array4i voxel_index_and_probability(
+    const Eigen::Array4i voxel_index_and_probability(
         common::RoundToInt(cell_center_global.x() * resolution_inverse),
         common::RoundToInt(cell_center_global.y() * resolution_inverse),
         common::RoundToInt(cell_center_global.z() * resolution_inverse),
         probability_value);
-        voxel_indices_and_probabilities.push_back(voxel_index_and_probability);
-        const Eigen::Array2i pixel_index = voxel_index_and_probability.head<2>();
-        *min_index = min_index->cwiseMin(pixel_index);
-        *max_index = max_index->cwiseMax(pixel_index);
-    }
-    
+
+    voxel_indices_and_probabilities.push_back(voxel_index_and_probability);
+    const Eigen::Array2i pixel_index = voxel_index_and_probability.head<2>();
+    *min_index = min_index->cwiseMin(pixel_index);
+    *max_index = max_index->cwiseMax(pixel_index);
   }
   return voxel_indices_and_probabilities;
 }
@@ -143,7 +113,6 @@ std::vector<Eigen::Array4i> ExtractVoxelData(
 // Builds texture data containing interleaved value and alpha for the
 // visualization from 'accumulated_pixel_data'.
 std::string ComputePixelValues(
-        const float resolution,
     const std::vector<PixelData>& accumulated_pixel_data) {
   std::string cell_data;
   cell_data.reserve(2 * accumulated_pixel_data.size());
@@ -153,50 +122,28 @@ std::string ComputePixelValues(
     // TODO(whess): Take into account submap rotation.
     // TODO(whess): Document the approach and make it more independent from the
     // chosen resolution.
-    //++aibee_zzx
     const float z_difference = pixel.count > 0 ? pixel.max_z - pixel.min_z : 0;
-    if (z_difference < kMinZDifference&&!pixel.z_impassable) {
+    if (z_difference < kMinZDifference) {
       cell_data.push_back(0);  // value
       cell_data.push_back(0);  // alpha
       continue;
-    } 
-    if(aibee_map_saver_type==0){
-      if(pixel.ifacc==-1)
-      {
-        cell_data.push_back(0);  // value
-        cell_data.push_back(0);  // alpha
-        continue;
-      }
-      // if(pixel.count<2){
-      //   cell_data.push_back(0);  // value
-      //   cell_data.push_back(0);  // alpha
-      //   continue;
-      // }
-      float free_space = std::max(z_difference - pixel.count, 0.f);
-      if(pixel.in_range_count>0){
-          free_space = 0;
-      }
-      const float free_space_weight = kFreeSpaceWeight * free_space;
-      const float total_weight = pixel.count + free_space_weight;
-      const float free_space_probability = 1.f - pixel.max_probability;
-      const float average_probability = ClampProbability(
-          (pixel.probability_sum + free_space_probability * free_space_weight) /
-          total_weight);
-
-      const int delta = 128 - ProbabilityToLogOddsInteger(average_probability);
-      const uint8 alpha = delta > 0 ? 0 : -delta;
-      const uint8 value = delta > 0 ? delta : 0;
-      cell_data.push_back(value);                         // value
-      cell_data.push_back((value || alpha) ? alpha : 1);  // alpha     
     }
-    if(aibee_map_saver_type==1){
-      cell_data.push_back(128);  // value
-      cell_data.push_back(0);  // alpha  
-    }
+    const float free_space = std::max(z_difference - pixel.count, 0.f);
+    const float free_space_weight = kFreeSpaceWeight * free_space;
+    const float total_weight = pixel.count + free_space_weight;
+    const float free_space_probability = 1.f - pixel.max_probability;
+    const float average_probability = ClampProbability(
+        (pixel.probability_sum + free_space_probability * free_space_weight) /
+        total_weight);
+    const int delta = 128 - ProbabilityToLogOddsInteger(average_probability);
+    const uint8 alpha = delta > 0 ? 0 : -delta;
+    const uint8 value = delta > 0 ? delta : 0;
+    cell_data.push_back(value);                         // value
+    cell_data.push_back((value || alpha) ? alpha : 1);  // alpha
   }
   return cell_data;
 }
-//+++++++++++++++++++
+
 void AddToTextureProto(
     const HybridGrid& hybrid_grid, const transform::Rigid3d& global_submap_pose,
     proto::SubmapQuery::Response::SubmapTexture* const texture) {
@@ -208,7 +155,6 @@ void AddToTextureProto(
   // Compute a bounding box for the texture.
   Eigen::Array2i min_index(INT_MAX, INT_MAX);
   Eigen::Array2i max_index(INT_MIN, INT_MIN);
-  //提取点
   const std::vector<Eigen::Array4i> voxel_indices_and_probabilities =
       ExtractVoxelData(hybrid_grid, global_submap_pose.cast<float>(),
                        &min_index, &max_index);
@@ -217,10 +163,10 @@ void AddToTextureProto(
   const int height = max_index.x() - min_index.x() + 1;
   texture->set_width(width);
   texture->set_height(height);
-  //
+
   const std::vector<PixelData> accumulated_pixel_data = AccumulatePixelData(
-          hybrid_grid.resolution(),width, height, min_index, max_index, voxel_indices_and_probabilities);
-  const std::string cell_data = ComputePixelValues(hybrid_grid.resolution(),accumulated_pixel_data);
+      width, height, min_index, max_index, voxel_indices_and_probabilities);
+  const std::string cell_data = ComputePixelValues(accumulated_pixel_data);
 
   common::FastGzipString(cell_data, texture->mutable_cells());
   *texture->mutable_slice_pose() = transform::ToProto(
@@ -335,19 +281,13 @@ void Submap3D::Finish() {
 
 ActiveSubmaps3D::ActiveSubmaps3D(const proto::SubmapsOptions3D& options)
     : options_(options),
-      range_data_inserter_(options.range_data_inserter_options()),
-      local_current_submap_(nullptr){
+      range_data_inserter_(options.range_data_inserter_options()) {
   // We always want to have at least one submap which we can return and will
   // create it at the origin in absence of a better choice.
   //
   // TODO(whess): Start with no submaps, so that all of them can be
   // approximately gravity aligned.
-  /* 
-    Eigen::Quaterniond aa(0.021825, -0.999660, 0.014168, -0.001845);
-    Eigen::Vector3d translation(0,0,0);
-    transform::Rigid3d temp(translation,aa);*/
   AddSubmap(transform::Rigid3d::Identity());
-    //AddSubmap(temp);
 }
 
 std::vector<std::shared_ptr<Submap3D>> ActiveSubmaps3D::submaps() const {
@@ -356,23 +296,6 @@ std::vector<std::shared_ptr<Submap3D>> ActiveSubmaps3D::submaps() const {
 
 int ActiveSubmaps3D::matching_index() const { return matching_submap_index_; }
 
-// add by galyean, to generate real-time local submap
-void ActiveSubmaps3D::CreatCurrentLocalSubmap(
-        const sensor::RangeData& range_data,
-        const transform::Rigid3d& global_submap_pose) {
-        transform::Rigid3d pose(Eigen::Vector3d(0,0,0),Eigen::Quaterniond::Identity());
-      local_current_submap_.reset(
-              new Submap3D(options_.high_resolution(),
-                      options_.low_resolution(),
-                           pose));
-
-
-  local_current_submap_->InsertRangeData(range_data, range_data_inserter_,
-                                         options_.high_resolution_max_range());
-}
-std::shared_ptr<Submap3D> ActiveSubmaps3D::CurrentSubmap() const{
-  return local_current_submap_;
-}
 void ActiveSubmaps3D::InsertRangeData(
     const sensor::RangeData& range_data,
     const Eigen::Quaterniond& gravity_alignment) {
@@ -381,15 +304,8 @@ void ActiveSubmaps3D::InsertRangeData(
                             options_.high_resolution_max_range());
   }
   if (submaps_.back()->num_range_data() == options_.num_range_data()) {
-    Eigen::Quaterniond q_g_b=gravity_alignment.conjugate();
-    double mag = sqrt(q_g_b.w()*q_g_b.w()+q_g_b.z()*q_g_b.z());
-      Eigen::Quaterniond q_along_gravity(q_g_b.w()/mag,0,0,q_g_b.z()/mag);
-      q_along_gravity.normalize();
-      Eigen::Vector3d translation = range_data.origin.cast<double>();
-      //std::cerr<<"submap origion : "<<translation.transpose()<<std::endl;
-    translation[2]=0;
     AddSubmap(transform::Rigid3d(range_data.origin.cast<double>(),
-                                 q_along_gravity.conjugate()));
+                                 gravity_alignment));
   }
 }
 
@@ -399,7 +315,6 @@ void ActiveSubmaps3D::AddSubmap(const transform::Rigid3d& local_submap_pose) {
     ++matching_submap_index_;
     submaps_.erase(submaps_.begin());
   }
-
   submaps_.emplace_back(new Submap3D(options_.high_resolution(),
                                      options_.low_resolution(),
                                      local_submap_pose));

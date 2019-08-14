@@ -79,7 +79,6 @@ LocalTrajectoryBuilder3D::AddRangeData(
     return nullptr;
   }
 
-// extrapolator_ 和 imu有关系
   const common::Time& time = synchronized_data.time;
   if (extrapolator_ == nullptr) {
     // Until we've initialized the extrapolator with our first IMU message, we
@@ -179,22 +178,10 @@ LocalTrajectoryBuilder3D::AddAccumulatedRangeData(
   const transform::Rigid3d pose_prediction =
       extrapolator_->ExtrapolatePose(time);
 
-  //std::cout<<"test_pose prediction: "<<pose_prediction.rotation().coeffs().transpose()<<std::endl;
-const Eigen::Quaterniond base_q = extrapolator_->getnewestRotation();
-// 从extrapolator_中拿到predict出来的pose，然后作为初值，继续做scan matching
   std::shared_ptr<const mapping::Submap3D> matching_submap =
       active_submaps_.submaps().front();
-
-  Eigen::Quaterniond sub_map_r = matching_submap->local_pose().rotation();
-  //std::cout<<"test_pose submap: "<<sub_map_r.coeffs().transpose()<<std::endl;
   transform::Rigid3d initial_ceres_pose =
       matching_submap->local_pose().inverse() * pose_prediction;
-  Eigen::Vector3d translation(initial_ceres_pose.translation()[0],
-                              initial_ceres_pose.translation()[1],
-                              0);
-
-  transform::Rigid3d initial_ceres_pose_z0(translation,initial_ceres_pose.rotation());
-  //initial_ceres_pose =initial_ceres_pose_z0;
   sensor::AdaptiveVoxelFilter adaptive_voxel_filter(
       options_.high_resolution_adaptive_voxel_filter_options());
   const sensor::PointCloud high_resolution_point_cloud_in_tracking =
@@ -232,7 +219,6 @@ const Eigen::Quaterniond base_q = extrapolator_->getnewestRotation();
        {&low_resolution_point_cloud_in_tracking,
         &matching_submap->low_resolution_hybrid_grid()}},
       &pose_observation_in_submap, &summary);
-
   kCeresScanMatcherCostMetric->Observe(summary.final_cost);
   double residual_distance = (pose_observation_in_submap.translation() -
                               initial_ceres_pose.translation())
@@ -241,29 +227,12 @@ const Eigen::Quaterniond base_q = extrapolator_->getnewestRotation();
   double residual_angle = pose_observation_in_submap.rotation().angularDistance(
       initial_ceres_pose.rotation());
   kScanMatcherResidualAngleMetric->Observe(residual_angle);
-  //std::cout<<"TAG:residual  "<<time<<"translation err :"<<residual_distance<<"   angle distance : "<<residual_angle*180/3.1415926<<"\n";
-
-  Eigen::Quaterniond actual_delta = base_q.conjugate()*(matching_submap->local_pose().rotation()*pose_observation_in_submap.rotation());
-  //std::cout<<"est delta quaterniod : "<<actual_delta.coeffs().transpose()<<std::endl;
-  //std::cout<<"local pose time: "<<time<<std::endl;
-  //std::cout<<"pose_observation_in_submap   "<<pose_observation_in_submap<<std::endl;
-  //std::cout<<"matching_submap->local_pose()   "<<matching_submap->local_pose()<<std::endl;
-  transform::Rigid3d pose_estimate =
+  const transform::Rigid3d pose_estimate =
       matching_submap->local_pose() * pose_observation_in_submap;
-  //std::cout<<"pose_estimate   "<<pose_estimate<<std::endl;
-  Eigen::Vector3d translation1(pose_estimate.translation()[0],
-                               pose_estimate.translation()[1],
-                              0);
-  transform::Rigid3d pose_estimate_z0(translation1,pose_estimate.rotation());
-  // added by galyean
-  //pose_estimate = pose_estimate_z0;
-  // add by galyean, to generate current local submap
-
   extrapolator_->AddPose(time, pose_estimate);
   const Eigen::Quaterniond gravity_alignment =
       extrapolator_->EstimateGravityOrientation(time);
-//std::cout<<"test_pose estimation: "<<pose_estimate.rotation().coeffs().transpose()<<std::endl;
-  //std::cerr<<"filtered_range_data_in_tracking origin"<<filtered_range_data_in_tracking.origin.transpose()<<std::endl;
+
   sensor::RangeData filtered_range_data_in_local = sensor::TransformRangeData(
       filtered_range_data_in_tracking, pose_estimate.cast<float>());
   std::unique_ptr<InsertionResult> insertion_result = InsertIntoSubmap(
@@ -275,7 +244,7 @@ const Eigen::Quaterniond base_q = extrapolator_->getnewestRotation();
       std::chrono::duration_cast<std::chrono::seconds>(duration).count());
   return common::make_unique<MatchingResult>(MatchingResult{
       time, pose_estimate, std::move(filtered_range_data_in_local),
-      std::move(insertion_result), active_submaps_.CurrentSubmap() });
+      std::move(insertion_result)});
 }
 
 void LocalTrajectoryBuilder3D::AddOdometryData(
@@ -307,13 +276,8 @@ LocalTrajectoryBuilder3D::InsertIntoSubmap(
        active_submaps_.submaps()) {
     insertion_submaps.push_back(submap);
   }
-
   active_submaps_.InsertRangeData(filtered_range_data_in_local,
                                   gravity_alignment);
-  // add by galyean, to generate real-time local submap
-  transform::Rigid3d pose(Eigen::Vector3d(0,0,0),Eigen::Quaterniond::Identity());
-  active_submaps_.CreatCurrentLocalSubmap(filtered_range_data_in_tracking,pose);
-
   const Eigen::VectorXf rotational_scan_matcher_histogram =
       scan_matching::RotationalScanMatcher::ComputeHistogram(
           sensor::TransformPointCloud(

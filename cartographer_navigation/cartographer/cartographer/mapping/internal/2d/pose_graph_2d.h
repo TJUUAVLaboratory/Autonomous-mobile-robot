@@ -144,8 +144,7 @@ class PoseGraph2D : public PoseGraph {
       PoseGraphInterface::GlobalSlamOptimizationCallback callback) override;
   transform::Rigid3d GetInterpolatedGlobalTrajectoryPose(
       int trajectory_id, const common::Time time) const REQUIRES(mutex_);
-  void SetLocalCurrentSubmap(SubmapData current_submap) override;
-  SubmapData GetLocalCurrentSubmap() const override;
+
  private:
   // The current state of the submap in the background threads. When this
   // transitions to kFinished, all nodes are tried to match against this submap.

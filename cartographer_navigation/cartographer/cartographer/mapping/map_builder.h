@@ -55,14 +55,11 @@ class MapBuilder : public MapBuilderInterface {
 
   std::string SubmapToProto(const SubmapId &submap_id,
                             proto::SubmapQuery::Response *response) override;
-  std::string LocalSubmapToProto(proto::SubmapQuery::Response *const response) override;
+
   void SerializeState(io::ProtoStreamWriterInterface *writer) override;
 
   void LoadState(io::ProtoStreamReaderInterface *reader,
                  bool load_frozen_state) override;
-    void LoadStateLandmark(io::ProtoStreamReaderInterface *reader,
-            const std::string landmark_poses_file,
-                   bool load_frozen_state);
 
   mapping::PoseGraphInterface *pose_graph() override {
     return pose_graph_.get();

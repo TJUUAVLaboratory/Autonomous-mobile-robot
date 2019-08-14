@@ -37,8 +37,6 @@
 #include "cartographer/mapping/internal/optimization/cost_functions/landmark_cost_function_3d.h"
 #include "cartographer/mapping/internal/optimization/cost_functions/rotation_cost_function_3d.h"
 #include "cartographer/mapping/internal/optimization/cost_functions/spa_cost_function_3d.h"
-#include "cartographer/mapping/internal/optimization/cost_functions/rotation_only_cost_function_3d.h"
-#include "cartographer/mapping/internal/optimization/cost_functions/cost_z_axis.h"
 #include "cartographer/transform/timestamped_transform.h"
 #include "cartographer/transform/transform.h"
 #include "ceres/ceres.h"
@@ -257,53 +255,7 @@ void OptimizationProblem3D::SetMaxNumIterations(
   options_.mutable_ceres_solver_options()->set_max_num_iterations(
       max_num_iterations);
 }
-void OptimizationProblem3D::compute_acc_residual(
-        double* middle_rotation,double*start_position,double*middle_position,
-        double* end_position,double gravity_constant,double*imu_calibration,
-        const Eigen::Vector3d&delta_velocity_imu_frame_,double first_delta_time_seconds_,
-        double second_delta_time_seconds_) {
-  const Eigen::Quaterniond eigen_imu_calibration(
-          imu_calibration[0], imu_calibration[1], imu_calibration[2],
-          imu_calibration[3]);
-  const Eigen::Quaternion<double> rotation(middle_rotation[0], middle_rotation[1],
-                                           middle_rotation[2], middle_rotation[3]);
-  const Eigen::Matrix<double, 3, 1> imu_delta_velocity =
-          rotation * eigen_imu_calibration *
-          delta_velocity_imu_frame_.cast<double>() -
-          gravity_constant *
-          (0.5 * (first_delta_time_seconds_ + second_delta_time_seconds_) *
-           Eigen::Vector3d::UnitZ())
-                  .cast<double>();
-  const Eigen::Matrix<double, 3, 1> start_velocity =
-          (Eigen::Map<const Eigen::Matrix<double, 3, 1>>(middle_position) -
-           Eigen::Map<const Eigen::Matrix<double, 3, 1>>(start_position)) /
-          double(first_delta_time_seconds_);
-  const Eigen::Matrix<double, 3, 1> end_velocity =
-          (Eigen::Map<const Eigen::Matrix<double, 3, 1>>(end_position) -
-           Eigen::Map<const Eigen::Matrix<double, 3, 1>>(middle_position)) /
-          double(second_delta_time_seconds_);
-  const Eigen::Matrix<double, 3, 1> delta_velocity = end_velocity - start_velocity;
-  Eigen::Vector3d residual = imu_delta_velocity - delta_velocity;
-  //printf("delta_imu: imu_delta_velocity: %f,%f,%f\n",imu_delta_velocity[0],imu_delta_velocity[1],imu_delta_velocity[2]);
-  //printf("delta_imu: delta_velocity: %f,%f,%f\n",delta_velocity[0],delta_velocity[1],delta_velocity[2]);
-  //printf("delta_imu: residual_velocity: %f,%f,%f\n",residual[0],residual[1],residual[2]);
 
-}
-void OptimizationProblem3D::compute_gyro_residual(
-        double*start_rotation,double*end_rotation,
-        double*imu_calibration,const Eigen::Quaterniond &delta_rotation_imu_frame_) {
-  const Eigen::Quaternion<double> start(start_rotation[0], start_rotation[1],
-                                   start_rotation[2], start_rotation[3]);
-  const Eigen::Quaternion<double> end(end_rotation[0], end_rotation[1],
-                                 end_rotation[2], end_rotation[3]);
-  const Eigen::Quaternion<double> eigen_imu_calibration(
-          imu_calibration[0], imu_calibration[1], imu_calibration[2],
-          imu_calibration[3]);
-  const Eigen::Quaternion<double> delta = (end.conjugate() * start).conjugate();
-  const Eigen::Quaternion<double> error =
-          end.conjugate() * start * eigen_imu_calibration *
-          delta_rotation_imu_frame_.cast<double>() * eigen_imu_calibration.conjugate();
-}
 void OptimizationProblem3D::Solve(
     const std::vector<Constraint>& constraints,
     const std::set<int>& frozen_trajectories,
@@ -313,9 +265,6 @@ void OptimizationProblem3D::Solve(
     return;
   }
 
-  //options_.set_fix_z_in_3d(true);
-
-  std::cout<<"setFixZ: "<<options_.fix_z_in_3d()<<"\n";
   ceres::Problem::Options problem_options;
   ceres::Problem problem(problem_options);
 
@@ -363,13 +312,6 @@ void OptimizationProblem3D::Solve(
           C_submaps.at(submap_id_data.id).rotation());
       problem.SetParameterBlockConstant(
           C_submaps.at(submap_id_data.id).translation());
-
-    }else{
-        problem.AddResidualBlock(
-                ZOnlyCostFunction3D::CreateAutoDiffCostFunction(
-                        1e3),
-                nullptr,
-                C_submaps.at(submap_id_data.id).translation());
     }
   }
   for (const auto& node_id_data : node_data_) {
@@ -384,14 +326,7 @@ void OptimizationProblem3D::Solve(
       problem.SetParameterBlockConstant(C_nodes.at(node_id_data.id).rotation());
       problem.SetParameterBlockConstant(
           C_nodes.at(node_id_data.id).translation());
-    }else{
-      problem.AddResidualBlock(
-              ZOnlyCostFunction3D::CreateAutoDiffCostFunction(
-                      1e3),
-              nullptr,
-              C_nodes.at(node_id_data.id).translation());
     }
-
   }
   // Add cost functions for intra- and inter-submap constraints.
   for (const Constraint& constraint : constraints) {
@@ -422,26 +357,8 @@ void OptimizationProblem3D::Solve(
       }
       TrajectoryData& trajectory_data = trajectory_data_.at(trajectory_id);
 
-
       problem.AddParameterBlock(trajectory_data.imu_calibration.data(), 4,
                                 new ceres::QuaternionParameterization());
-        LOG(INFO) << "\nIMU correction before was: "
-                  << common::RadToDeg(2. * std::acos(trajectory_data.imu_calibration[0]))
-                  << " deg (" << trajectory_data.imu_calibration[0] << ", " << trajectory_data.imu_calibration[1]
-                  << ", " << trajectory_data.imu_calibration[2] << ", " << trajectory_data.imu_calibration[3]
-                  << ")";
-
-      Eigen::Quaterniond pre_imu_calibration(1,
-                                             0,
-                                             0,
-                                             0);
-        problem.AddResidualBlock(
-                RotationOnlyCostFunction3D::CreateAutoDiffCostFunction(
-                        3e3, pre_imu_calibration),
-                nullptr,
-                trajectory_data.imu_calibration.data());
-
-      //problem.SetParameterBlockConstant(trajectory_data.imu_calibration.data());
       CHECK(imu_data_.HasTrajectory(trajectory_id));
       const auto imu_data = imu_data_.trajectory(trajectory_id);
       CHECK(imu_data.begin() != imu_data.end());
@@ -505,10 +422,6 @@ void OptimizationProblem3D::Solve(
               C_nodes.at(third_node_id).translation(),
               &trajectory_data.gravity_constant,
               trajectory_data.imu_calibration.data());
-          compute_acc_residual(C_nodes.at(second_node_id).rotation(),C_nodes.at(first_node_id).translation(),
-                               C_nodes.at(second_node_id).translation(), C_nodes.at(third_node_id).translation(),
-                               trajectory_data.gravity_constant,trajectory_data.imu_calibration.data(),delta_velocity,
-                               common::ToSeconds(first_duration),common::ToSeconds(second_duration));
         }
         problem.AddResidualBlock(
             RotationCostFunction3D::CreateAutoDiffCostFunction(
@@ -516,8 +429,6 @@ void OptimizationProblem3D::Solve(
             nullptr /* loss function */, C_nodes.at(first_node_id).rotation(),
             C_nodes.at(second_node_id).rotation(),
             trajectory_data.imu_calibration.data());
-        compute_gyro_residual(C_nodes.at(first_node_id).rotation(),C_nodes.at(second_node_id).rotation(),
-                              trajectory_data.imu_calibration.data(),result.delta_rotation);
       }
     }
   }
@@ -634,11 +545,6 @@ void OptimizationProblem3D::Solve(
           C_nodes.at(node_id).rotation(), C_nodes.at(node_id).translation());
     }
   }
-  for (const auto& trajectory_id_and_data : trajectory_data_) {
-    const int trajectory_id = trajectory_id_and_data.first;
-    const TrajectoryData& trajectory_data = trajectory_id_and_data.second;
-    LOG(INFO) << "\nGravity1 was: " << trajectory_data.gravity_constant;
-  }
   // Solve.
   ceres::Solver::Summary summary;
   ceres::Solve(
@@ -652,14 +558,13 @@ void OptimizationProblem3D::Solve(
       if (trajectory_id != 0) {
         LOG(INFO) << "Trajectory " << trajectory_id << ":";
       }
-      LOG(INFO) << "\nGravity was: " << trajectory_data.gravity_constant;
+      LOG(INFO) << "Gravity was: " << trajectory_data.gravity_constant;
       const auto& imu_calibration = trajectory_data.imu_calibration;
-
-      LOG(INFO) << "\n\nIMU correction was: "
+      LOG(INFO) << "IMU correction was: "
                 << common::RadToDeg(2. * std::acos(imu_calibration[0]))
                 << " deg (" << imu_calibration[0] << ", " << imu_calibration[1]
                 << ", " << imu_calibration[2] << ", " << imu_calibration[3]
-                << ")\n";
+                << ")";
     }
   }
 

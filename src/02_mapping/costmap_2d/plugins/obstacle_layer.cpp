@@ -131,7 +131,7 @@ void ObstacleLayer::onInitialize()
       source_node.getParam(raytrace_range_param_name, raytrace_range);
     }
 
-    ROS_WARN("Creating an observation buffer for source %s, topic %s, frame %s", source.c_str(), topic.c_str(),
+    ROS_WARN("Creating an observation buffer for source: %s, topic: %s, frame: %s", source.c_str(), topic.c_str(),
              sensor_frame.c_str());
 
     // create an observation buffer
@@ -283,6 +283,7 @@ void ObstacleLayer::laserScanValidInfCallback(const sensor_msgs::LaserScanConstP
     if (!std::isfinite(range) && range > 0)
     {
       message.ranges[i] = message.range_max - epsilon;
+      ROS_INFO_STREAM("message.range[i]" << message.ranges[i]);
     }
   }
 

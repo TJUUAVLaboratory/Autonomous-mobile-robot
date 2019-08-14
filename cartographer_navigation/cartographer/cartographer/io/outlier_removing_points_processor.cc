@@ -56,21 +56,7 @@ void OutlierRemovingPointsProcessor::Process(
       break;
   }
 }
-void OutlierRemovingPointsProcessor::MarkHumanPoints(){
-  //TODO mark
-  std::cout<<"human_points_ size: "<<human_points_.size()<<std::endl;
-  size_t num=0;
-  for(size_t i=0;i!=human_points_.size();++i){
-      num++;
-      const Eigen::Array3i index =
-          voxels_.GetCellIndex(human_points_[i]);
-      if (voxels_.value(index).hits > 0) {
-        int hits = voxels_.value(index).hits;
-        voxels_.mutable_value(index)->rays = 16*hits;
-      }
-  }
-  std::cout<<"mark human points num: "<<num<<std::endl;
-}
+
 PointsProcessor::FlushResult OutlierRemovingPointsProcessor::Flush() {
   switch (state_) {
     case State::kPhase1:
@@ -79,8 +65,6 @@ PointsProcessor::FlushResult OutlierRemovingPointsProcessor::Flush() {
       return FlushResult::kRestartStream;
 
     case State::kPhase2:
-    // add by galyean, try to mark voxels containing human points
-      MarkHumanPoints();
       LOG(INFO) << "Filtering outliers...";
       state_ = State::kPhase3;
       return FlushResult::kRestartStream;

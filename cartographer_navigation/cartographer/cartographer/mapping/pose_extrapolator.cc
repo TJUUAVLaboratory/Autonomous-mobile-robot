@@ -45,7 +45,6 @@ std::unique_ptr<PoseExtrapolator> PoseExtrapolator::InitializeWithImu(
   extrapolator->imu_tracker_->AddImuAngularVelocityObservation(
       imu_data.angular_velocity);
   extrapolator->imu_tracker_->Advance(imu_data.time);
-
   extrapolator->AddPose(
       imu_data.time,
       transform::Rigid3d::Rotation(extrapolator->imu_tracker_->orientation()));
@@ -76,13 +75,6 @@ void PoseExtrapolator::AddPose(const common::Time time,
     imu_tracker_ =
         common::make_unique<ImuTracker>(gravity_time_constant_, tracker_start);
   }
-  if(timed_pose_queue_.size()>0){
-    // out put delta rotation
-    const TimedPose& newest_timed_pose = timed_pose_queue_.back();
-    Eigen::Quaterniond q_before = newest_timed_pose.pose.rotation();
-    //std::cout<<"TAG:residual total angle : "<<q_before.angularDistance(pose.rotation())*180/3.1415926<<std::endl;
-  }
-
   timed_pose_queue_.push_back(TimedPose{time, pose});
   while (timed_pose_queue_.size() > 2 &&
          timed_pose_queue_[1].time <= time - pose_queue_duration_) {
@@ -145,13 +137,9 @@ transform::Rigid3d PoseExtrapolator::ExtrapolatePose(const common::Time time) {
   if (cached_extrapolated_pose_.time != time) {
     const Eigen::Vector3d translation =
         ExtrapolateTranslation(time) + newest_timed_pose.pose.translation();
-  Eigen::Quaterniond delta = ExtrapolateRotation(time, extrapolation_imu_tracker_.get());
-  //std::cout<<"get Extrapolate delta Rotation\n";
-  //std::cout<<"imu_delta_r quaterniod : "<<delta.coeffs().transpose()<<std::endl;
-  Eigen::Quaterniond r_drift = imu_tracker_->orientation().conjugate()*newest_timed_pose.pose.rotation();
-    //std::cout<<"imu_delta_r_new quaterniod : "<<(r_drift.conjugate()*delta*r_drift).coeffs().transpose()<<std::endl;
     const Eigen::Quaterniond rotation =
-        newest_timed_pose.pose.rotation() *delta;
+        newest_timed_pose.pose.rotation() *
+        ExtrapolateRotation(time, extrapolation_imu_tracker_.get());
     cached_extrapolated_pose_ =
         TimedPose{time, transform::Rigid3d{translation, rotation}};
   }
@@ -162,7 +150,6 @@ Eigen::Quaterniond PoseExtrapolator::EstimateGravityOrientation(
     const common::Time time) {
   ImuTracker imu_tracker = *imu_tracker_;
   AdvanceImuTracker(time, &imu_tracker);
-
   return imu_tracker.orientation();
 }
 
@@ -205,40 +192,7 @@ void PoseExtrapolator::TrimOdometryData() {
     odometry_data_.pop_front();
   }
 }
-void PoseExtrapolator::AdvanceImuTracker(const common::Time time,
-                                             ImuTracker* const imu_tracker,
-                                         const transform::Rigid3d& pose) const {
-  CHECK_GE(time, imu_tracker->time());
-  imu_tracker->UpdatePose(time,pose.rotation());
-  if (imu_data_.empty() || time < imu_data_.front().time) {
-    // There is no IMU data until 'time', so we advance the ImuTracker and use
-    // the angular velocities from poses and fake gravity to help 2D stability.
-    imu_tracker->Advance(time);
-    imu_tracker->AddImuLinearAccelerationObservation(Eigen::Vector3d::UnitZ());
-    imu_tracker->AddImuAngularVelocityObservation(
-            odometry_data_.size() < 2 ? angular_velocity_from_poses_
-                                      : angular_velocity_from_odometry_);
-    return;
-  }
-  if (imu_tracker->time() < imu_data_.front().time) {
-    // Advance to the beginning of 'imu_data_'.
-    imu_tracker->Advance(imu_data_.front().time);
-  }
-  auto it = std::lower_bound(
-          imu_data_.begin(), imu_data_.end(), imu_tracker->time(),
-          [](const sensor::ImuData& imu_data, const common::Time& time) {
-              return imu_data.time < time;
-          });
-  while (it != imu_data_.end() && it->time < time) {
-    imu_tracker->Advance(it->time);
-    imu_tracker->AddImuLinearAccelerationObservation(it->linear_acceleration);
-    imu_tracker->AddImuAngularVelocityObservation(it->angular_velocity);
-    ++it;
-  }
-  imu_tracker->Advance(time);
 
-
-}
 void PoseExtrapolator::AdvanceImuTracker(const common::Time time,
                                          ImuTracker* const imu_tracker) const {
   CHECK_GE(time, imu_tracker->time());
@@ -275,9 +229,7 @@ Eigen::Quaterniond PoseExtrapolator::ExtrapolateRotation(
   CHECK_GE(time, imu_tracker->time());
   AdvanceImuTracker(time, imu_tracker);
   const Eigen::Quaterniond last_orientation = imu_tracker_->orientation();
-  // add test by galyean
-  Eigen::Quaterniond delta = last_orientation.inverse() * imu_tracker->orientation();
-  return delta;
+  return last_orientation.inverse() * imu_tracker->orientation();
 }
 
 Eigen::Vector3d PoseExtrapolator::ExtrapolateTranslation(common::Time time) {

@@ -104,6 +104,9 @@ private:
   ros::Publisher sonarDataPub_7;
   ros::Publisher sonarDataPub_8;
   ros::Publisher sonarPointcloudPub;
+
+  double sonars_threshold  = 0.5;
+  double SONAR_MAX = INT64_MAX;
 };
 
 void Sonar2PointCloud::sonarDataCallback(const sensor_msgs::LaserScanConstPtr &message)
@@ -123,6 +126,9 @@ void Sonar2PointCloud::sonarDataCallback(const sensor_msgs::LaserScanConstPtr &m
     sonarsValue_temp.field_of_view = 0.5;
     sonarsValue_temp.min_range = 0.1;
     sonarsValue_temp.max_range = 1.0;
+    if(sonar_data[i] > sonars_threshold)
+      sonar_data[i] = SONAR_MAX;
+
     sonarsValue_temp.range = sonar_data[i];
     sonarsValue.push_back(sonarsValue_temp);
     sonarDataPub_0.publish(sonarsValue_temp); // publish sonars  range date
@@ -131,7 +137,7 @@ void Sonar2PointCloud::sonarDataCallback(const sensor_msgs::LaserScanConstPtr &m
     geometry_msgs::PointStamped sonarsPoints_temp;
     sonarsPoints_temp.header = message->header;
     sonarsPoints_temp.header.frame_id = sonars_frame[i];
-    sonarsPoints_temp.point.x = message->ranges[i];
+    sonarsPoints_temp.point.x = sonar_data[i];
     sonarsPoints_temp.point.y = 0;
     sonarsPoints_temp.point.z = 0;
     sonarsPoints.push_back(sonarsPoints_temp);

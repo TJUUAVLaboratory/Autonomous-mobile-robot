@@ -76,16 +76,14 @@ class MapBuilderInterface {
   // error string on failure, or an empty string on success.
   virtual std::string SubmapToProto(const SubmapId& submap_id,
                                     proto::SubmapQuery::Response* response) = 0;
-  virtual std::string LocalSubmapToProto(proto::SubmapQuery::Response *const response) = 0;
+
   // Serializes the current state to a proto stream.
   virtual void SerializeState(io::ProtoStreamWriterInterface* writer) = 0;
 
   // Loads the SLAM state from a proto stream.
   virtual void LoadState(io::ProtoStreamReaderInterface* reader,
                          bool load_frozen_state) = 0;
-  virtual void LoadStateLandmark(io::ProtoStreamReaderInterface *reader,
-                           const std::string landmark_poses_file,
-                           bool load_frozen_state) = 0;
+
   virtual int num_trajectory_builders() const = 0;
 
   virtual mapping::PoseGraphInterface* pose_graph() = 0;

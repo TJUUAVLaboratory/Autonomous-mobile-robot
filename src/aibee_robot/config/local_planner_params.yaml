@@ -30,7 +30,7 @@ local_costmap:
    plugins:
       - {name: local_obstacles_laser, type: "costmap_2d::ObstacleLayer" }
       - {name: local_rplidar_laser,   type: "costmap_2d::ObstacleLayer" }
-      - {name: local_sonar_laser,     type: "costmap_2d::ObstacleLayer" }
+    #  - {name: local_sonar_laser,     type: "costmap_2d::ObstacleLayer" }
       - {name: local_inflation_layer, type: "costmap_2d::InflationLayer"}
 
    local_obstacles_laser:
@@ -41,7 +41,7 @@ local_costmap:
       obstacle_range: 3.5   ## local_costmap
       # track_unknown_space:
       observation_sources: scan
-      scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true, expected_update_rate: 0}
+      scan: {data_type: LaserScan, topic: /scan, sensor_frame: base_link, marking: true, clearing: true, expected_update_rate: 0}
 
    local_rplidar_laser:
       max_obstacle_height: 0.50
@@ -51,7 +51,7 @@ local_costmap:
       obstacle_range: 2.5   ## local_costmap
       # track_unknown_space:
       observation_sources: scan
-      scan: {data_type: LaserScan, topic: /singalScan0, marking: true, clearing: true, expected_update_rate: 0}
+      scan: {data_type: LaserScan, topic: /rplidar_point, marking: true, clearing: true, expected_update_rate: 0}
 
    local_sonar_laser:
       max_obstacle_height: 0.3
@@ -65,7 +65,7 @@ local_costmap:
 
 
    local_inflation_layer:
-      inflation_radius: 0.15
+      inflation_radius: 0.2
       ##robot_radius:   0.5     ## robot footprint 300mm
       
 
@@ -118,9 +118,9 @@ TrajectoryPlannerROS:
 
 # EBandPlannerROS
 EBandPlannerROS:
-   max_vel_lin: 0.2
-   max_vel_th: 0.2
-   max_acceleration: 0.1
+   max_vel_lin: 0.4
+   max_vel_th: 0.3
+   max_acceleration: 0.15
    max_translational_acceleration: 0.1
    mae_rotational_acceleration: 0.2
 

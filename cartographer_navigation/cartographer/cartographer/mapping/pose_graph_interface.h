@@ -74,7 +74,7 @@ class PoseGraphInterface {
   };
 
   struct TrajectoryData {
-    double gravity_constant = -9.8;
+    double gravity_constant = 9.8;
     std::array<double, 4> imu_calibration{{1., 0., 0., 0.}};
     common::optional<transform::Rigid3d> fixed_frame_origin_in_map;
   };
@@ -94,10 +94,6 @@ class PoseGraphInterface {
 
   // Returns data for all submaps.
   virtual MapById<SubmapId, SubmapData> GetAllSubmapData() const = 0;
-
-  // add by galyean, set and return local submap
-  virtual void SetLocalCurrentSubmap(SubmapData current_submap_) = 0;
-  virtual SubmapData GetLocalCurrentSubmap() const = 0;
 
   // Returns the global poses for all submaps.
   virtual MapById<SubmapId, SubmapPose> GetAllSubmapPoses() const = 0;
